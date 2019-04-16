@@ -48,7 +48,7 @@ public class GameScreen implements Screen {
 		//БГ
 		background = new Texture(Gdx.files.internal("Battleground1.png"));
 		//Игрок
-		hero = new Hero(new Vector2(150.0f,150.0f),new Vector2(100.0f,150.0f));
+		hero = new Hero(new Vector2(150.0f,150.0f),new Vector2(700.0f,00.0f));
 
 	}
 	@Override
@@ -60,6 +60,7 @@ public class GameScreen implements Screen {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		update(Time);
 		camera.position.set(hero.getCoordX(), hero.getCoordY()+350.0f, 0);
+		if(camera.position.x < 640.0f) camera.position.x = 640.0f;
 		camera.update();
 		
 		game.batch.setProjectionMatrix(camera.combined);

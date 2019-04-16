@@ -10,6 +10,7 @@ public class Entities {
 	
 	//В какую сторону направлена сущность
 	protected boolean sideView;  // true - вправо, false - влево
+	protected boolean isAttacking;
 	//Координаты сущности
 	protected float coordX;
 	protected float coordY;
@@ -17,6 +18,8 @@ public class Entities {
 	//Размер сущности
 	protected float sizeX;
 	protected float sizeY;
+	
+	protected float ATTACK_SPEED = 0.05f;
 	
 	//Текущий кадр
 	public TextureRegion currentFrame;
@@ -32,20 +35,30 @@ public class Entities {
 	protected static int STAY_FRAME_COL;   //С какой колонны начинать заполнение
 	protected static int STAY_FRAME_ROWS;  //Количество строк
 	protected static int STAY_FRAME_ROW;   //С какой строки
+	//Анимация покоя
+	protected Animation<TextureRegion> stayAnimation;
 	
 	// Количество спрайтов движения
 	protected static int MOVE_FRAME_COLS;
 	protected static int MOVE_FRAME_COL;
 	protected static int MOVE_FRAME_ROWS;
 	protected static int MOVE_FRAME_ROW;
-	
-	//Анимация покоя
-	protected Animation<TextureRegion> stayAnimation;
 	//Анимация движения
 	protected Animation<TextureRegion> moveAnimation;
 	
+	// Спрайты атаки
+	protected static int ATTACK1_FRAME_COLS;
+	protected static int ATTACK1_FRAME_COL;
+	protected static int ATTACK1_FRAME_ROWS;
+	protected static int ATTACK1_FRAME_ROW;
+	
+	protected float ATTACK1_DURATION = 0.10f;
+	//Анимация атаки1
+	protected Animation<TextureRegion> attack1Animation;
+	
 	protected TextureRegion[] stayFrames;
 	protected TextureRegion[] moveFrames;
+	protected TextureRegion[] attack1Frames;
 	
 	public void update(float delta) {
 	
