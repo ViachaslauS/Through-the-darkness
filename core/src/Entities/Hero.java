@@ -2,6 +2,7 @@ package Entities;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -10,7 +11,14 @@ import com.badlogic.gdx.math.Vector2;
 
 
 public class Hero  extends Entities{
-
+// ууу сука кек
+	private Animation<TextureRegion> teleportAnimation;
+	private TextureRegion[] teleportFrames;
+	private Texture skills;
+	private Sound shift;
+	Animation<TextureRegion> tempAnimation;
+	
+	
 	public Hero(Vector2 heroSize,Vector2 heroCoord) {
 		
 		setSize(heroSize);
@@ -60,33 +68,68 @@ public class Hero  extends Entities{
 		stayAnimation = new Animation<TextureRegion>(0.10f, stayFrames);
 		moveAnimation = new Animation<TextureRegion>(0.10f,moveFrames);
 		attack1Animation = new Animation<TextureRegion>(ATTACK_SPEED,attack1Frames);
-		currentFrame = stayAnimation.getKeyFrame(0.0f, true);
+		currentFrame = stayAnimation.getKeyFrame(0.10f, true);
+		
+		
+		
+		// Добавление блядской телепортации
+		shift = Gdx.audio.newSound(Gdx.files.internal("sprintSound.wav"));
+		skills = new Texture(Gdx.files.internal("dark_skills.png"));
+		TextureRegion[][] temp = TextureRegion.split(skills,skills.getWidth()/10,skills.getHeight()/10);
+		teleportFrames = new TextureRegion[10];
+		for(int i=0;i<10;i++) {
+			teleportFrames[i] = temp[1][i];
+		}
+		teleportAnimation = new Animation<TextureRegion>(0.05f,teleportFrames);
+		
 	}
 	
 	@Override
 	public void update(float delta) {
-		if((currentFrame == attack1Animation.getKeyFrames()[ATTACK1_FRAME_COLS*ATTACK1_FRAME_ROWS-1]) || Gdx.input.isKeyJustPressed(Keys.S)) {
+		if(coordX < 0)
+			coordX = 0;
+//		if((currentFrame == teleportAnimation.getKeyFrames()[ATTACK1_FRAME_COLS*ATTACK1_FRAME_ROWS-1]) || Gdx.input.isKeyJustPressed(Keys.S)) {
+//			ATTACK1_DURATION = 0.0f;
+//			isAttacking = false;
+//		}
+		if((currentFrame == teleportAnimation.getKeyFrames()[9]) || Gdx.input.isKeyJustPressed(Keys.S)) {
 			ATTACK1_DURATION = 0.0f;
 			isAttacking = false;
 		}
-			if(Gdx.input.isKeyJustPressed(Keys.F)) {
+		if(Gdx.input.isKeyJustPressed(Keys.SHIFT_LEFT)) {
 				isAttacking = true;
 			}
 			if(isAttacking)
 			{
-				currentFrame = attack1Animation.getKeyFrame(ATTACK1_DURATION, false);
+				currentFrame = teleportAnimation.getKeyFrame(ATTACK1_DURATION, false);
+				
+				if(currentFrame == teleportAnimation.getKeyFrames()[2])
+					shift.play(0.0f);
 				ATTACK1_DURATION+=Gdx.graphics.getDeltaTime();
-				if(sideView) {                                                                 //я хз ваще, но работает
-					if(!currentFrame.isFlipX())												   // крч поворот в сторону в кот. шли 
-						currentFrame.flip(false, false); 
-					else
+				if(sideView) {
+					if(currentFrame == teleportAnimation.getKeyFrames()[4] || currentFrame == teleportAnimation.getKeyFrames()[5] || currentFrame == teleportAnimation.getKeyFrames()[6])
+						coordX+= 200*Gdx.graphics.getDeltaTime();
+						//coordX+=1500*Gdx.graphics.getDeltaTime(); 							//я хз ваще, но работает
+					if(!currentFrame.isFlipX()) {											   // крч поворот в сторону в кот. шли 
+						currentFrame.flip(false, false);
+						
+					}
+					else {
 						currentFrame.flip(true, false);
+					}
 				}
 				else {
-					if(currentFrame.isFlipX())
+					if(currentFrame == teleportAnimation.getKeyFrames()[4] || currentFrame == teleportAnimation.getKeyFrames()[5] || currentFrame == teleportAnimation.getKeyFrames()[6])
+						coordX-= 200*Gdx.graphics.getDeltaTime();
+						//coordX-=1500*Gdx.graphics.getDeltaTime();
+					if(currentFrame.isFlipX()) {
+					
 						currentFrame.flip(false, false);
-					else
+					}
+					else {
+					
 						currentFrame.flip(true, false);
+					}
 				}	
 				return;
 			}
@@ -110,8 +153,6 @@ public class Hero  extends Entities{
 					if(!currentFrame.isFlipX())
 						currentFrame.flip(true, false);
 					coordX -= 500 * Gdx.graphics.getDeltaTime();
-					if(coordX <0)				 //При подходе к границе
-						 coordX = 0;
 					sideView = false;
 					
 					return;
