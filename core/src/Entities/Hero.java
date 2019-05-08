@@ -1,7 +1,10 @@
 package Entities;
 
+import java.io.Console;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -10,40 +13,55 @@ import com.badlogic.gdx.math.Vector2;
 
 
 
+/**
+ * @author Slava
+ * 
+ * {@link silentiumslava@gmail.com}
+ *
+ */
 public class Hero  extends Entities{
-// ууу сука кек
+	
+	public PlayerStats stats;
+	
 	private Animation<TextureRegion> teleportAnimation;
 	private TextureRegion[] teleportFrames;
 	private Texture skills;
 	private Sound shift;
-	Animation<TextureRegion> tempAnimation;
+	Animation<TextureRegion> currentAnimation;
+	Animation<TextureRegion>[] allAnimations;
+	public void picParam() {
+		//Общее количество спрайтов в листе
+				PIC_FRAME_COLS = 10;
+				PIC_FRAME_ROWS = 10;
+				//Количество спрайтов покоя
+				STAY_FRAME_COL = 0;
+				STAY_FRAME_COLS = 10;	
+				STAY_FRAME_ROW = 0;
+				STAY_FRAME_ROWS = 1;
+				//Количество спрайтов движения
+				MOVE_FRAME_COL = 0;
+				MOVE_FRAME_COLS = 10;
+				MOVE_FRAME_ROW = 2;
+				MOVE_FRAME_ROWS = 1;
+				//Количество спрайтов атаки1
+				ATTACK1_FRAME_COL = 0;
+				ATTACK1_FRAME_COLS = 10;
+				ATTACK1_FRAME_ROW = 3;
+				ATTACK1_FRAME_ROWS = 1;
+	}
 	
 	
 	public Hero(Vector2 heroSize,Vector2 heroCoord) {
-		
+		preferences = Gdx.app.getPreferences("herostats");
+		stats = new PlayerStats();
 		setSize(heroSize);
 		setCoord(heroCoord);
-		sideView = true; 
+		sideView = 1; 
 		isAttacking = false;
 		allSheets = new Texture(Gdx.files.internal("Hero.png"));
-		//Общее количество спрайтов в листе
-		PIC_FRAME_COLS = 10;
-		PIC_FRAME_ROWS = 10;
-		//Количество спрайтов покоя
-		STAY_FRAME_COL = 0;
-		STAY_FRAME_COLS = 10;	
-		STAY_FRAME_ROW = 0;
-		STAY_FRAME_ROWS = 1;
-		//Количество спрайтов движения
-		MOVE_FRAME_COL = 0;
-		MOVE_FRAME_COLS = 10;
-		MOVE_FRAME_ROW = 2;
-		MOVE_FRAME_ROWS = 1;
-		//Количество спрайтов атаки1
-		ATTACK1_FRAME_COL = 0;
-		ATTACK1_FRAME_COLS = 10;
-		ATTACK1_FRAME_ROW = 3;
-		ATTACK1_FRAME_ROWS = 1;
+		
+		picParam();
+		
 		//Заполнение собирателя всеми текстурам из листа
 		imageCollector = TextureRegion.split(allSheets,allSheets.getWidth()/PIC_FRAME_ROWS,allSheets.getHeight()/PIC_FRAME_COLS);
 		//Инициализация всех TextureRegion'ов 
@@ -61,16 +79,11 @@ public class Hero  extends Entities{
 			for(int j=0;j<MOVE_FRAME_COLS;j++)
 				moveFrames[index++] = imageCollector[i+MOVE_FRAME_ROW][j+MOVE_FRAME_COL];
 		index = 0;
-		for(int i=0; i<ATTACK1_FRAME_ROWS;i++)
-			for(int j=0;j<ATTACK1_FRAME_COLS;j++)
-				attack1Frames[index++] = imageCollector[i+ATTACK1_FRAME_ROW][j+ATTACK1_FRAME_COL];
 		//Инициализация переменных анимации
 		stayAnimation = new Animation<TextureRegion>(0.10f, stayFrames);
 		moveAnimation = new Animation<TextureRegion>(0.10f,moveFrames);
-		attack1Animation = new Animation<TextureRegion>(ATTACK_SPEED,attack1Frames);
+		attack1Animation = new Animation<TextureRegion>(ANIMATION_SPEED*(1-stats.ATKSPEED()),attack1Frames);
 		currentFrame = stayAnimation.getKeyFrame(0.10f, true);
-		
-		
 		
 		// Добавление блядской телепортации
 		shift = Gdx.audio.newSound(Gdx.files.internal("sprintSound.wav"));
@@ -78,106 +91,193 @@ public class Hero  extends Entities{
 		TextureRegion[][] temp = TextureRegion.split(skills,skills.getWidth()/10,skills.getHeight()/10);
 		teleportFrames = new TextureRegion[10];
 		for(int i=0;i<10;i++) {
-			teleportFrames[i] = temp[1][i];
+			teleportFrames[i] = temp[0][i];
+			attack1Frames[i] = temp[1][i];
 		}
-		teleportAnimation = new Animation<TextureRegion>(0.05f,teleportFrames);
+		teleportAnimation = new Animation<TextureRegion>(ANIMATION_SPEED*(1-stats.ATKSPEED()),teleportFrames);
+		
 		
 	}
+
 	
+	// -1 - Стоп
+	// 0 - Состояние покоя, простое движение		1 - Атака1	
+	// 2 - Телепорт									3 -  			
 	@Override
 	public void update(float delta) {
-		if(coordX < 0)
+		
+		 if(coordX < 0)
 			coordX = 0;
-//		if((currentFrame == teleportAnimation.getKeyFrames()[ATTACK1_FRAME_COLS*ATTACK1_FRAME_ROWS-1]) || Gdx.input.isKeyJustPressed(Keys.S)) {
-//			ATTACK1_DURATION = 0.0f;
-//			isAttacking = false;
-//		}
-		if((currentFrame == teleportAnimation.getKeyFrames()[9]) || Gdx.input.isKeyJustPressed(Keys.S)) {
-			ATTACK1_DURATION = 0.0f;
-			isAttacking = false;
-		}
-		if(Gdx.input.isKeyJustPressed(Keys.SHIFT_LEFT)) {
-				isAttacking = true;
-			}
-			if(isAttacking)
-			{
-				currentFrame = teleportAnimation.getKeyFrame(ATTACK1_DURATION, false);
+		 if(currentAction!=0) {
+			 if(checkStop())
+				 return;
+			 if(switchAction())
+				 return;
+		 }
+		 checkKeys();
+		 if(Gdx.input.isKeyPressed(Keys.D) || Gdx.input.isKeyPressed(Keys.RIGHT)) {   //движение вправо
 				
-				if(currentFrame == teleportAnimation.getKeyFrames()[2])
-					shift.play(0.0f);
-				ATTACK1_DURATION+=Gdx.graphics.getDeltaTime();
-				if(sideView) {
-					if(currentFrame == teleportAnimation.getKeyFrames()[4] || currentFrame == teleportAnimation.getKeyFrames()[5] || currentFrame == teleportAnimation.getKeyFrames()[6])
-						coordX+= 200*Gdx.graphics.getDeltaTime();
-						//coordX+=1500*Gdx.graphics.getDeltaTime(); 							//я хз ваще, но работает
-					if(!currentFrame.isFlipX()) {											   // крч поворот в сторону в кот. шли 
-						currentFrame.flip(false, false);
-						
-					}
-					else {
-						currentFrame.flip(true, false);
-					}
+				currentFrame = moveAnimation.getKeyFrame(delta, true);
+				
+				if(currentFrame.isFlipX()) {
+					currentFrame.flip(true, false);
 				}
-				else {
-					if(currentFrame == teleportAnimation.getKeyFrames()[4] || currentFrame == teleportAnimation.getKeyFrames()[5] || currentFrame == teleportAnimation.getKeyFrames()[6])
-						coordX-= 200*Gdx.graphics.getDeltaTime();
-						//coordX-=1500*Gdx.graphics.getDeltaTime();
-					if(currentFrame.isFlipX()) {
-					
-						currentFrame.flip(false, false);
-					}
-					else {
-					
-						currentFrame.flip(true, false);
-					}
-				}	
+				coordX += 500 * Gdx.graphics.getDeltaTime();
+				sideView = 1;
+				return;	
+			}
+			if(Gdx.input.isKeyPressed(Keys.A) || Gdx.input.isKeyPressed(Keys.LEFT)) {    //движение влево
+				
+				currentFrame = moveAnimation.getKeyFrame(delta, true);
+				
+				if(!currentFrame.isFlipX())
+					currentFrame.flip(true, false);
+				coordX -= 500 * Gdx.graphics.getDeltaTime();
+				sideView = -1;
+				
 				return;
 			}
-			else
-			{
-				if(Gdx.input.isKeyPressed(Keys.D) || Gdx.input.isKeyPressed(Keys.RIGHT)) {   //движение вправо
-					
-					currentFrame = moveAnimation.getKeyFrame(delta, true);
-					
-					if(currentFrame.isFlipX()) {
-						currentFrame.flip(true, false);
-					}
-					coordX += 500 * Gdx.graphics.getDeltaTime();
-					sideView = true;
-					return;	
-				}
-				if(Gdx.input.isKeyPressed(Keys.A) || Gdx.input.isKeyPressed(Keys.LEFT)) {    //движение влево
-					
-					currentFrame = moveAnimation.getKeyFrame(delta, true);
-					
-					if(!currentFrame.isFlipX())
-						currentFrame.flip(true, false);
-					coordX -= 500 * Gdx.graphics.getDeltaTime();
-					sideView = false;
-					
-					return;
-				}
-			}
-			currentFrame = stayAnimation.getKeyFrame(delta, true);							//выбор текущего кадра -- в самый низ
-			if(sideView) {                                                                 //я хз ваще, но работает
-				if(!currentFrame.isFlipX())												   // крч поворот в сторону в кот. шли 
-					currentFrame.flip(false, false); 
-				else
-					currentFrame.flip(true, false);
+			currentFrame = stayAnimation.getKeyFrame(delta,true);
+			frameFlip();
+			
+	}
+			
+	public boolean switchAction() {
+		switch(currentAction) {
+		case 1:attack1();   	break;
+		case 2:teleport();	    break;
+		case 3:   break;
+		default: return false;
+		}
+		return true;
+	}
+	/**
+	 *  Проверка на нажатия кнопок.
+	 *  Сюда добавляются все новые кнопки
+	 */
+	public void checkKeys() { 	//Сюда добавлять новые кнопки
+		
+		//Удар1 
+		if(Gdx.input.isKeyJustPressed(Keys.F)) {
+			currentAction = 1;
+			currentAnimation = attack1Animation;
+			attack1();
+			return;
+		}
+		//Рывок
+		if(Gdx.input.isKeyJustPressed(Keys.SHIFT_LEFT)) {
+			currentAction = 2;
+			currentAnimation = teleportAnimation;
+			teleport();
+			return;
+		}
+	}
+	/** Проверяет нажата ли S(клавиша остановки), если да то сбрасывает анимацию
+	 * @return
+	 * Если клавиша была нажата то true
+	 */
+	private boolean checkStop() {
+		if(Gdx.input.isKeyPressed(Keys.S)) {
+			reset();
+			return true;
+		}
+		return false;	
+	}
+	/**
+	 * обновляет кадр анимации
+	 * @return
+	 * возвращает true если анимация закончена, при этом производит сброс
+	 */
+	public boolean refresh() { 
+		currentFrame = currentAnimation.getKeyFrame(CURRENT_DURATION, false);
+		if(currentFrame == currentAnimation.getKeyFrames()[currentAnimation.getKeyFrames().length-1]) {
+			CURRENT_DURATION = 0.0f;
+			reset();
+			return true;
+		}
+		CURRENT_DURATION+=Gdx.graphics.getDeltaTime();	
+		return false;
+	}
+	public void attack1() {
+		if(refresh())
+			return;
+		if(currentFrame == currentAnimation.getKeyFrames()[4] || currentFrame == currentAnimation.getKeyFrames()[5] || currentFrame == currentAnimation.getKeyFrames()[6])
+			coordX+=200*Gdx.graphics.getDeltaTime()*sideView;
+		frameFlip();
+		return;
+		
+	}
+	public void teleport() {
+		if(refresh())
+			return;
+		if(currentFrame == currentAnimation.getKeyFrames()[4] || currentFrame == currentAnimation.getKeyFrames()[5] || currentFrame == currentAnimation.getKeyFrames()[6]) {
+			coordX+=1000*Gdx.graphics.getDeltaTime()*sideView/(1-stats.ATKSPEED());
+			System.out.println(coordX);
+		}
+		frameFlip();
+		return;
+	}
+	/**
+	 * Сбрасывает анимацию и кадр в состояние покоя
+	 */
+	public void reset() {
+		currentAnimation = stayAnimation;
+		currentFrame = stayAnimation.getKeyFrames()[0];
+		currentAction = 0;
+	}
+	/**
+	 *  Даже боги не знают как работает этот метод, но благодаря нему все делается в нужную сторону
+	 */
+	public void frameFlip() {
+		if(sideView == 1)
+		{
+			if(!currentFrame.isFlipX()) {											    
+				currentFrame.flip(false, false);	
 			}
 			else {
-				if(currentFrame.isFlipX())
-					currentFrame.flip(false, false);
-				else
-					currentFrame.flip(true, false);
+				currentFrame.flip(true, false);
 			}
-			
 		}
+		else {
+			if(currentFrame.isFlipX()) {
+			
+				currentFrame.flip(false, false);
+			}
+			else {
+			
+				currentFrame.flip(true, false);
+			}
+		}
+	}
 	@Override
 	public void dispose() {
 		allSheets.dispose();
 		stayFrames = null;
 		imageCollector = null;
 		stayAnimation = null;
+	}
+	@Override
+	protected void loadPreferences() {
+		HITPOINT = preferences.getFloat("HITPOINT", 100.0f);
+		DAMAGE = preferences.getFloat("DAMAGE", 1.0f);
+		ARMOR = preferences.getFloat("ARMOR", 0.0f);
+		MANA = preferences.getFloat("MANA", 100.0f);
+		
+	}
+	@Override
+	public void resetPreferences() {
+		preferences.clear();
+		HITPOINT = preferences.getFloat("HITPOINT", 100.0f);
+		DAMAGE = preferences.getFloat("DAMAGE", 1.0f);
+		ARMOR = preferences.getFloat("ARMOR", 0.0f);
+		MANA = preferences.getFloat("MANA", 100.0f);
+	}
+	/* (non-Javadoc)
+	 * @see Entities.Entities#getDamage()
+	 */
+	@Override
+	public float getDamage() {
+		return DAMAGE;
+		
 	}
 }

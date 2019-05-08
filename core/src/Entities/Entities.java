@@ -1,5 +1,6 @@
 package Entities;
 
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -8,8 +9,30 @@ import com.badlogic.gdx.math.Vector3;
 
 public class Entities {
 	
+	protected float HITPOINT;
+	public float getHITPOINT() {
+		return HITPOINT;
+	}
+
+	public float getMANA() {
+		return MANA;
+	}
+
+	public float getARMOR() {
+		return ARMOR;
+	}
+
+	public float getDAMAGE() {
+		return DAMAGE;
+	}
+	protected float MANA;
+	protected float ARMOR;
+	protected float DAMAGE;
+	
+	
+	Preferences preferences;
 	//В какую сторону направлена сущность
-	protected boolean sideView;  // true - вправо, false - влево
+	protected int sideView;  // 1 - вправо, -1 - влево
 	protected boolean isAttacking;
 	//Координаты сущности
 	protected float coordX;
@@ -19,7 +42,7 @@ public class Entities {
 	protected float sizeX;
 	protected float sizeY;
 	
-	protected float ATTACK_SPEED = 0.05f;
+	protected float ANIMATION_SPEED = 0.1f;
 	
 	//Текущий кадр
 	public TextureRegion currentFrame;
@@ -52,13 +75,21 @@ public class Entities {
 	protected static int ATTACK1_FRAME_ROWS;
 	protected static int ATTACK1_FRAME_ROW;
 	
-	protected float ATTACK1_DURATION = 0.10f;
+	protected float CURRENT_DURATION = 0.0f;
 	//Анимация атаки1
 	protected Animation<TextureRegion> attack1Animation;
 	
 	protected TextureRegion[] stayFrames;
 	protected TextureRegion[] moveFrames;
 	protected TextureRegion[] attack1Frames;
+	
+	/**
+	 *  это набор вариантов анимаций
+	 *  -1 - Стоп/
+	 *	0 - Состояние покоя, простое движение/		1 - Атака1/	
+	 *	2 - Телепорт/								3 -  			
+	 */
+	protected int currentAction = 0;
 	
 	public void update(float delta) {
 	
@@ -116,4 +147,33 @@ public class Entities {
 		this.sizeY = sizeY;
 	}
 
+	/** Получить урон
+
+	 * @param damage параметр, соответстующий наносимому урону
+	 */
+	public void giveDamage(float damage) {
+		HITPOINT-=(damage*((ARMOR+1)/100));
+	}
+	/**
+	 * @return Урон сущности
+	 */
+	public float getDamage() {
+		return DAMAGE;
+	}
+	public float getHitPoints() {
+		return HITPOINT;
+	}
+	public void resetPreferences() {
+		preferences.clear();
+		preferences.putFloat("HITPOINT", 100.0f);
+		preferences.putFloat("ARMOR", 0.0f);
+		preferences.putFloat("MANA", 100.0f);
+		preferences.putFloat("DAMAGE", 1.0f);
+	}
+	protected void loadPreferences() {
+		HITPOINT = preferences.getFloat("HITPOINT", 100.0f);
+		DAMAGE = preferences.getFloat("DAMAGE", 1.0f);
+		ARMOR = preferences.getFloat("ARMOR", 0.0f);
+		MANA = preferences.getFloat("MANA", 100.0f);
+	}
 }

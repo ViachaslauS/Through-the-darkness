@@ -1,5 +1,7 @@
 package com.mygdx.game;
 
+import java.util.function.ToIntFunction;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
@@ -13,6 +15,7 @@ import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import Entities.Hero;
+import Levels.Level1;
 
 public class GameScreen implements Screen {
 	
@@ -29,6 +32,9 @@ public class GameScreen implements Screen {
 	Viewport viewportHUD;
 	
 	Hero hero;								//Главный герой
+	
+	private int mapCounter = 0;
+	private float centreMapCoord = 0.0f;
 	
 	private float Time = 0.0f;
 	public GameScreen(final RPG game_) {
@@ -50,11 +56,13 @@ public class GameScreen implements Screen {
 		//Игрок
 		hero = new Hero(new Vector2(150.0f,150.0f),new Vector2(700.0f,00.0f));
 
+		
+		//level = new Level1();
 	}
 	@Override
 	public void render(float delta) {
 		
-		
+		//level.render(camera);
 		Time+=delta;
 		Gdx.gl.glClearColor(0, 0.1f, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -67,7 +75,9 @@ public class GameScreen implements Screen {
 		
 		game.batch.begin();
 		
-		game.batch.draw(background, 0, 0,1280,720);
+		backgroundDraw();
+		
+		
 		game.batch.draw(hero.currentFrame, hero.getCoordX(), hero.getCoordY()+150, hero.getSizeX(), hero.getSizeY());
 
 		
@@ -91,8 +101,30 @@ public class GameScreen implements Screen {
 		game.batch.end();
 	}
 	
+	
+	private void backgroundDraw() {
+		
+		float coord = hero.getCoordX();
+		if(coord/1280 > mapCounter)
+		{
+			mapCounter++;
+			centreMapCoord+=1280;
+		}
+		if(coord/1280 < mapCounter) {
+			mapCounter--;
+			centreMapCoord-=1280;
+		}
+		game.batch.draw(background, centreMapCoord-1280, 0,1280,720);
+		game.batch.draw(background, centreMapCoord, 0,1280,720);
+		game.batch.draw(background, centreMapCoord+1280, 0,1280,720);
+	}
+	
 	private void update(float delta)
 	{
+		if(hero.getHITPOINT() <= 0.0f) {
+			//тут смерть по-красивому
+			
+		}
 		hero.update(delta);
 		
 	}
