@@ -7,8 +7,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public class RPG  extends Game{
 	
-	SpriteBatch batch;
-	BitmapFont font;    //רנטפע
+	public SpriteBatch batch;
+	public BitmapFont font;    //font
 
 	@Override
 	public void create() {
@@ -16,7 +16,7 @@ public class RPG  extends Game{
 		
 		batch = new SpriteBatch();
 		font = new BitmapFont(Gdx.files.internal("menu_font.fnt"),Gdx.files.internal("menu_font.png"),false);
-		this.setScreen(new MainMenuScreen(this));
+		this.setScreen(new LevelLoading(this,new MainMenuScreen(this)));
 	}
 	@Override
 	public void render() {

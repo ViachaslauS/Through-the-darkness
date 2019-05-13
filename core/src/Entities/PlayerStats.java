@@ -16,11 +16,11 @@ public class PlayerStats {
 	public PlayerStats() {
 		Preferences pref = Gdx.app.getPreferences("herostats2");
 		
-		pref.clear(); // Убрать!!!
+		//pref.clear(); // REMOVE!!!
 		experience = pref.getFloat("Exp",0.0f);
 		level = pref.getInteger("Level", 1);
 		power = pref.getFloat("Power", 1.0f);
-		agility = pref.getFloat("Agility", 50.0f);
+		agility = pref.getFloat("Agility", 1.0f);
 		intelligency = pref.getFloat("Intel",1.0f);
 		freestats = pref.getInteger("FreeStatements", 0);
 	}
@@ -44,7 +44,7 @@ public class PlayerStats {
 	public float SPEED() {
 		return (float) (agility*1.005);
 	}
-	public float ATKSPEED() {		// Не трогать!
+	public float ATKSPEED() {		// Don't touch!
 		return (float) (agility*0.007<0.75 ? agility*0.007 : 0.75);
 	}
 	
