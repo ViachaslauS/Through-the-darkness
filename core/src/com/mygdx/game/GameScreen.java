@@ -22,16 +22,16 @@ public class GameScreen implements Screen {
 	final RPG game;
 	
 	SpriteBatch batch;
-	BitmapFont font;                        //Шрифт
+	BitmapFont font;                        //пїЅпїЅпїЅпїЅпїЅ
 	Texture background;
 	
 	OrthographicCamera camera;
 	Viewport viewport;
 	
-	OrthographicCamera cameraHUD;			//Камера UI
+	OrthographicCamera cameraHUD;			//пїЅпїЅпїЅпїЅпїЅпїЅ UI
 	Viewport viewportHUD;
 	
-	Hero hero;								//Главный герой
+	Hero hero;								//пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 	
 	private int mapCounter = 0;
 	private float centreMapCoord = 0.0f;
@@ -41,19 +41,19 @@ public class GameScreen implements Screen {
 		game = game_;
 		batch = new SpriteBatch();
 		
-		// Камера
+		// пїЅпїЅпїЅпїЅпїЅпїЅ
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, 1280, 720);
 		viewport = new FillViewport(1280, 720, camera);
 		
-		//Камера HUD
+		//пїЅпїЅпїЅпїЅпїЅпїЅ HUD
 		cameraHUD = new OrthographicCamera();		
 		cameraHUD.setToOrtho(false, 1280, 720);
 		viewportHUD = new FillViewport(1280, 720, cameraHUD);
 		
-		//БГ
+		//пїЅпїЅ
 		background = new Texture(Gdx.files.internal("Battleground1.png"));
-		//Игрок
+		//пїЅпїЅпїЅпїЅпїЅ
 		hero = new Hero(new Vector2(150.0f,150.0f),new Vector2(700.0f,00.0f));
 
 		
@@ -97,7 +97,7 @@ public class GameScreen implements Screen {
 		game.batch.setProjectionMatrix(cameraHUD.combined);
 		game.batch.begin();
 		game.font.draw(game.batch, "Suka", 100  , 100);
-		// Элементы интерфейса
+		// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 		game.batch.end();
 	}
 	
@@ -122,7 +122,7 @@ public class GameScreen implements Screen {
 	private void update(float delta)
 	{
 		if(hero.getHITPOINT() <= 0.0f) {
-			//тут смерть по-красивому
+			//пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 			
 		}
 		hero.update(delta);
