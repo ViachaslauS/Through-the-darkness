@@ -5,18 +5,20 @@ import java.io.Console;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.Preferences;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.World;
 
 
 
 /**
  * @author Slava
- * 
- * {@link silentiumslava@gmail.com}
+ *<br> 
+ *{@link silentiumslava@gmail.com}
  *
  */
 public class Hero  extends Entities{
@@ -30,20 +32,20 @@ public class Hero  extends Entities{
 	Animation<TextureRegion> currentAnimation;
 	Animation<TextureRegion>[] allAnimations;
 	public void picParam() {
-		//Общее количество спрайтов в листе
+		//Count of sprites in image
 				PIC_FRAME_COLS = 10;
 				PIC_FRAME_ROWS = 10;
-				//Количество спрайтов покоя
+				//count idle sprites
 				STAY_FRAME_COL = 0;
 				STAY_FRAME_COLS = 10;	
 				STAY_FRAME_ROW = 0;
 				STAY_FRAME_ROWS = 1;
-				//Количество спрайтов движения
+				//count move sprites
 				MOVE_FRAME_COL = 0;
 				MOVE_FRAME_COLS = 10;
 				MOVE_FRAME_ROW = 2;
 				MOVE_FRAME_ROWS = 1;
-				//Количество спрайтов атаки1
+				//count attack1 sprites
 				ATTACK1_FRAME_COL = 0;
 				ATTACK1_FRAME_COLS = 10;
 				ATTACK1_FRAME_ROW = 3;
@@ -51,43 +53,44 @@ public class Hero  extends Entities{
 	}
 	
 	
-	public Hero(Vector2 heroSize,Vector2 heroCoord) {
+	public Hero(Vector2 heroSize,Vector2 heroCoord,AssetManager loader) {
 		preferences = Gdx.app.getPreferences("herostats");
+		manager = loader;
 		stats = new PlayerStats();
 		setSize(heroSize);
 		setCoord(heroCoord);
 		sideView = 1; 
 		isAttacking = false;
-		allSheets = new Texture(Gdx.files.internal("Hero.png"));
+		allSheets = manager.get("Hero.png",Texture.class);
 		
 		picParam();
 		
-		//Заполнение собирателя всеми текстурам из листа
+		//include to collector all sprites from picture
 		imageCollector = TextureRegion.split(allSheets,allSheets.getWidth()/PIC_FRAME_ROWS,allSheets.getHeight()/PIC_FRAME_COLS);
-		//Инициализация всех TextureRegion'ов 
+		//initialize TextureRegions
 		stayFrames = new TextureRegion[STAY_FRAME_COLS*STAY_FRAME_ROWS];
 		moveFrames = new TextureRegion[MOVE_FRAME_COLS*MOVE_FRAME_ROWS];
 		attack1Frames = new TextureRegion[ATTACK1_FRAME_COLS*ATTACK1_FRAME_ROWS];
-		//Заполнение TextureRegion'ов спрайтами
+		//include to TextureRegions sprites
 		int index = 0;
-		for(int i=0;i<STAY_FRAME_ROWS;i++)  //Заполнение покоя
+		for(int i=0;i<STAY_FRAME_ROWS;i++)  
 			for(int j=0;j<STAY_FRAME_COLS;j++) {
 				stayFrames[index++] = imageCollector[i+STAY_FRAME_ROW][j+STAY_FRAME_COL];
 			}
 		index = 0;
-		for(int i=0;i<MOVE_FRAME_ROWS;i++)  //Заполнение движения
+		for(int i=0;i<MOVE_FRAME_ROWS;i++)  
 			for(int j=0;j<MOVE_FRAME_COLS;j++)
 				moveFrames[index++] = imageCollector[i+MOVE_FRAME_ROW][j+MOVE_FRAME_COL];
 		index = 0;
-		//Инициализация переменных анимации
+		//Initialize of animations
 		stayAnimation = new Animation<TextureRegion>(0.10f, stayFrames);
 		moveAnimation = new Animation<TextureRegion>(0.10f,moveFrames);
 		attack1Animation = new Animation<TextureRegion>(ANIMATION_SPEED*(1-stats.ATKSPEED()),attack1Frames);
 		currentFrame = stayAnimation.getKeyFrame(0.10f, true);
 		
-		// Добавление блядской телепортации
-		shift = Gdx.audio.newSound(Gdx.files.internal("sprintSound.wav"));
-		skills = new Texture(Gdx.files.internal("dark_skills.png"));
+		// Add fucking teleport
+		shift = manager.get("sprintSound.wav",Sound.class)	 ;
+		skills = manager.get("dark_skills.png",Texture.class);
 		TextureRegion[][] temp = TextureRegion.split(skills,skills.getWidth()/10,skills.getHeight()/10);
 		teleportFrames = new TextureRegion[10];
 		for(int i=0;i<10;i++) {
@@ -99,12 +102,10 @@ public class Hero  extends Entities{
 		
 	}
 
-	
-	// -1 - Стоп
-	// 0 - Состояние покоя, простое движение		1 - Атака1	
-	// 2 - Телепорт									3 -  			
 	@Override
 	public void update(float delta) {
+		
+		updatePhysic();
 		
 		 if(coordX < 0)
 			coordX = 0;
@@ -114,25 +115,28 @@ public class Hero  extends Entities{
 			 if(switchAction())
 				 return;
 		 }
-		 checkKeys();
-		 if(Gdx.input.isKeyPressed(Keys.D) || Gdx.input.isKeyPressed(Keys.RIGHT)) {   //движение вправо
+		 else
+			 checkKeys();
+		 if(Gdx.input.isKeyPressed(Keys.D) || Gdx.input.isKeyPressed(Keys.RIGHT)) {   //move right
 				
 				currentFrame = moveAnimation.getKeyFrame(delta, true);
 				
 				if(currentFrame.isFlipX()) {
 					currentFrame.flip(true, false);
 				}
-				coordX += 500 * Gdx.graphics.getDeltaTime();
+				//coordX += 500 * Gdx.graphics.getDeltaTime();
+				move(500);
 				sideView = 1;
 				return;	
 			}
-			if(Gdx.input.isKeyPressed(Keys.A) || Gdx.input.isKeyPressed(Keys.LEFT)) {    //движение влево
+			if(Gdx.input.isKeyPressed(Keys.A) || Gdx.input.isKeyPressed(Keys.LEFT)) {    //move left
 				
 				currentFrame = moveAnimation.getKeyFrame(delta, true);
 				
 				if(!currentFrame.isFlipX())
 					currentFrame.flip(true, false);
-				coordX -= 500 * Gdx.graphics.getDeltaTime();
+				//coordX -= 500 * Gdx.graphics.getDeltaTime();
+				move(-500);
 				sideView = -1;
 				
 				return;
@@ -146,35 +150,43 @@ public class Hero  extends Entities{
 		switch(currentAction) {
 		case 1:attack1();   	break;
 		case 2:teleport();	    break;
-		case 3:   break;
+		case 3:jump();		    break;
 		default: return false;
 		}
 		return true;
 	}
+
+
 	/**
-	 *  Проверка на нажатия кнопок.
-	 *  Сюда добавляются все новые кнопки
+	 *  Check pressed buttons.<br>
+	 *  Here need to add new actions with buttons
 	 */
-	public void checkKeys() { 	//Сюда добавлять новые кнопки
+	public void checkKeys() { 	//Here including new button
 		
-		//Удар1 
+		//Attack1
 		if(Gdx.input.isKeyJustPressed(Keys.F)) {
 			currentAction = 1;
 			currentAnimation = attack1Animation;
 			attack1();
 			return;
 		}
-		//Рывок
+		//teleport
 		if(Gdx.input.isKeyJustPressed(Keys.SHIFT_LEFT)) {
 			currentAction = 2;
 			currentAnimation = teleportAnimation;
 			teleport();
 			return;
 		}
+		//jump
+		if(Gdx.input.isKeyJustPressed(Keys.UP)) {
+			currentAction = 3;
+			currentAnimation = stayAnimation;
+			jump();
+		}
 	}
-	/** Проверяет нажата ли S(клавиша остановки), если да то сбрасывает анимацию
+	/** Check, was li pressed S button
 	 * @return
-	 * Если клавиша была нажата то true
+	 * If button was pressed then true
 	 */
 	private boolean checkStop() {
 		if(Gdx.input.isKeyPressed(Keys.S)) {
@@ -184,9 +196,9 @@ public class Hero  extends Entities{
 		return false;	
 	}
 	/**
-	 * обновляет кадр анимации
+	 * update animation frame
 	 * @return
-	 * возвращает true если анимация закончена, при этом производит сброс
+	 * return true if animation was ended, and use reset()
 	 */
 	public boolean refresh() { 
 		currentFrame = currentAnimation.getKeyFrame(CURRENT_DURATION, false);
@@ -202,7 +214,8 @@ public class Hero  extends Entities{
 		if(refresh())
 			return;
 		if(currentFrame == currentAnimation.getKeyFrames()[4] || currentFrame == currentAnimation.getKeyFrames()[5] || currentFrame == currentAnimation.getKeyFrames()[6])
-			coordX+=200*Gdx.graphics.getDeltaTime()*sideView;
+			//coordX+=200*Gdx.graphics.getDeltaTime()*sideView;
+			move(200*sideView);
 		frameFlip();
 		return;
 		
@@ -211,22 +224,37 @@ public class Hero  extends Entities{
 		if(refresh())
 			return;
 		if(currentFrame == currentAnimation.getKeyFrames()[4] || currentFrame == currentAnimation.getKeyFrames()[5] || currentFrame == currentAnimation.getKeyFrames()[6]) {
-			coordX+=1000*Gdx.graphics.getDeltaTime()*sideView/(1-stats.ATKSPEED());
-			System.out.println(coordX);
+			//coordX+=1000*Gdx.graphics.getDeltaTime()*sideView/(1-stats.ATKSPEED());
+			move(1000*sideView/(1-stats.ATKSPEED()));
+			Gdx.app.log("Player coord", String.valueOf(coordX));
 		}
 		frameFlip();
 		return;
 	}
+	private boolean isJump = false;
+	private void jump() {
+		if(isJump) {
+			if(isEntitieGrounded()) {
+				isJump = false;
+				reset();
+			}
+			return;
+		}
+		if(isEntitieGrounded()) {
+			isJump = true;
+			entitieBox.applyLinearImpulse(new Vector2(0,1100), new Vector2(coordX,coordY), true);
+		}
+	}
 	/**
-	 * Сбрасывает анимацию и кадр в состояние покоя
+	 * reset current animation and action
 	 */
 	public void reset() {
 		currentAnimation = stayAnimation;
 		currentFrame = stayAnimation.getKeyFrames()[0];
 		currentAction = 0;
 	}
-	/**
-	 *  Даже боги не знают как работает этот метод, но благодаря нему все делается в нужную сторону
+	/** 
+	 *  I don't know what do this method, but his work
 	 */
 	public void frameFlip() {
 		if(sideView == 1)
@@ -280,4 +308,7 @@ public class Hero  extends Entities{
 		return DAMAGE;
 		
 	}
+
+	
+	
 }

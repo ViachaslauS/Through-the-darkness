@@ -1,11 +1,29 @@
 package Entities;
 
+import java.util.List;
+
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.physics.box2d.WorldManifold;
+import com.badlogic.gdx.utils.Array;
+
+import Engine.RPGWorld;
+
+import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.physics.box2d.CircleShape;
+import com.badlogic.gdx.physics.box2d.Contact;
+import com.badlogic.gdx.physics.box2d.Fixture;
+import com.badlogic.gdx.physics.box2d.MassData;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
 
 public class Entities {
 	
@@ -29,54 +47,68 @@ public class Entities {
 	protected float ARMOR;
 	protected float DAMAGE;
 	
+	protected Body body;
 	
-	Preferences preferences;
-	//В какую сторону направлена сущность
-	protected int sideView;  // 1 - вправо, -1 - влево
+	
+	protected AssetManager manager;
+	
+	protected Preferences preferences;
+	
+	/**
+	 *  side which sees entities
+	 *   <br>
+	 *   1 - right
+	 *   <br>
+	 *   2 - left
+	 */
+	protected int sideView;  
 	protected boolean isAttacking;
-	//Координаты сущности
+	//Coord of Entities
 	protected float coordX;
 	protected float coordY;
 	protected float coordZ;
-	//Размер сущности
+	//Size of Entities
 	protected float sizeX;
 	protected float sizeY;
 	
 	protected float ANIMATION_SPEED = 0.1f;
 	
-	//Текущий кадр
+	//current Frame
 	public TextureRegion currentFrame;
-	//Все спрайты из 1 листа
+	
+	/**
+	 *  All sprites from 1 picture
+	 */
 	protected Texture allSheets;
-	//Общее количество спрайтов в картинке
+	//count of sprites in pic
 	protected static int PIC_FRAME_COLS;
 	protected static int PIC_FRAME_ROWS;
-	TextureRegion[][] imageCollector;
+	protected TextureRegion[][] imageCollector;
 	
-	// Количество необходимых спрайтов покоя в картинке
-	protected static int STAY_FRAME_COLS;  //Количество колонн
-	protected static int STAY_FRAME_COL;   //С какой колонны начинать заполнение
-	protected static int STAY_FRAME_ROWS;  //Количество строк
-	protected static int STAY_FRAME_ROW;   //С какой строки
-	//Анимация покоя
+	// count of needed sprites from pic
+	protected static int STAY_FRAME_COLS;  //column
+	protected static int STAY_FRAME_COL;   //from which column
+	protected static int STAY_FRAME_ROWS;  //row
+	protected static int STAY_FRAME_ROW;   //from which row
+	//Idle Animtaion
 	protected Animation<TextureRegion> stayAnimation;
 	
-	// Количество спрайтов движения
+	//Count mount sprites
 	protected static int MOVE_FRAME_COLS;
 	protected static int MOVE_FRAME_COL;
 	protected static int MOVE_FRAME_ROWS;
 	protected static int MOVE_FRAME_ROW;
-	//Анимация движения
+	//move Animation
 	protected Animation<TextureRegion> moveAnimation;
 	
-	// Спрайты атаки
+	//Attack sprites
 	protected static int ATTACK1_FRAME_COLS;
 	protected static int ATTACK1_FRAME_COL;
 	protected static int ATTACK1_FRAME_ROWS;
 	protected static int ATTACK1_FRAME_ROW;
 	
 	protected float CURRENT_DURATION = 0.0f;
-	//Анимация атаки1
+	//Animation attack1
 	protected Animation<TextureRegion> attack1Animation;
 	
 	protected TextureRegion[] stayFrames;
@@ -84,10 +116,15 @@ public class Entities {
 	protected TextureRegion[] attack1Frames;
 	
 	/**
-	 *  это набор вариантов анимаций
-	 *  -1 - Стоп/
-	 *	0 - Состояние покоя, простое движение/		1 - Атака1/	
-	 *	2 - Телепорт/								3 -  			
+	 *  Variants of actions:
+	 *  <br>
+	 *	0 - idle, or simple move
+	 *  <br>
+	 *  1 - Attack1	
+	 *  <br>
+	 *	2 - Teleport	
+	 *  <br>
+	 *  3 - Jump					 			
 	 */
 	protected int currentAction = 0;
 	
@@ -147,15 +184,15 @@ public class Entities {
 		this.sizeY = sizeY;
 	}
 
-	/** Получить урон
-
-	 * @param damage параметр, соответстующий наносимому урону
+	/** Get Damage
+		(descrease HITPOINT of entities)
+	 * @param damage
 	 */
 	public void giveDamage(float damage) {
 		HITPOINT-=(damage*((ARMOR+1)/100));
 	}
 	/**
-	 * @return Урон сущности
+	 * @return Damage of Entities
 	 */
 	public float getDamage() {
 		return DAMAGE;
@@ -175,5 +212,120 @@ public class Entities {
 		DAMAGE = preferences.getFloat("DAMAGE", 1.0f);
 		ARMOR = preferences.getFloat("ARMOR", 0.0f);
 		MANA = preferences.getFloat("MANA", 100.0f);
+	}
+	
+	protected Body entitieBox;
+	protected Fixture physicsFixture;
+	protected Fixture sensorFixture;
+	protected RPGWorld rpgWorld;
+	/**
+	 * Set body for entitie
+	 * @param world from the level
+	 */
+	public void setBody(RPGWorld rpgWorld) {
+		this.rpgWorld = rpgWorld;
+		BodyDef bodyDef = new BodyDef();
+		bodyDef.type = BodyType.DynamicBody;
+		
+		entitieBox = rpgWorld.world.createBody(bodyDef);
+		bodyInitialize();
+	}
+	/**
+	 *  Initializing entities body. <br>
+	 *  Creating polygons and adding them to Body
+	 */
+	protected void bodyInitialize() {
+		
+		CircleShape circlePolygon = new CircleShape();
+		circlePolygon.setRadius(75);
+		circlePolygon.setPosition(new Vector2(75,coordY-75));
+		//Gdx.app.log("Sprite Coord", ""+ entitieBox.getGravityScale());
+		sensorFixture = entitieBox.createFixture(circlePolygon,0f);
+		sensorFixture.setSensor(true);
+		circlePolygon.dispose();
+		
+			PolygonShape polygon = new PolygonShape();
+			polygon.setAsBox(38, 75,new Vector2(75,coordY-75),0);
+			physicsFixture = entitieBox.createFixture(polygon, 0.0f);
+			polygon.dispose();
+			physicsFixture.setDensity(10000);
+			physicsFixture.setSensor(false);
+			entitieBox.setBullet(true);
+			entitieBox.setGravityScale(1000f);
+			entitieBox.setTransform(coordX, coordY, 0);
+	}
+	
+	Vector2 bodyVelocity;
+
+	protected void updatePhysic() {
+		if(entitieBox.getLinearVelocity().y == 0) {
+			coordY = entitieBox.getPosition().y;
+		}
+		else {
+			coordY += Gdx.graphics.getDeltaTime()*entitieBox.getLinearVelocity().y;
+		}
+		entitieBox.setTransform(coordX, coordY, 0);
+		Gdx.app.log("Gravity and speed",""+entitieBox.getGravityScale()+"  "+ entitieBox.getLinearVelocity());
+	}
+
+	protected boolean isEntitieGrounded() {
+		//get all contacts in world
+		Array<Contact> contactList = rpgWorld.world.getContactList();
+		for(int i=0;i<contactList.size;i++) {
+			Contact contact = contactList.get(i);
+			// Check all contacts in world between player
+			if(contact.isTouching() && (contact.getFixtureA() == physicsFixture || contact.getFixtureB() == physicsFixture)) {
+				WorldManifold manifold = contact.getWorldManifold();
+				boolean below = true;
+				for(int j=0;j<manifold.getNumberOfContactPoints();j++) {
+					below &= (manifold.getPoints()[j].y < physicsFixture.getBody().getPosition().y);
+				}
+				if(below) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	protected void move(float coords) {
+		if((isCanMove() && isEntitieGrounded()) || (isCanMove() && !isEntitieGrounded()))
+			coordX+=coords*Gdx.graphics.getDeltaTime();
+		else
+			if(sideView == moveOut)
+				coordX+=coords*Gdx.graphics.getDeltaTime();
+			else
+				setCoord(physicsFixture.getBody().getPosition()); 
+	}
+	
+	private int moveOut = 0;
+	/**
+	 * check the lets on the way
+	 * @return if entitie can move return true
+	 */
+	private boolean isCanMove() {
+		Array<Contact> contactList = rpgWorld.world.getContactList();
+		boolean below = true;
+		for(int i=0;i<contactList.size;i++) {
+			Contact contact = contactList.get(i);
+			// Check all contacts in world between player
+			if(contact.isTouching() && (contact.getFixtureA() == physicsFixture || contact.getFixtureB() == physicsFixture)) {
+				WorldManifold manifold = contact.getWorldManifold();
+				for(int j=0;j<manifold.getNumberOfContactPoints();j++) {
+					below &= !(manifold.getPoints()[j].y - physicsFixture.getShape().getRadius()  > physicsFixture.getBody().getPosition().y- physicsFixture.getShape().getRadius());
+					//below = ((manifold.getPoints()[j].y - physicsFixture.getShape().getRadius()+10) < (physicsFixture.getBody().getPosition().y-physicsFixture.getShape().getRadius()));
+					if(!below) {
+						if(coordX+sizeX/2 > manifold.getPoints()[j].x) {
+							
+							moveOut = 1;
+						}
+						else {
+							moveOut = -1;
+						}
+						return below;
+					}
+				}
+			}
+		}
+		return below;
 	}
 }
