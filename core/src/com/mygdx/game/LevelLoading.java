@@ -14,6 +14,10 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import Levels.GlobalWindow;
 
+/**
+ * Abstract factory multithreads level loading
+ * @author Slava Stankevich 
+ */
 public class LevelLoading implements Screen {
 
 	final RPG game;

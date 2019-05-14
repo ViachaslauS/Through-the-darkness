@@ -52,7 +52,7 @@ public class Entities {
 	
 	protected AssetManager manager;
 	
-	Preferences preferences;
+	protected Preferences preferences;
 	
 	/**
 	 *  side which sees entities
@@ -83,7 +83,7 @@ public class Entities {
 	//count of sprites in pic
 	protected static int PIC_FRAME_COLS;
 	protected static int PIC_FRAME_ROWS;
-	TextureRegion[][] imageCollector;
+	protected TextureRegion[][] imageCollector;
 	
 	// count of needed sprites from pic
 	protected static int STAY_FRAME_COLS;  //column

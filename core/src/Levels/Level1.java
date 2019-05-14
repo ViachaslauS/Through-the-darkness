@@ -27,6 +27,7 @@ import com.mygdx.game.RPG;
 import Engine.Platform;
 import Engine.RPGWorld;
 import Entities.Hero;
+import aiall.AiCustom;
 
 public class Level1 implements GlobalWindow {
 	
@@ -47,7 +48,7 @@ public class Level1 implements GlobalWindow {
 	// Creating a hero
 	BodyDef def;
 	Hero hero;								//Hero
-	
+	AiCustom ai;
 	//World world;
 	RPGWorld rpgWorld;
 	Box2DDebugRenderer debugRenderer;
@@ -88,7 +89,7 @@ public class Level1 implements GlobalWindow {
 		
 		
 		game.batch.draw(hero.currentFrame, hero.getCoordX(), hero.getCoordY(), hero.getSizeX(), hero.getSizeY());
-
+		game.batch.draw(ai.currentFrame, ai.getCoordX(), ai.getCoordY(), ai.getSizeX(), ai.getSizeY());
 		
 		game.batch.end();
 
@@ -134,6 +135,7 @@ public class Level1 implements GlobalWindow {
 			
 		}
 		hero.update(delta);
+		ai.update();
 		//world.step(1/500f, 36, 16);
 		rpgWorld.world.step(1/1000f, 36, 16);
 	}
@@ -167,8 +169,10 @@ public class Level1 implements GlobalWindow {
 		background = assetManager.get("Battleground1.png",Texture.class);
 		//Player
 		hero = new Hero(new Vector2(150.0f,150.0f),new Vector2(700.0f,150.0f),assetManager);
+		ai = new AiCustom(new Vector2(150.0f,150.0f) , new Vector2(900.0f,150.0f),2225);
 		//hero.setBody(world);
 		hero.setBody(rpgWorld);
+		ai.setBody(rpgWorld);
 		def = new BodyDef();
 		def.type = BodyType.DynamicBody;
 		//Body entitieBox = world.createBody(def);
