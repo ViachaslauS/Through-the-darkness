@@ -23,7 +23,7 @@ import com.badlogic.gdx.physics.box2d.World;
  */
 public class Hero  extends Entities{
 	
-	public PlayerStats stats;
+	//public PlayerStats stats;
 	
 	private Animation<TextureRegion> teleportAnimation;
 	private TextureRegion[] teleportFrames;
@@ -54,9 +54,10 @@ public class Hero  extends Entities{
 	
 	
 	public Hero(Vector2 heroSize,Vector2 heroCoord,AssetManager loader) {
-		preferences = Gdx.app.getPreferences("herostats");
+		super("herostats");
+		//preferences = Gdx.app.getPreferences("herostats");
 		manager = loader;
-		stats = new PlayerStats();
+		//stats = new PlayerStats("herostats");
 		setSize(heroSize);
 		setCoord(heroCoord);
 		sideView = 1; 
@@ -85,7 +86,7 @@ public class Hero  extends Entities{
 		//Initialize of animations
 		stayAnimation = new Animation<TextureRegion>(0.10f, stayFrames);
 		moveAnimation = new Animation<TextureRegion>(0.10f,moveFrames);
-		attack1Animation = new Animation<TextureRegion>(ANIMATION_SPEED*(1-stats.ATKSPEED()),attack1Frames);
+		attack1Animation = new Animation<TextureRegion>(ANIMATION_SPEED*(1-entitieData.stats.ATKSPEED()),attack1Frames);
 		currentFrame = stayAnimation.getKeyFrame(0.10f, true);
 		
 		// Add fucking teleport
@@ -97,7 +98,7 @@ public class Hero  extends Entities{
 			teleportFrames[i] = temp[0][i];
 			attack1Frames[i] = temp[1][i];
 		}
-		teleportAnimation = new Animation<TextureRegion>(ANIMATION_SPEED*(1-stats.ATKSPEED()),teleportFrames);
+		teleportAnimation = new Animation<TextureRegion>(ANIMATION_SPEED*(1-entitieData.stats.ATKSPEED()),teleportFrames);
 		
 		
 	}
@@ -105,6 +106,7 @@ public class Hero  extends Entities{
 	@Override
 	public void update(float delta) {
 		
+		entitieData.updateData();
 		updatePhysic();
 		
 		 if(coordX < 0)
@@ -120,7 +122,7 @@ public class Hero  extends Entities{
 		 if(Gdx.input.isKeyPressed(Keys.D) || Gdx.input.isKeyPressed(Keys.RIGHT)) {   //move right
 				
 				currentFrame = moveAnimation.getKeyFrame(delta, true);
-				
+				//entitieData.currentFrame = currentFrame;
 				if(currentFrame.isFlipX()) {
 					currentFrame.flip(true, false);
 				}
@@ -132,7 +134,7 @@ public class Hero  extends Entities{
 			if(Gdx.input.isKeyPressed(Keys.A) || Gdx.input.isKeyPressed(Keys.LEFT)) {    //move left
 				
 				currentFrame = moveAnimation.getKeyFrame(delta, true);
-				
+				//entitieData.currentFrame = currentFrame;
 				if(!currentFrame.isFlipX())
 					currentFrame.flip(true, false);
 				//coordX -= 500 * Gdx.graphics.getDeltaTime();
@@ -202,9 +204,11 @@ public class Hero  extends Entities{
 	 */
 	public boolean refresh() { 
 		currentFrame = currentAnimation.getKeyFrame(CURRENT_DURATION, false);
+		//entitieData.currentFrame = currentFrame;
 		if(currentFrame == currentAnimation.getKeyFrames()[currentAnimation.getKeyFrames().length-1]) {
 			CURRENT_DURATION = 0.0f;
 			reset();
+			
 			return true;
 		}
 		CURRENT_DURATION+=Gdx.graphics.getDeltaTime();	
@@ -214,8 +218,12 @@ public class Hero  extends Entities{
 		if(refresh())
 			return;
 		if(currentFrame == currentAnimation.getKeyFrames()[4] || currentFrame == currentAnimation.getKeyFrames()[5] || currentFrame == currentAnimation.getKeyFrames()[6])
-			//coordX+=200*Gdx.graphics.getDeltaTime()*sideView;
+		{	//coordX+=200*Gdx.graphics.getDeltaTime()*sideView;
+			if(entitieData.isAttacking != 2 )
+				entitieData.isAttacking = 1;
 			move(200*sideView);
+		}
+		
 		frameFlip();
 		return;
 		
@@ -225,7 +233,7 @@ public class Hero  extends Entities{
 			return;
 		if(currentFrame == currentAnimation.getKeyFrames()[4] || currentFrame == currentAnimation.getKeyFrames()[5] || currentFrame == currentAnimation.getKeyFrames()[6]) {
 			//coordX+=1000*Gdx.graphics.getDeltaTime()*sideView/(1-stats.ATKSPEED());
-			move(1000*sideView/(1-stats.ATKSPEED()));
+			move(1000*sideView/(1-entitieData.stats.ATKSPEED()));
 			Gdx.app.log("Player coord", String.valueOf(coordX));
 		}
 		frameFlip();
@@ -252,6 +260,7 @@ public class Hero  extends Entities{
 		currentAnimation = stayAnimation;
 		currentFrame = stayAnimation.getKeyFrames()[0];
 		currentAction = 0;
+		entitieData.isAttacking = 0;
 	}
 	/** 
 	 *  I don't know what do this method, but his work
@@ -284,22 +293,7 @@ public class Hero  extends Entities{
 		imageCollector = null;
 		stayAnimation = null;
 	}
-	@Override
-	protected void loadPreferences() {
-		HITPOINT = preferences.getFloat("HITPOINT", 100.0f);
-		DAMAGE = preferences.getFloat("DAMAGE", 1.0f);
-		ARMOR = preferences.getFloat("ARMOR", 0.0f);
-		MANA = preferences.getFloat("MANA", 100.0f);
-		
-	}
-	@Override
-	public void resetPreferences() {
-		preferences.clear();
-		HITPOINT = preferences.getFloat("HITPOINT", 100.0f);
-		DAMAGE = preferences.getFloat("DAMAGE", 1.0f);
-		ARMOR = preferences.getFloat("ARMOR", 0.0f);
-		MANA = preferences.getFloat("MANA", 100.0f);
-	}
+
 	/* (non-Javadoc)
 	 * @see Entities.Entities#getDamage()
 	 */

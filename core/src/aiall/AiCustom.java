@@ -42,7 +42,8 @@ public class AiCustom extends Entities {
 	
 	
 	public AiCustom(Vector2 size,Vector2 coord, int id) {
-		preferences = Gdx.app.getPreferences("aistats"+ id);
+		super("aistats"+id);
+		//preferences = Gdx.app.getPreferences("aistats"+ id);
 		setSize(size);
 		setCoord(coord);
 		_coord = coord;

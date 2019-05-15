@@ -13,8 +13,8 @@ public class PlayerStats {
 	private float intelligency;
 	
 	private int freestats;
-	public PlayerStats() {
-		Preferences pref = Gdx.app.getPreferences("herostats2");
+	public PlayerStats(String object) {
+		Preferences pref = Gdx.app.getPreferences(object);
 		
 		//pref.clear(); // REMOVE!!!
 		experience = pref.getFloat("Exp",0.0f);
@@ -53,5 +53,8 @@ public class PlayerStats {
 	}
 	public float MANAREG() {
 		return (float)(intelligency*1.1);
+	}
+	public float HPREG() {
+		return (float)(power*1.05);
 	}
 }

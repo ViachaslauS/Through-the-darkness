@@ -24,6 +24,7 @@ import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mygdx.game.RPG;
 
+import Engine.DamageDeal;
 import Engine.Platform;
 import Engine.RPGWorld;
 import Entities.Hero;
@@ -34,6 +35,8 @@ public class Level1 implements GlobalWindow {
 	final RPG game;
 	
 	private AssetManager assetManager;
+	
+	DamageDeal damageMaster;
 	
 	SpriteBatch batch;
 	BitmapFont font;                        //font
@@ -66,7 +69,7 @@ public class Level1 implements GlobalWindow {
 		rpgWorld.setEnvironment(createEnvironment());
 		//world = new World(new Vector2(0,-100), true);
 		debugRenderer = new Box2DDebugRenderer(true, true, true, true, true, true);
-		
+		damageMaster = new DamageDeal(rpgWorld);
 	}
 	@Override
 	public void render(float delta) {
@@ -97,12 +100,17 @@ public class Level1 implements GlobalWindow {
 		game.batch.setProjectionMatrix(cameraHUD.combined);
 		game.batch.begin();
 		game.font.draw(game.batch, "Suka", 100  , 100);
+		drawInterface();
 		// player interface is here
 		game.batch.end();
 		//debugRenderer.render(world, viewport.getCamera().combined);
 		debugRenderer.render(rpgWorld.world, viewport.getCamera().combined);
 	}
 	
+	private void drawInterface() {
+		// TODO Auto-generated method stub
+		
+	}
 	public  void managerLoad() {
 		
 		assetManager.load("Battleground1.png", Texture.class);
@@ -130,6 +138,9 @@ public class Level1 implements GlobalWindow {
 	
 	private void update(float delta)
 	{
+		
+		damageMaster.update();
+		Gdx.app.log("Hitpoints of ai and hero",""+ ai.getHITPOINT()+"  "+hero.getHITPOINT());
 		if(hero.getHITPOINT() <= 0.0f) {
 			//here need to make death of player
 			
@@ -137,7 +148,7 @@ public class Level1 implements GlobalWindow {
 		hero.update(delta);
 		ai.update();
 		//world.step(1/500f, 36, 16);
-		rpgWorld.world.step(1/1000f, 36, 16);
+		rpgWorld.world.step(1/1000f, 36, 100);
 	}
 	
 	@Override
