@@ -16,6 +16,8 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.WorldManifold;
 import com.badlogic.gdx.utils.Array;
 
+import Engine.DamageDeal;
+import Engine.ObjectData;
 import Engine.RPGWorld;
 
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
@@ -27,9 +29,20 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 
 public class Entities {
 	
+	public Entities(String name) {
+		
+		entitieData = new ObjectData(name);
+	}
+	
+	protected ObjectData entitieData;
+	
 	protected float HITPOINT;
+	/**
+	 * true return
+	 * @return 
+	 */
 	public float getHITPOINT() {
-		return HITPOINT;
+		return entitieData.getHITPOINT();
 	}
 
 	public float getMANA() {
@@ -52,7 +65,7 @@ public class Entities {
 	
 	protected AssetManager manager;
 	
-	protected Preferences preferences;
+	//protected Preferences preferences;
 	
 	/**
 	 *  side which sees entities
@@ -200,19 +213,7 @@ public class Entities {
 	public float getHitPoints() {
 		return HITPOINT;
 	}
-	public void resetPreferences() {
-		preferences.clear();
-		preferences.putFloat("HITPOINT", 100.0f);
-		preferences.putFloat("ARMOR", 0.0f);
-		preferences.putFloat("MANA", 100.0f);
-		preferences.putFloat("DAMAGE", 1.0f);
-	}
-	protected void loadPreferences() {
-		HITPOINT = preferences.getFloat("HITPOINT", 100.0f);
-		DAMAGE = preferences.getFloat("DAMAGE", 1.0f);
-		ARMOR = preferences.getFloat("ARMOR", 0.0f);
-		MANA = preferences.getFloat("MANA", 100.0f);
-	}
+
 	
 	protected Body entitieBox;
 	protected Fixture physicsFixture;
@@ -241,6 +242,7 @@ public class Entities {
 		circlePolygon.setPosition(new Vector2(75,coordY-75));
 		//Gdx.app.log("Sprite Coord", ""+ entitieBox.getGravityScale());
 		sensorFixture = entitieBox.createFixture(circlePolygon,0f);
+		sensorFixture.setUserData(entitieData);
 		sensorFixture.setSensor(true);
 		circlePolygon.dispose();
 		
@@ -250,9 +252,11 @@ public class Entities {
 			polygon.dispose();
 			physicsFixture.setDensity(10000);
 			physicsFixture.setSensor(false);
+			physicsFixture.setUserData(sensorFixture);
 			entitieBox.setBullet(true);
 			entitieBox.setGravityScale(1000f);
 			entitieBox.setTransform(coordX, coordY, 0);
+			//entitieBox.setUserData(entitieData);
 	}
 	
 	Vector2 bodyVelocity;
@@ -265,7 +269,7 @@ public class Entities {
 			coordY += Gdx.graphics.getDeltaTime()*entitieBox.getLinearVelocity().y;
 		}
 		entitieBox.setTransform(coordX, coordY, 0);
-		Gdx.app.log("Gravity and speed",""+entitieBox.getGravityScale()+"  "+ entitieBox.getLinearVelocity());
+		//Gdx.app.log("Gravity and speed",""+entitieBox.getGravityScale()+"  "+ entitieBox.getLinearVelocity());
 	}
 
 	protected boolean isEntitieGrounded() {
