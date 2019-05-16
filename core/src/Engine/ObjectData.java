@@ -31,7 +31,7 @@ public class ObjectData {
 	 * 	if this parametr is true - entitie attack and do damage
 	 */
 	public int isAttacking = 0;
-	
+	public boolean isAi = false;
 	protected float HITPOINT;
 	protected float MANA;
 	protected float ARMOR;

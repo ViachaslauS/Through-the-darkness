@@ -145,10 +145,24 @@ public class Level1 implements GlobalWindow {
 			//here need to make death of player
 			
 		}
+		check_path();
 		hero.update(delta);
 		ai.update();
 		//world.step(1/500f, 36, 16);
 		rpgWorld.world.step(1/1000f, 36, 100);
+	}
+	
+	private void check_path() {
+		
+		  System.out.println("hero :" + hero.getCoordX()+ "\n");
+		  System.out.println("ai :" + ai.getCoordX()+ "\n"); 
+		  if(ai.getCoordX() <=
+		  hero.getCoordX()) {ai.sideView = 1;} else { ai.sideView = -1;} 
+		  //distance = hero.getCoordX() - ai.getCoordX(); 
+		  //if(distance <= 300 && distance >= 80 ) {
+		  
+		 // ai.setAttacking(true); } else ai.setAttacking(false);
+		 
 	}
 	
 	@Override
@@ -236,7 +250,7 @@ public class Level1 implements GlobalWindow {
 	public Array<Platform> createEnvironment() {
 		Array<Platform> platforms = new Array<Platform>();
 		platforms.add(new Platform(new Vector2(0,-30), new Vector2(10000,100),rpgWorld)); // Earth platform
-		
+		//platforms.add( new Platform(new Vector2(1500,40), new Vector2(20,400), rpgWorld));
 		return platforms;
 	}
 	

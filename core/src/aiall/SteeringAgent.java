@@ -11,16 +11,16 @@ import com.badlogic.gdx.math.Vector3;
 public class SteeringAgent implements Steerable<Vector2> {
 	private Vector2 _position;
 	private float _orientation;
-	private boolean _tagged;
+	private int _tagged;
 	public Vector3 all ;
 	boolean _independentorientation = false;
-	Vector2 linearVelocity = new Vector2(450,0);
+	Vector2 linearVelocity = new Vector2(1000,0);
 	SteeringBehavior<Vector2> steeringBehavior;
 	//SteeringAcceleration<Vector2> steeringOutput;
-	public SteeringAgent(Vector2 position, int orientetion, boolean tagged) {
+	public SteeringAgent(Vector2 position, int orientetion, int tagged) {
 		_position = position;
 		_orientation = orientetion;
-		_tagged = false;
+		_tagged = tagged;
 		//steeringOutput.setZero();
 		all = new Vector3(0,0,0);
 		
@@ -144,13 +144,13 @@ public class SteeringAgent implements Steerable<Vector2> {
 	@Override
 	public boolean isTagged() {
 		// TODO Auto-generated method stub
-		return _tagged;
+		return false;
 	}
 
 	@Override
 	public void setTagged(boolean tagged) {
 		// TODO Auto-generated method stub
-		_tagged = tagged;
+	
 	}
 
 
@@ -176,6 +176,8 @@ public class SteeringAgent implements Steerable<Vector2> {
 		{
 			linearVelocity.x *= -1;
 		}
+		_position.x = 0;
+		_position.y = 0;
 		this._position.mulAdd(linearVelocity, Gdx.graphics.getDeltaTime());
 		if(_independentorientation) {
 			_independentorientation = false;

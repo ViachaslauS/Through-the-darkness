@@ -4,8 +4,10 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
+import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.WorldManifold;
+import com.badlogic.gdx.utils.Array;
 
 import Entities.Entities;
 
@@ -14,8 +16,10 @@ public class RPGContactListener implements ContactListener{
 	Entities entitie;
 	ObjectData bodyData;
 	int sideView = 1;
-	public RPGContactListener() {
+	RPGWorld world;
+	public RPGContactListener(RPGWorld world) {
 		entitie = null;
+		this.world = world;
 	}
 	
 	@Override
@@ -33,7 +37,7 @@ public class RPGContactListener implements ContactListener{
 		 * contact.getFixtureB().getUserData(); if(bodyData.isAttacking) {
 		 * if(contact.getFixtureA().getBody().getPosition().x >
 		 * contact.getFixtureB().getBody().getPosition().x) { sideView = -1; }
-		 * bodyData.setHitpoint(5); // меопюбхкэмн пюанрюер!!! bodyData.isAttacking =
+		 * bodyData.setHitpoint(5); // О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫ О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫!!! bodyData.isAttacking =
 		 * false;
 		 * 
 		 * } bodyData = (ObjectData) contact.getFixtureB().getUserData();
@@ -41,14 +45,39 @@ public class RPGContactListener implements ContactListener{
 		 * false; } } }
 		 */
 		
+		
 	}
 
 	@Override
 	public void endContact(Contact contact) {
-		// TODO Auto-generated method stub
+		Array<Contact> contacts = world.world.getContactList();
+		for(int i = 0; i< contacts.size;i++) {
+			//if(contacts.get(i).isTouching()) {
+				if(contacts.get(i).getFixtureA().getUserData()!=null && contacts.get(i).getFixtureB().getUserData()!=null) {
+					if(contacts.get(i).getFixtureA().getUserData().getClass().getName() == "com.badlogic.gdx.physics.box2d.Fixture" && contacts.get(i).getFixtureB().getUserData().getClass().getName() == ("com.badlogic.gdx.physics.box2d.Fixture"))
+						continue;
+					if(contacts.get(i).getFixtureA().getUserData().getClass().getName() == "com.badlogic.gdx.physics.box2d.Fixture")
+						collisionWizard(contacts.get(i).getFixtureA(),contacts.get(i).getFixtureB());
+					else
+						if(contacts.get(i).getFixtureB().getUserData().getClass().getName() == "com.badlogic.gdx.physics.box2d.Fixture")
+							collisionWizard(contacts.get(i).getFixtureB(),contacts.get(i).getFixtureA());
+				}
+			}
 		
 	}
-
+private void collisionWizard(Fixture receiver, Fixture dealer) {
+		
+		Fixture recDataFix = (Fixture) receiver.getUserData();
+		ObjectData recData = (ObjectData) recDataFix.getUserData();
+		ObjectData dealData = (ObjectData) dealer.getUserData();
+		aiReact(recData, dealData);
+		
+	}
+private void aiReact(ObjectData rec, ObjectData deal) {
+		
+		  if(rec.isAi) { rec.isAttacking = 0; } else deal.isAttacking = 0;
+		 
+	}
 	@Override
 	public void preSolve(Contact contact, Manifold oldManifold) {
 		

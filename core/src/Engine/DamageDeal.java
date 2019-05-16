@@ -45,6 +45,22 @@ public class DamageDeal {
 			recData.setHitpoint(dealData.getDAMAGE());
 			dealData.isAttacking = 2;
 		}
+		aiReact(recData, dealData);
 	}
 	
+	private void aiReact(ObjectData rec, ObjectData deal) {
+	if(rec.isAi) {
+		rec.isAttacking = -1;
+		
+	}
+	else
+	if(deal.isAi){deal.isAttacking = -1;}
+		
+	}
+	
+	
+	
 }
+
+
+

@@ -74,8 +74,8 @@ public class Entities {
 	 *   <br>
 	 *   2 - left
 	 */
-	protected int sideView;  
-	protected boolean isAttacking;
+	public int sideView;  
+	//protected boolean isAttacking;
 	//Coord of Entities
 	protected float coordX;
 	protected float coordY;
@@ -278,7 +278,7 @@ public class Entities {
 		for(int i=0;i<contactList.size;i++) {
 			Contact contact = contactList.get(i);
 			// Check all contacts in world between player
-			if(contact.isTouching() && (contact.getFixtureA() == physicsFixture || contact.getFixtureB() == physicsFixture)) {
+			if(contact.isTouching() && (contact.getFixtureA() == physicsFixture && contact.getFixtureB().getUserData() == null) || (contact.getFixtureB() == physicsFixture && contact.getFixtureA().getUserData() == null)) {
 				WorldManifold manifold = contact.getWorldManifold();
 				boolean below = true;
 				for(int j=0;j<manifold.getNumberOfContactPoints();j++) {

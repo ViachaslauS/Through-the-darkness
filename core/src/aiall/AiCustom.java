@@ -1,5 +1,7 @@
 package aiall;
 
+import java.sql.Time;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.steer.behaviors.FollowPath;
 import com.badlogic.gdx.ai.steer.utils.Path;
@@ -8,15 +10,24 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.physics.box2d.CircleShape;
+import com.badlogic.gdx.physics.box2d.Filter;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
 
+import Engine.RPGWorld;
 import Entities.Entities;
 
 public class AiCustom extends Entities {
-	public float _orientation;
-	boolean isAttaking;
+	//public float sideView;
+	//boolean isAttaking;
 	Vector3 all;
 	Vector2 _coord;
+	private float time;
 	SteeringAgent steeringAgent;
+	
+	Filter f = new Filter();
+	
+	
 	//FollowPath followPath;
 	Path<Vector2, Pathparametrs> path;
 	public void picParam() {
@@ -43,6 +54,7 @@ public class AiCustom extends Entities {
 	
 	public AiCustom(Vector2 size,Vector2 coord, int id) {
 		super("aistats"+id);
+		
 		//preferences = Gdx.app.getPreferences("aistats"+ id);
 		setSize(size);
 		setCoord(coord);
@@ -50,12 +62,14 @@ public class AiCustom extends Entities {
 		coordX = coord.x;
 		coordY = coord.y;
 		sideView = 1;
-		_orientation = (float) sideView;
-		isAttaking = false;
+		entitieData.isAi = true;
+		//sideView = (float) sideView;
+		//isAttacking = false;
 		allSheets = new Texture(Gdx.files.internal("Hero.png"));
-		steeringAgent = new SteeringAgent(coord, sideView, isAttaking);
+		steeringAgent = new SteeringAgent(coord, sideView, 0);
 		//followPath = new FollowPath<Vector2, Pathparametrs>(steeringAgent, path);
-		
+		f.maskBits = RPGWorld.MASK_RUNNER;
+		f.categoryBits = RPGWorld.CATEGORY_RUNNER;
 		
 		picParam();
 		
@@ -84,15 +98,69 @@ public class AiCustom extends Entities {
 	}
 	
 	  public void update() {
-		 if(isAttaking) {
-		 all = steeringAgent.update(this._orientation);
-		 coordX = all.y;
-		 coordY = all.z;
-		 _orientation = all.x;
+		 
+		  time+= Gdx.graphics.getDeltaTime();
+		
+		  if(time>=1) {
+			  
+			  jump();
+		  }
+		  if(entitieData.isAttacking == -1) {
+		 all = steeringAgent.update(this.sideView);
+		 move(all.y);
+		 
+		 sideView = (int) all.x;
 		 
 		 }
+		  updatePhysic();
+		  entitieData.updateData();
+		  
+		  
 	  }
+	  private boolean isJump = false;
+	  public void jump() {
+		 
+		  time = 0;
+		  if(isJump) {
+				if(isEntitieGrounded()) {
+					isJump = false;
+				}
+				return;
+			}
+			if(isEntitieGrounded()) {
+				isJump = true;
+				entitieBox.applyLinearImpulse(new Vector2(0,1100), new Vector2(coordX,coordY), true);
+			}
+		  
+	  }
+
+
+	public void setAttacking(int b) {
+		entitieData.isAttacking = b;
 		
+	}
+	 @Override
+	protected void bodyInitialize() {
+		 CircleShape circlePolygon = new CircleShape();
+			circlePolygon.setRadius(300);
+			circlePolygon.setPosition(new Vector2(75,coordY-75));
+			//Gdx.app.log("Sprite Coord", ""+ entitieBox.getGravityScale());
+			sensorFixture = entitieBox.createFixture(circlePolygon,0f);
+			sensorFixture.setUserData(entitieData);
+			sensorFixture.setSensor(true);
+			circlePolygon.dispose();
+			
+				PolygonShape polygon = new PolygonShape();
+				polygon.setAsBox(38, 75,new Vector2(75,coordY-75),0);
+				physicsFixture = entitieBox.createFixture(polygon, 0.0f);
+				polygon.dispose();
+				physicsFixture.setDensity(10000);
+				physicsFixture.setSensor(false);
+				physicsFixture.setUserData(sensorFixture);
+				entitieBox.setBullet(true);
+				entitieBox.setGravityScale(1000f);
+				entitieBox.setTransform(coordX, coordY, 0);
+	}
 	
 	
 	

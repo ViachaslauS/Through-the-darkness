@@ -61,9 +61,8 @@ public class Hero  extends Entities{
 		setSize(heroSize);
 		setCoord(heroCoord);
 		sideView = 1; 
-		isAttacking = false;
 		allSheets = manager.get("Hero.png",Texture.class);
-		
+		entitieData.isAi = false;
 		picParam();
 		
 		//include to collector all sprites from picture
