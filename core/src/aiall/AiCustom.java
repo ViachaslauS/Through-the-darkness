@@ -1,9 +1,10 @@
 package aiall;
 
 import java.sql.Time;
+import java.util.ArrayList;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.ai.steer.behaviors.FollowPath;
+
 import com.badlogic.gdx.ai.steer.utils.Path;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -13,21 +14,28 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.utils.Array;
 
 import Engine.RPGWorld;
+import Entities.Bullet;
 import Entities.Entities;
-
+import com.badlogic.gdx.*;
 public class AiCustom extends Entities {
 	//public float sideView;
 	//boolean isAttaking;
 	Vector3 all;
 	Vector2 _coord;
+	private float bulletTime = 0;
 	private float time;
 	SteeringAgent steeringAgent;
+	public ArrayList<Bullet> bullets = new ArrayList<Bullet>();
+	private float attack_time=0;
+	
+	
 	
 	Filter f = new Filter();
 	
-	
+
 	//FollowPath followPath;
 	Path<Vector2, Pathparametrs> path;
 	public void picParam() {
@@ -70,6 +78,8 @@ public class AiCustom extends Entities {
 		//followPath = new FollowPath<Vector2, Pathparametrs>(steeringAgent, path);
 		f.maskBits = RPGWorld.MASK_RUNNER;
 		f.categoryBits = RPGWorld.CATEGORY_RUNNER;
+		f.groupIndex = -1;
+	    
 		
 		picParam();
 		
@@ -100,17 +110,25 @@ public class AiCustom extends Entities {
 	  public void update() {
 		 
 		  time+= Gdx.graphics.getDeltaTime();
-		
-		  if(time>=1) {
-			  
+		  entitieData.attackTime += Gdx.graphics.getDeltaTime();
+		  bulletTime += Gdx.graphics.getDeltaTime();
+		  
+		  if(bulletTime >= 5 && entitieData.isAttacking == -1) {
+			  bulletTime = 0;
+			  shoot();
+		  }
+		  
+		  if(time>=1) {  
 			  jump();
 		  }
+		 for(int i = 0; i< bullets.size(); i++)
+				 bullets.get(i).update(Gdx.graphics.getDeltaTime());
 		  if(entitieData.isAttacking == -1) {
+			  
 		 all = steeringAgent.update(this.sideView);
 		 move(all.y);
-		 
 		 sideView = (int) all.x;
-		 
+		 	
 		 }
 		  updatePhysic();
 		  entitieData.updateData();
@@ -160,8 +178,24 @@ public class AiCustom extends Entities {
 				entitieBox.setBullet(true);
 				entitieBox.setGravityScale(1000f);
 				entitieBox.setTransform(coordX, coordY, 0);
+				physicsFixture.setFilterData(f);
+			    sensorFixture.setFilterData(f);
 	}
 	
 	
+	public void deleteBot() {
+		entitieBox.destroyFixture(physicsFixture);
+		entitieBox.destroyFixture(sensorFixture);
+		dispose();
+		
+	}
+	
+	// Shoot to hero
+	public void shoot() {
+		Bullet bullet = new Bullet(this.coordX, this.coordY+(this.getSizeY()/2),this.sideView);
+		bullet.setBody(rpgWorld);
+		bullets.add(bullet);
+		
+	}
 	
 }

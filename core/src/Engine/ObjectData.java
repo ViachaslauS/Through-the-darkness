@@ -32,6 +32,9 @@ public class ObjectData {
 	 */
 	public int isAttacking = 0;
 	public boolean isAi = false;
+	public float attackTime = 0;
+	public boolean isInvisible = false;
+	public boolean isBull = false;
 	protected float HITPOINT;
 	protected float MANA;
 	protected float ARMOR;
@@ -96,7 +99,7 @@ public class ObjectData {
 		MAXMANA = 100.0f * stats.MANA();
 		
 		HITPOINT = preferences.getFloat("HITPOINT", 100.0f) * stats.HP();
-		DAMAGE = preferences.getFloat("DAMAGE", 1.0f) * stats.DAMAGE();
+		DAMAGE = preferences.getFloat("DAMAGE", 100.0f) * stats.DAMAGE();
 		ARMOR = preferences.getFloat("ARMOR", 0.0f);
 		checkARMOR();
 		MANA = preferences.getFloat("MANA", 100.0f) * stats.MANA();

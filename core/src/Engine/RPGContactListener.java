@@ -4,13 +4,13 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
+import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.WorldManifold;
 import com.badlogic.gdx.utils.Array;
 
 import Entities.Entities;
-
 public class RPGContactListener implements ContactListener{
 
 	Entities entitie;
@@ -24,29 +24,31 @@ public class RPGContactListener implements ContactListener{
 	
 	@Override
 	public void beginContact(Contact contact) {
-		/*
-		 * if(contact.getFixtureA().getUserData()!= null &&
-		 * contact.getFixtureB().getUserData()!= null ) {
-		 * if(contact.getFixtureB().getUserData().equals("box") &&
-		 * contact.getFixtureA().getUserData().equals("box")) {
-		 * 
-		 * } else {
-		 * 
-		 * if(contact.getFixtureB().getUserData().equals("box")) bodyData = (ObjectData)
-		 * contact.getFixtureA().getUserData(); else bodyData = (ObjectData)
-		 * contact.getFixtureB().getUserData(); if(bodyData.isAttacking) {
-		 * if(contact.getFixtureA().getBody().getPosition().x >
-		 * contact.getFixtureB().getBody().getPosition().x) { sideView = -1; }
-		 * bodyData.setHitpoint(5); // ����������� ��������!!! bodyData.isAttacking =
-		 * false;
-		 * 
-		 * } bodyData = (ObjectData) contact.getFixtureB().getUserData();
-		 * if(bodyData.isAttacking) { bodyData.setHitpoint(5); bodyData.isAttacking =
-		 * false; } } }
-		 */
+		if(contact.getFixtureA().getUserData() != null && contact.getFixtureB().getUserData() != null)
+		{
+			ObjectData fixAData = recreate(contact.getFixtureA());
+			ObjectData fixBData = recreate(contact.getFixtureB());
+			
+			if(fixAData.isBull && fixBData.isBull)
+				contact.setEnabled(false);
+			if((fixAData.isBull && fixBData.isAi) || (fixBData.isBull && fixAData.isAi))
+				contact.setEnabled(true);
+		}
+		
+		
 		
 		
 	}
+	
+	private ObjectData recreate(Fixture fixtureA) {
+		if(fixtureA.getUserData().getClass().getName() == "com.badlogic.gdx.physics.box2d.Fixture" ) {
+			Fixture temp = (Fixture) fixtureA.getUserData();
+			return (ObjectData) temp.getUserData();
+		}
+		return (ObjectData) fixtureA.getUserData();
+	}
+	
+	
 
 	@Override
 	public void endContact(Contact contact) {
@@ -80,7 +82,7 @@ private void aiReact(ObjectData rec, ObjectData deal) {
 	}
 	@Override
 	public void preSolve(Contact contact, Manifold oldManifold) {
-		
+	
 	}
 
 	@Override
