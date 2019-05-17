@@ -13,6 +13,8 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 
+import Engine.ObjectData;
+
 
 
 /**
@@ -26,6 +28,8 @@ public class Hero  extends Entities{
 	//public PlayerStats stats;
 	
 	private Animation<TextureRegion> teleportAnimation;
+	private Animation<TextureRegion> deathAnimation;
+	
 	private TextureRegion[] teleportFrames;
 	private Texture skills;
 	private Sound shift;
@@ -82,10 +86,15 @@ public class Hero  extends Entities{
 			for(int j=0;j<MOVE_FRAME_COLS;j++)
 				moveFrames[index++] = imageCollector[i+MOVE_FRAME_ROW][j+MOVE_FRAME_COL];
 		index = 0;
+		TextureRegion[] deathFrames = new TextureRegion[10];
+		for(int i = 0; i<10; i++) {
+			deathFrames[i] = imageCollector[4][i];
+		}
 		//Initialize of animations
 		stayAnimation = new Animation<TextureRegion>(0.10f, stayFrames);
 		moveAnimation = new Animation<TextureRegion>(0.10f,moveFrames);
 		attack1Animation = new Animation<TextureRegion>(ANIMATION_SPEED*(1-entitieData.stats.ATKSPEED()),attack1Frames);
+		deathAnimation = new Animation<TextureRegion>(0.10f,deathFrames);
 		currentFrame = stayAnimation.getKeyFrame(0.10f, true);
 		
 		// Add fucking teleport
@@ -165,14 +174,19 @@ public class Hero  extends Entities{
 	public void checkKeys() { 	//Here including new button
 		
 		//Attack1
-		if(Gdx.input.isKeyJustPressed(Keys.F)) {
+		if(Gdx.input.isKeyJustPressed(Keys.NUM_1)) {
 			currentAction = 1;
 			currentAnimation = attack1Animation;
+			entitieData.skillDamage = 1.0f;
 			attack1();
 			return;
 		}
 		//teleport
 		if(Gdx.input.isKeyJustPressed(Keys.SHIFT_LEFT)) {
+			if(!this.entitieData.setMANA(10))
+				return;
+			isPhysicUpdatingActive = false;
+			//this.physicsFixture.setSensor(true);
 			currentAction = 2;
 			currentAnimation = teleportAnimation;
 			teleport();
@@ -216,7 +230,7 @@ public class Hero  extends Entities{
 	public void attack1() {
 		if(refresh())
 			return;
-		if(currentFrame == currentAnimation.getKeyFrames()[4] || currentFrame == currentAnimation.getKeyFrames()[5] || currentFrame == currentAnimation.getKeyFrames()[6])
+		if(currentFrame == currentAnimation.getKeyFrames()[5] || currentFrame == currentAnimation.getKeyFrames()[6] || currentFrame == currentAnimation.getKeyFrames()[7])
 		{	//coordX+=200*Gdx.graphics.getDeltaTime()*sideView;
 			if(entitieData.isAttacking != 2 )
 				entitieData.isAttacking = 1;
@@ -228,8 +242,11 @@ public class Hero  extends Entities{
 		
 	}
 	public void teleport() {
-		if(refresh())
+		if(refresh()) {
+			isPhysicUpdatingActive = true;
+			//this.physicsFixture.setSensor(false);
 			return;
+		}
 		if(currentFrame == currentAnimation.getKeyFrames()[4] || currentFrame == currentAnimation.getKeyFrames()[5] || currentFrame == currentAnimation.getKeyFrames()[6]) {
 			//coordX+=1000*Gdx.graphics.getDeltaTime()*sideView/(1-stats.ATKSPEED());
 			move(1000*sideView/(1-entitieData.stats.ATKSPEED()));
@@ -260,6 +277,7 @@ public class Hero  extends Entities{
 		currentFrame = stayAnimation.getKeyFrames()[0];
 		currentAction = 0;
 		entitieData.isAttacking = 0;
+		entitieData.skillDamage = 0.0f;
 	}
 	/** 
 	 *  I don't know what do this method, but his work
@@ -300,6 +318,27 @@ public class Hero  extends Entities{
 	public float getDamage() {
 		return DAMAGE;
 		
+	}
+
+	
+	public boolean death() {
+		if(!isDeath) {
+			isDeath = true;
+			currentAnimation = deathAnimation;
+			currentFrame = currentAnimation.getKeyFrame(0);
+			CURRENT_DURATION = 0.0f;
+		}
+		updatePhysic();
+		if(currentFrame == currentAnimation.getKeyFrames()[currentAnimation.getKeyFrames().length-1])
+			return true;
+		currentFrame = currentAnimation.getKeyFrame(CURRENT_DURATION);
+		CURRENT_DURATION+=Gdx.graphics.getDeltaTime();
+		return false;
+	}
+
+
+	public ObjectData getEntitieData() {
+		return entitieData;
 	}
 
 	

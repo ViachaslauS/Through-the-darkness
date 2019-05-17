@@ -61,7 +61,7 @@ public class MainMenuScreen implements GlobalWindow{
 		assetManager = new AssetManager();
 		game = rpg;
 		camera = new OrthographicCamera();
-		camera.setToOrtho(false, 1280, 720);
+		camera.setToOrtho(false, RPG.WINDOW_WIDTH, RPG.WINDOW_HEIGHT);
 		
 		//mainImage = new Texture(Gdx.files.internal("mainImage.jpg"));
 		//soundtrack = Gdx.audio.newMusic(Gdx.files.internal("menuSound.mp3"));
@@ -83,7 +83,7 @@ public class MainMenuScreen implements GlobalWindow{
 		
 		game.batch.begin();
 		
-		game.batch.draw(mainImage, 0, 0, 1280, 720);
+		game.batch.draw(mainImage, 0, 0, RPG.WINDOW_WIDTH, RPG.WINDOW_HEIGHT);
 		
 		game.batch.end();
 		stage.draw();
@@ -93,7 +93,7 @@ public class MainMenuScreen implements GlobalWindow{
 			dispose();
 		}
 		if(btnExit.isPressed()) {
-		     dispose();
+			Gdx.app.exit();
 		}
 	
 		
@@ -143,9 +143,9 @@ viewport = new FitViewport(VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
 		table = new Table();
 		
 		table.row();
-		table.add(btnPlay).padTop(10f).colspan(2).width(200).height(200);
+		table.add(btnPlay).padTop(10f).colspan(2).width(300).height(200);
 		table.row();
-		table.add(btnExit).padTop(10f).colspan(2).width(200).height(200);
+		table.add(btnExit).padTop(10f).colspan(2).width(300).height(200);
 		
 		table.setFillParent(true);
 		table.pack();
@@ -169,7 +169,8 @@ viewport = new FitViewport(VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
 	@Override
 	public void resize(int width, int height) {
 		viewport.update(width, height);
-		
+		RPG.WINDOW_HEIGHT = height;
+		RPG.WINDOW_WIDTH = width;
 	}
 
 	@Override

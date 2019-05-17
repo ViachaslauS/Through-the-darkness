@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 import Levels.GlobalWindow;
 
@@ -25,17 +26,21 @@ public class LevelLoading implements Screen {
 	private GlobalWindow loadingWindow;
 	private SpriteBatch batch;
 	private OrthographicCamera camera;
-	private Texture currentLoad, fullLoad;
-	
+	private TextureRegion currentLoad;
+	private TextureRegion fullLoad;
+	private TextureRegion[][] loadbars;
+	private Texture background;
 	public LevelLoading(RPG game_,GlobalWindow newWindow) {
 		game = game_;
 		loadingWindow = newWindow;
-		currentLoad = new Texture(Gdx.files.internal("currentloadbar.png"));
-		fullLoad = new Texture(Gdx.files.internal("fullloadbar.png"));
+		Texture tempBar = new Texture(Gdx.files.internal("loadingbarNEW.png"));
+		loadbars = TextureRegion.split(tempBar, tempBar.getWidth(), tempBar.getHeight()/5);
+		currentLoad =loadbars[0][0];
+		fullLoad = loadbars[1][0];
 		batch = new SpriteBatch();
 		camera = new OrthographicCamera();
-		camera.setToOrtho(false, 1280, 720);
-		
+		camera.setToOrtho(false, RPG.WINDOW_WIDTH, RPG.WINDOW_HEIGHT);
+		background = new Texture(Gdx.files.internal("loadingBG.jpg"));
 		
 	}
 	@Override
@@ -51,9 +56,9 @@ public class LevelLoading implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         camera.update();
         batch.begin();
-        
-        batch.draw(fullLoad, Gdx.graphics.getWidth()/2-fullLoad.getWidth()/2, Gdx.graphics.getHeight()/2-fullLoad.getHeight()/2,fullLoad.getWidth(),fullLoad.getHeight());
-        batch.draw(currentLoad,Gdx.graphics.getWidth()/2-currentLoad.getWidth()/2,Gdx.graphics.getHeight()/2-currentLoad.getHeight()/2,loadingWindow.getLoadProgress()*currentLoad.getWidth(),currentLoad.getHeight());
+        batch.draw(background, 0, 0);
+        batch.draw(fullLoad, Gdx.graphics.getWidth()/2-fullLoad.getRegionWidth()/2 , 100,fullLoad.getRegionWidth(),fullLoad.getRegionHeight());
+        batch.draw(currentLoad,Gdx.graphics.getWidth()/2-currentLoad.getRegionWidth()/2+55,100,loadingWindow.getLoadProgress()*currentLoad.getRegionWidth(),currentLoad.getRegionHeight());
         
         batch.end();
 		
@@ -65,7 +70,8 @@ public class LevelLoading implements Screen {
 	@Override
 	public void resize(int width, int height) {
 		// TODO Auto-generated method stub
-		
+		RPG.WINDOW_HEIGHT = height;
+		RPG.WINDOW_WIDTH = width;
 	}
 
 	@Override

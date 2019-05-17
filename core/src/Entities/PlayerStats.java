@@ -13,9 +13,14 @@ public class PlayerStats {
 	private float intelligency;
 	
 	private int freestats;
+	
+	Preferences pref;
 	public PlayerStats(String object) {
-		Preferences pref = Gdx.app.getPreferences(object);
-		
+		pref = Gdx.app.getPreferences(object);
+		int isBegin = pref.getInteger("FirstLaunch", 0);
+		if(isBegin == 0) {
+			startStats();
+		}
 		//pref.clear(); // REMOVE!!!
 		experience = pref.getFloat("Exp",0.0f);
 		level = pref.getInteger("Level", 1);
@@ -23,6 +28,16 @@ public class PlayerStats {
 		agility = pref.getFloat("Agility", 1.0f);
 		intelligency = pref.getFloat("Intel",1.0f);
 		freestats = pref.getInteger("FreeStatements", 0);
+	}
+	void startStats() {
+		pref.clear();
+		pref.putInteger("FirstLaunch", 1);
+		pref.putFloat("Exp", 0.0f);
+		pref.putInteger("Level", 1);
+		pref.putFloat("Power", 1.0f);
+		pref.putFloat("Agility", 1.0f);
+		pref.putFloat("Intel", 1.0f);
+		pref.putInteger("FreeStatements", 0);
 	}
 	public void ADDEXP(float exp) {
 		experience+=exp;

@@ -10,6 +10,9 @@ public class RPG  extends Game{
 	public SpriteBatch batch;
 	public BitmapFont font;    //font
 
+	public static int WINDOW_WIDTH = 1280;
+	public static int WINDOW_HEIGHT = 720;
+	
 	@Override
 	public void create() {
 		// TODO Auto-generated method stub

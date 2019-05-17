@@ -4,6 +4,7 @@ import java.util.function.ToIntFunction;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
@@ -21,12 +22,16 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FillViewport;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.mygdx.game.LevelLoading;
+import com.mygdx.game.MainMenuScreen;
 import com.mygdx.game.RPG;
 
 import Engine.DamageDeal;
 import Engine.Platform;
 import Engine.RPGWorld;
+import Engine.UserInterface;
 import Entities.Hero;
 import aiall.AiCustom;
 
@@ -43,10 +48,10 @@ public class Level1 implements GlobalWindow {
 	Texture background;
 	
 	OrthographicCamera camera;
-	Viewport viewport;
+	FitViewport viewport;
 	
 	OrthographicCamera cameraHUD;			//Camera UI
-	Viewport viewportHUD;
+	FitViewport viewportHUD;
 	
 	// Creating a hero
 	BodyDef def;
@@ -55,6 +60,8 @@ public class Level1 implements GlobalWindow {
 	//World world;
 	RPGWorld rpgWorld;
 	Box2DDebugRenderer debugRenderer;
+	
+	UserInterface UI;
 	
 	private int mapCounter = 0; 
 	private float centreMapCoord = 0.0f;
@@ -70,6 +77,7 @@ public class Level1 implements GlobalWindow {
 		//world = new World(new Vector2(0,-100), true);
 		debugRenderer = new Box2DDebugRenderer(true, true, true, true, true, true);
 		damageMaster = new DamageDeal(rpgWorld);
+		UI = new UserInterface();
 	}
 	@Override
 	public void render(float delta) {
@@ -95,11 +103,11 @@ public class Level1 implements GlobalWindow {
 		game.batch.draw(ai.currentFrame, ai.getCoordX(), ai.getCoordY(), ai.getSizeX(), ai.getSizeY());
 		
 		game.batch.end();
-
+		//cameraHUD.position.set(hero.getCoordX(), /* hero.getCoordY() + */350.0f, 0);
 		cameraHUD.update();
 		game.batch.setProjectionMatrix(cameraHUD.combined);
 		game.batch.begin();
-		game.font.draw(game.batch, "Suka", 100  , 100);
+		
 		drawInterface();
 		// player interface is here
 		game.batch.end();
@@ -107,8 +115,11 @@ public class Level1 implements GlobalWindow {
 		debugRenderer.render(rpgWorld.world, viewport.getCamera().combined);
 	}
 	
+	
+	
 	private void drawInterface() {
-		// TODO Auto-generated method stub
+		
+		UI.draw(game.batch,hero.getEntitieData());
 		
 	}
 	public  void managerLoad() {
@@ -138,24 +149,31 @@ public class Level1 implements GlobalWindow {
 	
 	private void update(float delta)
 	{
+		// Exit from level to menu
+		if(Gdx.input.isKeyPressed(Keys.ESCAPE))
+			game.setScreen(new LevelLoading(game, new MainMenuScreen(game)));
 		
 		damageMaster.update();
 		Gdx.app.log("Hitpoints of ai and hero",""+ ai.getHITPOINT()+"  "+hero.getHITPOINT());
 		if(hero.getHITPOINT() <= 0.0f) {
-			//here need to make death of player
-			
+			if(hero.death()) {
+				
+				//dispose();
+			}
+		}
+		else {
+			hero.update(delta);	
+			//hero.giveDamage(0.1f);
 		}
 		check_path();
-		hero.update(delta);
 		ai.update();
-		//world.step(1/500f, 36, 16);
-		rpgWorld.world.step(1/1000f, 36, 100);
+		rpgWorld.world.step(1/1000f, 100, 100);
 	}
 	
 	private void check_path() {
 		
-		  System.out.println("hero :" + hero.getCoordX()+ "\n");
-		  System.out.println("ai :" + ai.getCoordX()+ "\n"); 
+		  //System.out.println("hero :" + hero.getCoordX()+ "\n");
+		  //System.out.println("ai :" + ai.getCoordX()+ "\n"); 
 		  if(ai.getCoordX() <=
 		  hero.getCoordX()) {ai.sideView = 1;} else { ai.sideView = -1;} 
 		  //distance = hero.getCoordX() - ai.getCoordX(); 
@@ -182,18 +200,18 @@ public class Level1 implements GlobalWindow {
 
 		// camera
 		camera = new OrthographicCamera();
-		camera.setToOrtho(false, 1280, 720);
-		viewport = new FillViewport(1280, 720, camera);
+		camera.setToOrtho(false, RPG.WINDOW_WIDTH, RPG.WINDOW_HEIGHT);
+		viewport = new FitViewport(RPG.WINDOW_WIDTH, RPG.WINDOW_HEIGHT, camera);
 		
 		//camera HUD
 		cameraHUD = new OrthographicCamera();		
-		cameraHUD.setToOrtho(false, 1280, 720);
-		viewportHUD = new FillViewport(1280, 720, cameraHUD);
+		cameraHUD.setToOrtho(false, RPG.WINDOW_WIDTH, RPG.WINDOW_HEIGHT);
+		viewportHUD = new FitViewport(RPG.WINDOW_WIDTH, RPG.WINDOW_HEIGHT, cameraHUD);
 		
 		//Background
 		background = assetManager.get("Battleground1.png",Texture.class);
 		//Player
-		hero = new Hero(new Vector2(150.0f,150.0f),new Vector2(700.0f,150.0f),assetManager);
+		hero = new Hero(new Vector2(150.0f,150.0f),new Vector2(600.0f,150.0f),assetManager);
 		ai = new AiCustom(new Vector2(150.0f,150.0f) , new Vector2(900.0f,150.0f),2225);
 		//hero.setBody(world);
 		hero.setBody(rpgWorld);
@@ -217,8 +235,10 @@ public class Level1 implements GlobalWindow {
 	}
 	@Override
 	public void resize(int width, int height) {
-		// TODO Auto-generated method stub
-		
+		RPG.WINDOW_HEIGHT = height;
+		RPG.WINDOW_WIDTH = width;
+		viewport.update(width, height,false);
+		viewportHUD.update(width, height,false);
 	}
 
 	@Override
@@ -250,7 +270,7 @@ public class Level1 implements GlobalWindow {
 	public Array<Platform> createEnvironment() {
 		Array<Platform> platforms = new Array<Platform>();
 		platforms.add(new Platform(new Vector2(0,-30), new Vector2(10000,100),rpgWorld)); // Earth platform
-		//platforms.add( new Platform(new Vector2(1500,40), new Vector2(20,400), rpgWorld));
+		platforms.add( new Platform(new Vector2(1500,40), new Vector2(20,400), rpgWorld));
 		return platforms;
 	}
 	

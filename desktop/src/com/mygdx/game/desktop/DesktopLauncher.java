@@ -16,6 +16,8 @@ public class DesktopLauncher {
 		config.title = "RPG";
 		config.width = windowWidth;
 		config.height = windowHeight;
+		//config.foregroundFPS = 2;
+	
 		new LwjglApplication(new RPG(), config);
 	}
 }

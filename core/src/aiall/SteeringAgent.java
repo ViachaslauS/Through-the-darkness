@@ -14,7 +14,7 @@ public class SteeringAgent implements Steerable<Vector2> {
 	private int _tagged;
 	public Vector3 all ;
 	boolean _independentorientation = false;
-	Vector2 linearVelocity = new Vector2(1000,0);
+	Vector2 linearVelocity = new Vector2(12000,0);
 	SteeringBehavior<Vector2> steeringBehavior;
 	//SteeringAcceleration<Vector2> steeringOutput;
 	public SteeringAgent(Vector2 position, int orientetion, int tagged) {

@@ -42,7 +42,7 @@ public class DamageDeal {
 		ObjectData dealData = (ObjectData) dealer.getUserData();
 		
 		if(dealData.isAttacking == 1 ) {
-			recData.setHitpoint(dealData.getDAMAGE());
+			recData.setHitpoint(dealData.getSkillDamage());
 			dealData.isAttacking = 2;
 		}
 		aiReact(recData, dealData);

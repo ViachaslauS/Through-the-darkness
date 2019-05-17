@@ -29,6 +29,7 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 
 public class Entities {
 	
+	
 	public Entities(String name) {
 		
 		entitieData = new ObjectData(name);
@@ -62,6 +63,7 @@ public class Entities {
 	
 	protected Body body;
 	
+	protected boolean isDeath = false;
 	
 	protected AssetManager manager;
 	
@@ -202,7 +204,7 @@ public class Entities {
 	 * @param damage
 	 */
 	public void giveDamage(float damage) {
-		HITPOINT-=(damage*((ARMOR+1)/100));
+		entitieData.setHitpoint(damage);
 	}
 	/**
 	 * @return Damage of Entities
@@ -239,7 +241,8 @@ public class Entities {
 		
 		CircleShape circlePolygon = new CircleShape();
 		circlePolygon.setRadius(75);
-		circlePolygon.setPosition(new Vector2(75,coordY-75));
+		circlePolygon.setPosition(new Vector2(75,coordY-sizeY/2));
+		
 		//Gdx.app.log("Sprite Coord", ""+ entitieBox.getGravityScale());
 		sensorFixture = entitieBox.createFixture(circlePolygon,0f);
 		sensorFixture.setUserData(entitieData);
@@ -247,7 +250,7 @@ public class Entities {
 		circlePolygon.dispose();
 		
 			PolygonShape polygon = new PolygonShape();
-			polygon.setAsBox(38, 75,new Vector2(75,coordY-75),0);
+			polygon.setAsBox(38, 75,new Vector2(75,coordY-sizeY/2),0);
 			physicsFixture = entitieBox.createFixture(polygon, 0.0f);
 			polygon.dispose();
 			physicsFixture.setDensity(10000);
@@ -260,9 +263,13 @@ public class Entities {
 	}
 	
 	Vector2 bodyVelocity;
-
+	protected boolean isPhysicUpdatingActive = true;
+	
 	protected void updatePhysic() {
-		if(entitieBox.getLinearVelocity().y == 0) {
+		if(!isPhysicUpdatingActive)
+			return;
+		//Gdx.app.log("velocity", ""+entitieBox.getLinearVelocity().y);
+		if(entitieBox.getLinearVelocity().y == 0 || (entitieBox.getLinearVelocity().y < 0.0f && isEntitieGrounded())) {
 			coordY = entitieBox.getPosition().y;
 		}
 		else {
@@ -274,6 +281,7 @@ public class Entities {
 
 	protected boolean isEntitieGrounded() {
 		//get all contacts in world
+		
 		Array<Contact> contactList = rpgWorld.world.getContactList();
 		for(int i=0;i<contactList.size;i++) {
 			Contact contact = contactList.get(i);

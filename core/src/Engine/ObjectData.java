@@ -32,6 +32,8 @@ public class ObjectData {
 	 */
 	public int isAttacking = 0;
 	public boolean isAi = false;
+	public float skillDamage = 0.0f;
+	
 	protected float HITPOINT;
 	protected float MANA;
 	protected float ARMOR;
@@ -41,7 +43,7 @@ public class ObjectData {
 	private float addAgility;
 	private float addPower;
 	
-	public ObjectData(String object) {
+	public ObjectData(String object) { 
 		
 		preferences = Gdx.app.getPreferences(object);
 		stats = new PlayerStats(object+"_stat");
@@ -75,8 +77,17 @@ public class ObjectData {
 		
 	}
 	
-	public void setMANA(float mana) {
+	/**
+	 * Descrease mana on param
+	 * @param mana value
+	 */
+	public boolean setMANA(float mana) {
 		MANA -= mana;
+		if(MANA < 0) {
+			MANA += mana ;
+			return false;
+		}
+		return true;
 	}
 	public void setARMOR(float armor) {
 		ARMOR = armor;
@@ -105,6 +116,10 @@ public class ObjectData {
 	
 	public void resetPref() {
 		preferences.clear();
+		preferences.putFloat("HITPOINT", 100.0f);
+		preferences.putFloat("DAMAGE", 10.0f) ;
+		preferences.putFloat("ARMOR", 0.0f);
+		preferences.putFloat("MANA", 0.0f);
 	}
 	float regenClock = 0.0f;
 	/**
@@ -192,5 +207,9 @@ public class ObjectData {
 		if(ARMOR < 0) {
 			ARMOR = 0;
 		}
+	}
+
+	public float getSkillDamage() {
+		return DAMAGE*skillDamage;
 	}
 }
