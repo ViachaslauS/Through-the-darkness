@@ -11,9 +11,11 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.physics.box2d.World;
 
 import Engine.ObjectData;
+import Engine.RPGWorld;
 
 
 
@@ -32,6 +34,8 @@ public class Hero  extends Entities{
 	
 	private TextureRegion[] teleportFrames;
 	private Texture skills;
+	Filter f = new Filter();
+	
 	private Sound shift;
 	Animation<TextureRegion> currentAnimation;
 	Animation<TextureRegion>[] allAnimations;
@@ -68,6 +72,12 @@ public class Hero  extends Entities{
 		allSheets = manager.get("Hero.png",Texture.class);
 		entitieData.isAi = false;
 		picParam();
+		
+		
+		// filter
+				f.maskBits = RPGWorld.MASK_PLAYER;
+				f.categoryBits = RPGWorld.CATEGORY_PLAYER;
+				f.groupIndex = -1;
 		
 		//include to collector all sprites from picture
 		imageCollector = TextureRegion.split(allSheets,allSheets.getWidth()/PIC_FRAME_ROWS,allSheets.getHeight()/PIC_FRAME_COLS);
@@ -177,7 +187,7 @@ public class Hero  extends Entities{
 		if(Gdx.input.isKeyJustPressed(Keys.NUM_1)) {
 			currentAction = 1;
 			currentAnimation = attack1Animation;
-			entitieData.skillDamage = 1.0f;
+			entitieData.skillDamage = 100.0f;
 			attack1();
 			return;
 		}
@@ -185,7 +195,7 @@ public class Hero  extends Entities{
 		if(Gdx.input.isKeyJustPressed(Keys.SHIFT_LEFT)) {
 			if(!this.entitieData.setMANA(10))
 				return;
-			isPhysicUpdatingActive = false;
+			//isPhysicUpdatingActive = false;
 			//this.physicsFixture.setSensor(true);
 			currentAction = 2;
 			currentAnimation = teleportAnimation;
@@ -243,10 +253,10 @@ public class Hero  extends Entities{
 	}
 	public void teleport() {
 		if(refresh()) {
-			isPhysicUpdatingActive = true;
-			//this.physicsFixture.setSensor(false);
+			entitieData.isInvisible = false;
 			return;
 		}
+		 entitieData.isInvisible = true;
 		if(currentFrame == currentAnimation.getKeyFrames()[4] || currentFrame == currentAnimation.getKeyFrames()[5] || currentFrame == currentAnimation.getKeyFrames()[6]) {
 			//coordX+=1000*Gdx.graphics.getDeltaTime()*sideView/(1-stats.ATKSPEED());
 			move(1000*sideView/(1-entitieData.stats.ATKSPEED()));
@@ -340,7 +350,10 @@ public class Hero  extends Entities{
 	public ObjectData getEntitieData() {
 		return entitieData;
 	}
-
+	public void setFIlter() {
+		physicsFixture.setFilterData(f);
+		sensorFixture.setFilterData(f);
+	}
 	
 	
 }

@@ -1,5 +1,6 @@
 package Levels;
 
+import java.util.ArrayList;
 import java.util.function.ToIntFunction;
 
 import com.badlogic.gdx.Gdx;
@@ -73,7 +74,7 @@ public class Level1 implements GlobalWindow {
 		assetManager = new AssetManager();
 		game = game_;
 		rpgWorld = new RPGWorld();
-		rpgWorld.setEnvironment(createEnvironment());
+		rpgWorld.setEnvironment(createEnvironment(), createEnemy());
 		//world = new World(new Vector2(0,-100), true);
 		debugRenderer = new Box2DDebugRenderer(true, true, true, true, true, true);
 		damageMaster = new DamageDeal(rpgWorld);
@@ -100,7 +101,12 @@ public class Level1 implements GlobalWindow {
 		
 		
 		game.batch.draw(hero.currentFrame, hero.getCoordX(), hero.getCoordY(), hero.getSizeX(), hero.getSizeY());
-		game.batch.draw(ai.currentFrame, ai.getCoordX(), ai.getCoordY(), ai.getSizeX(), ai.getSizeY());
+		for(int i =0; i<bots.size();i++)
+		{
+			game.batch.draw(bots.get(i).currentFrame, bots.get(i).getCoordX(), bots.get(i).getCoordY(), bots.get(i).getSizeX(), bots.get(i).getSizeY());
+			for(int j=0;j<bots.get(i).bullets.size();j++)
+				bots.get(i).bullets.get(j).render(game.batch);
+		}
 		
 		game.batch.end();
 		//cameraHUD.position.set(hero.getCoordX(), /* hero.getCoordY() + */350.0f, 0);
@@ -154,7 +160,7 @@ public class Level1 implements GlobalWindow {
 			game.setScreen(new LevelLoading(game, new MainMenuScreen(game)));
 		
 		damageMaster.update();
-		Gdx.app.log("Hitpoints of ai and hero",""+ ai.getHITPOINT()+"  "+hero.getHITPOINT());
+		//Gdx.app.log("Hitpoints of ai and hero",""+ ai.getHITPOINT()+"  "+hero.getHITPOINT());
 		if(hero.getHITPOINT() <= 0.0f) {
 			if(hero.death()) {
 				
@@ -166,7 +172,21 @@ public class Level1 implements GlobalWindow {
 			//hero.giveDamage(0.1f);
 		}
 		check_path();
-		ai.update();
+		for(int i = 0; i< bots.size(); i++) {
+			
+			for(int j = 0; j < bots.get(i).bullets.size(); j++) {
+				if(bots.get(i).bullets.get(j).remove) {
+				//	bots.get(i).bullets.get(j).delete();
+					bots.get(i).bullets.remove(j);
+				}
+			
+			}
+			bots.get(i).update();
+			if(bots.get(i).getHITPOINT() <= 0.0f) {
+				bots.get(i).deleteBot();
+				bots.remove(i);
+			}
+		}
 		rpgWorld.world.step(1/1000f, 100, 100);
 	}
 	
@@ -174,12 +194,9 @@ public class Level1 implements GlobalWindow {
 		
 		  //System.out.println("hero :" + hero.getCoordX()+ "\n");
 		  //System.out.println("ai :" + ai.getCoordX()+ "\n"); 
-		  if(ai.getCoordX() <=
-		  hero.getCoordX()) {ai.sideView = 1;} else { ai.sideView = -1;} 
-		  //distance = hero.getCoordX() - ai.getCoordX(); 
-		  //if(distance <= 300 && distance >= 80 ) {
-		  
-		 // ai.setAttacking(true); } else ai.setAttacking(false);
+		 for(int i = 0; i< bots.size(); i++)
+			  if(bots.get(i).getCoordX() <=
+			  hero.getCoordX()) {bots.get(i).sideView = 1;} else { bots.get(i).sideView = -1;} 
 		 
 	}
 	
@@ -212,10 +229,12 @@ public class Level1 implements GlobalWindow {
 		background = assetManager.get("Battleground1.png",Texture.class);
 		//Player
 		hero = new Hero(new Vector2(150.0f,150.0f),new Vector2(600.0f,150.0f),assetManager);
-		ai = new AiCustom(new Vector2(150.0f,150.0f) , new Vector2(900.0f,150.0f),2225);
+		//ai = new AiCustom(new Vector2(150.0f,150.0f) , new Vector2(900.0f,150.0f),2225);
 		//hero.setBody(world);
 		hero.setBody(rpgWorld);
-		ai.setBody(rpgWorld);
+		hero.setFIlter();
+		for(int i = 0; i < bots.size(); i++)
+			bots.get(i).setBody(rpgWorld);
 		def = new BodyDef();
 		def.type = BodyType.DynamicBody;
 		//Body entitieBox = world.createBody(def);
@@ -273,6 +292,15 @@ public class Level1 implements GlobalWindow {
 		platforms.add( new Platform(new Vector2(1500,40), new Vector2(20,400), rpgWorld));
 		return platforms;
 	}
+	
+	public ArrayList<AiCustom> bots;
+	public ArrayList<AiCustom> createEnemy() {
+		 bots = new ArrayList<AiCustom>();
+		bots.add(new AiCustom(new Vector2(150.0f,150.0f) , new Vector2(1100.0f,150.0f),2225));
+		bots.add(new AiCustom(new Vector2(150.0f,150.0f) , new Vector2(1300.0f,150.0f),2224));
+		return bots;
+	}
+	
 	
 	
 }

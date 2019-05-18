@@ -6,6 +6,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.physics.box2d.Fixture;
 
 public class Platform {
@@ -15,6 +16,8 @@ public class Platform {
 	Rectangle bounds;
 	Body platformBox;
 	Fixture PhysicFixture;
+	
+	Filter f = new Filter();
 	
 	
 	public Vector2 getPosition() {
@@ -49,6 +52,14 @@ public class Platform {
 		PhysicFixture.setDensity(10000);
 		PhysicFixture.setFriction(10000);
 		polygon.dispose();
+		
+		//fitler
+				f.categoryBits = RPGWorld.CATEGORY_SCENERY;
+				f.maskBits = RPGWorld.MASK_SCENERY;
+				f.groupIndex = 2;
+				PhysicFixture.setFilterData(f);
+		
+		
 	}
 	
 }

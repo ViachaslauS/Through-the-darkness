@@ -32,6 +32,9 @@ public class ObjectData {
 	 */
 	public int isAttacking = 0;
 	public boolean isAi = false;
+	public float attackTime = 0;
+	public boolean isInvisible = false;
+	public boolean isBull = false;
 	public float skillDamage = 0.0f;
 	
 	protected float HITPOINT;

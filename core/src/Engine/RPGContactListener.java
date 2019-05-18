@@ -24,28 +24,15 @@ public class RPGContactListener implements ContactListener{
 	
 	@Override
 	public void beginContact(Contact contact) {
-		/*
-		 * if(contact.getFixtureA().getUserData()!= null &&
-		 * contact.getFixtureB().getUserData()!= null ) {
-		 * if(contact.getFixtureB().getUserData().equals("box") &&
-		 * contact.getFixtureA().getUserData().equals("box")) {
-		 * 
-		 * } else {
-		 * 
-		 * if(contact.getFixtureB().getUserData().equals("box")) bodyData = (ObjectData)
-		 * contact.getFixtureA().getUserData(); else bodyData = (ObjectData)
-		 * contact.getFixtureB().getUserData(); if(bodyData.isAttacking) {
-		 * if(contact.getFixtureA().getBody().getPosition().x >
-		 * contact.getFixtureB().getBody().getPosition().x) { sideView = -1; }
-		 * bodyData.setHitpoint(5); // ����������� ��������!!! bodyData.isAttacking =
-		 * false;
-		 * 
-		 * } bodyData = (ObjectData) contact.getFixtureB().getUserData();
-		 * if(bodyData.isAttacking) { bodyData.setHitpoint(5); bodyData.isAttacking =
-		 * false; } } }
-		 */
-		
-		
+	
+	
+	}
+	private ObjectData recreate(Fixture fixtureA) {
+		if(fixtureA.getUserData().getClass().getName() == "com.badlogic.gdx.physics.box2d.Fixture" ) {
+			Fixture temp = (Fixture) fixtureA.getUserData();
+			return (ObjectData) temp.getUserData();
+		}
+		return (ObjectData) fixtureA.getUserData();
 	}
 
 	@Override
@@ -80,6 +67,25 @@ private void aiReact(ObjectData rec, ObjectData deal) {
 	}
 	@Override
 	public void preSolve(Contact contact, Manifold oldManifold) {
+		
+		WorldManifold manifold = contact.getWorldManifold();
+		
+		for(int i =0; i < manifold.getNumberOfContactPoints(); i++) {
+			if(contact.getFixtureA().getUserData() != null && contact.getFixtureB().getUserData() != null)
+			{
+				ObjectData fixAData = recreate(contact.getFixtureA());
+				ObjectData fixBData = recreate(contact.getFixtureB());
+				
+				if(fixAData.isBull && fixBData.isBull)
+					contact.setEnabled(false);
+				if((fixAData.isBull && !(fixBData.isAi)) || (fixBData.isBull && !(fixAData.isAi)))
+					contact.setEnabled(true);
+			}
+			
+		}
+		
+		
+		
 		
 	}
 
