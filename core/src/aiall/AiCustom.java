@@ -13,6 +13,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.Filter;
+import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 
 import Engine.RPGWorld;
@@ -32,7 +33,7 @@ public class AiCustom extends Entities {
 	private float attack_time=0;
 	
 	Filter f = new Filter();
-	
+	Filter attf = new Filter();
 	
 	//FollowPath followPath;
 	Path<Vector2, Pathparametrs> path;
@@ -76,7 +77,10 @@ public class AiCustom extends Entities {
 		//followPath = new FollowPath<Vector2, Pathparametrs>(steeringAgent, path);
 		f.maskBits = RPGWorld.MASK_RUNNER;
 		f.categoryBits = RPGWorld.CATEGORY_RUNNER;
-		f.groupIndex = -1;
+		f.groupIndex = -1; // filter of body
+		attf.groupIndex = -5; // filter of attack
+		attf.categoryBits = RPGWorld.CATEGORY_RUNNER;
+		attf.maskBits = RPGWorld.MASK_RUNNER;
 		picParam();
 		
 		//���������� ���������� ����� ��������� �� �����
@@ -108,7 +112,7 @@ public class AiCustom extends Entities {
 		  time+= Gdx.graphics.getDeltaTime();
 		  entitieData.attackTime += Gdx.graphics.getDeltaTime();
 		  bulletTime += Gdx.graphics.getDeltaTime();
-		  if(bulletTime >= 5 && entitieData.isAttacking == -1) {
+		  if(bulletTime >= 5 && entitieData.isAttacking == -1 && !(isJump)) {
 			  bulletTime = 0;
 			  shoot();
 		  }
@@ -150,7 +154,7 @@ public class AiCustom extends Entities {
 		  
 	  }
 
-
+	  Fixture attackRange;
 	public void setAttacking(int b) {
 		entitieData.isAttacking = b;
 		
@@ -164,7 +168,15 @@ public class AiCustom extends Entities {
 			sensorFixture = entitieBox.createFixture(circlePolygon,0f);
 			sensorFixture.setUserData(entitieData);
 			sensorFixture.setSensor(true);
-			circlePolygon.dispose();
+			
+			
+				circlePolygon.setRadius(75);
+				circlePolygon.setPosition(new Vector2(75,coordY-75));
+				attackRange = entitieBox.createFixture(circlePolygon,0f);
+				attackRange.setUserData(entitieData);
+				attackRange.setSensor(true);
+				circlePolygon.dispose();
+				
 			
 				PolygonShape polygon = new PolygonShape();
 				polygon.setAsBox(38, 75,new Vector2(75,coordY-75),0);
@@ -179,6 +191,7 @@ public class AiCustom extends Entities {
 				
 				physicsFixture.setFilterData(f);
 			    sensorFixture.setFilterData(f);
+			    attackRange.setFilterData(attf);
 	}
 	 public void deleteBot() {
 			entitieBox.destroyFixture(physicsFixture);
