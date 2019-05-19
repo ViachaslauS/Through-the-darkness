@@ -96,36 +96,46 @@ public class Entities {
 	 */
 	protected Texture allSheets;
 	//count of sprites in pic
-	protected static int PIC_FRAME_COLS;
-	protected static int PIC_FRAME_ROWS;
+	protected  int PIC_FRAME_COLS;
+	protected  int PIC_FRAME_ROWS;
 	protected TextureRegion[][] imageCollector;
 	
 	// count of needed sprites from pic
-	protected static int STAY_FRAME_COLS;  //column
-	protected static int STAY_FRAME_COL;   //from which column
-	protected static int STAY_FRAME_ROWS;  //row
-	protected static int STAY_FRAME_ROW;   //from which row
+	protected  int STAY_FRAME_COLS;  //column
+	protected  int STAY_FRAME_COL;   //from which column
+	protected  int STAY_FRAME_ROWS;  //row
+	protected  int STAY_FRAME_ROW;   //from which row
 	//Idle Animtaion
 	protected Animation<TextureRegion> stayAnimation;
 	
 	//Count mount sprites
-	protected static int MOVE_FRAME_COLS;
-	protected static int MOVE_FRAME_COL;
-	protected static int MOVE_FRAME_ROWS;
-	protected static int MOVE_FRAME_ROW;
+	protected  int MOVE_FRAME_COLS;
+	protected  int MOVE_FRAME_COL;
+	protected  int MOVE_FRAME_ROWS;
+	protected  int MOVE_FRAME_ROW;
 	//move Animation
 	protected Animation<TextureRegion> moveAnimation;
 	
 	//Attack sprites
-	protected static int ATTACK1_FRAME_COLS;
-	protected static int ATTACK1_FRAME_COL;
-	protected static int ATTACK1_FRAME_ROWS;
-	protected static int ATTACK1_FRAME_ROW;
+	protected  int ATTACK1_FRAME_COLS;
+	protected  int ATTACK1_FRAME_COL;
+	protected  int ATTACK1_FRAME_ROWS;
+	protected  int ATTACK1_FRAME_ROW;
 	
 	protected float CURRENT_DURATION = 0.0f;
 	//Animation attack1
 	protected Animation<TextureRegion> attack1Animation;
 	
+	// SLAVA CRITICAL SECTION
+	//________________________________________________________
+	protected int DEATH_FRAME_COLS;
+	protected int DEATH_FRAME_COL;
+	protected int DEATH_FRAME_ROWS;
+	protected int DEATH_FRAME_ROW;
+	
+	protected Animation<TextureRegion> deathAnimation;
+	protected TextureRegion[] deathFrames;
+	//________________________________________________________
 	protected TextureRegion[] stayFrames;
 	protected TextureRegion[] moveFrames;
 	protected TextureRegion[] attack1Frames;
@@ -216,6 +226,30 @@ public class Entities {
 		return HITPOINT;
 	}
 
+	/** 
+	 *  I don't know what do this method, but his work
+	 */
+	public void frameFlip() {
+		if(sideView == 1)
+		{
+			if(!currentFrame.isFlipX()) {											    
+				currentFrame.flip(false, false);	
+			}
+			else {
+				currentFrame.flip(true, false);
+			}
+		}
+		else {
+			if(currentFrame.isFlipX()) {
+			
+				currentFrame.flip(false, false);
+			}
+			else {
+			
+				currentFrame.flip(true, false);
+			}
+		}
+	}
 	
 	protected Body entitieBox;
 	protected Fixture physicsFixture;

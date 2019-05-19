@@ -30,7 +30,7 @@ public class UserInterface {
 	
 	public void draw(SpriteBatch batch, ObjectData objectData) {
 		batch.draw(emptyBar, 20,720-70,objectData.MAXHITPOINT*3,70);
-		batch.draw(fullHP, 40,720-70,objectData.HITPOINT*3,70);
+		batch.draw(fullHP, 40,720-70,objectData.getHITPOINT()*3,70);
 		//batch.draw(fullHP, 20, Gdx.graphics.getHeight()-50,objectData.MAXHITPOINT*5,50, objectData.HITPOINT*5, 50, 1, 1, 0, false);
 		batch.draw(emptyBar,20,720-110,objectData.MAXMANA*3,70);
 		batch.draw(fullMANA, 40,720-110,objectData.MANA*3,70);

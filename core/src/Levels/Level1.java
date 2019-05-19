@@ -103,9 +103,13 @@ public class Level1 implements GlobalWindow {
 		game.batch.draw(hero.currentFrame, hero.getCoordX(), hero.getCoordY(), hero.getSizeX(), hero.getSizeY());
 		for(int i =0; i<bots.size();i++)
 		{
+			// Slava CRITICAL SECTION
+			// _______________________________
 			game.batch.draw(bots.get(i).currentFrame, bots.get(i).getCoordX(), bots.get(i).getCoordY(), bots.get(i).getSizeX(), bots.get(i).getSizeY());
-			for(int j=0;j<bots.get(i).bullets.size();j++)
+			bots.get(i).barAIDrawing(game.batch);
+			for(int j=0;j<bots.get(i).bullets.size();j++)  
 				bots.get(i).bullets.get(j).render(game.batch);
+			// ________________________________
 		}
 		
 		game.batch.end();
@@ -120,7 +124,6 @@ public class Level1 implements GlobalWindow {
 		//debugRenderer.render(world, viewport.getCamera().combined);
 		debugRenderer.render(rpgWorld.world, viewport.getCamera().combined);
 	}
-	
 	
 	
 	private void drawInterface() {
@@ -181,12 +184,21 @@ public class Level1 implements GlobalWindow {
 				}
 			
 			}
-			bots.get(i).update();
-			if(bots.get(i).getHITPOINT() <= 0.0f) {
+			// Slava CRITICAL SECTION
+			//____________________________________________
+			//bots.get(i).update(delta);
+			//if(bots.get(i).getHITPOINT() <= 0.0f) {
+			//	bots.get(i).deleteBot();
+			//	bots.remove(i);
+			//}
+			bots.get(i).update(delta);
+			if(bots.get(i).isDead) {
 				bots.get(i).deleteBot();
 				bots.remove(i);
 			}
+				
 		}
+		//_________________________________________________
 		rpgWorld.world.step(1/1000f, 100, 100);
 	}
 	
@@ -289,15 +301,16 @@ public class Level1 implements GlobalWindow {
 	public Array<Platform> createEnvironment() {
 		Array<Platform> platforms = new Array<Platform>();
 		platforms.add(new Platform(new Vector2(0,-30), new Vector2(10000,100),rpgWorld)); // Earth platform
-		platforms.add( new Platform(new Vector2(1500,40), new Vector2(20,400), rpgWorld));
+		platforms.add(new Platform(new Vector2(1500,40), new Vector2(20,400), rpgWorld));
+		platforms.add(new Platform(new Vector2(2200,200), new Vector2(300,20), rpgWorld));
 		return platforms;
 	}
 	
 	public ArrayList<AiCustom> bots;
 	public ArrayList<AiCustom> createEnemy() {
 		 bots = new ArrayList<AiCustom>();
-		bots.add(new AiCustom(new Vector2(150.0f,150.0f) , new Vector2(1100.0f,150.0f),2225));
-		bots.add(new AiCustom(new Vector2(150.0f,150.0f) , new Vector2(1300.0f,150.0f),2224));
+		bots.add(new AiCustom(new Vector2(150.0f,150.0f) , new Vector2(1100.0f,150.0f),1));
+		bots.add(new AiCustom(new Vector2(150.0f,150.0f) , new Vector2(1300.0f,150.0f),1));
 		return bots;
 	}
 	

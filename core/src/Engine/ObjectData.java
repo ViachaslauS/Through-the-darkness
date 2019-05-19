@@ -22,6 +22,21 @@ public class ObjectData {
 	Array<Buff> buffs;
 	
 	protected float MAXHITPOINT;
+	public float getMAXHITPOINT() {
+		return MAXHITPOINT;
+	}
+
+	public void setMAXHITPOINT(float mAXHITPOINT) {
+		MAXHITPOINT = mAXHITPOINT;
+	}
+
+	public float getMAXMANA() {
+		return MAXMANA;
+	}
+
+	public void setMAXMANA(float mAXMANA) {
+		MAXMANA = mAXMANA;
+	}
 	protected float MAXMANA;
 	
 	
@@ -37,7 +52,7 @@ public class ObjectData {
 	public boolean isBull = false;
 	public float skillDamage = 0.0f;
 	
-	protected float HITPOINT;
+	private float HITPOINT;
 	protected float MANA;
 	protected float ARMOR;
 	protected float DAMAGE;
@@ -78,6 +93,12 @@ public class ObjectData {
 		checkARMOR();
 		HITPOINT -= damage/(ARMOR+1);
 		
+	}
+	/**
+	 *  reset value of HP to 0.0f
+	 */
+	public void resetHitpoints() {
+		HITPOINT = 0.0f;
 	}
 	
 	/**
@@ -200,7 +221,10 @@ public class ObjectData {
 	}
 
 	private void regenHP() {
-		HITPOINT += stats.HPREG();
+		if(HITPOINT<= 0 )
+			HITPOINT = 0;
+		else
+			HITPOINT += stats.HPREG();
 	}
 
 	private void checkARMOR() {

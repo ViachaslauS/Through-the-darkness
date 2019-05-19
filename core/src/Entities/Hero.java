@@ -30,7 +30,7 @@ public class Hero  extends Entities{
 	//public PlayerStats stats;
 	
 	private Animation<TextureRegion> teleportAnimation;
-	private Animation<TextureRegion> deathAnimation;
+	//private Animation<TextureRegion> deathAnimation;
 	
 	private TextureRegion[] teleportFrames;
 	private Texture skills;
@@ -58,6 +58,11 @@ public class Hero  extends Entities{
 				ATTACK1_FRAME_COLS = 10;
 				ATTACK1_FRAME_ROW = 3;
 				ATTACK1_FRAME_ROWS = 1;
+				//for death
+				DEATH_FRAME_COL = 0;
+				DEATH_FRAME_COLS = 10;
+				DEATH_FRAME_ROW = 4;
+				DEATH_FRAME_ROWS = 1;
 	}
 	
 	
@@ -96,10 +101,13 @@ public class Hero  extends Entities{
 			for(int j=0;j<MOVE_FRAME_COLS;j++)
 				moveFrames[index++] = imageCollector[i+MOVE_FRAME_ROW][j+MOVE_FRAME_COL];
 		index = 0;
-		TextureRegion[] deathFrames = new TextureRegion[10];
-		for(int i = 0; i<10; i++) {
-			deathFrames[i] = imageCollector[4][i];
+		deathFrames = new TextureRegion[DEATH_FRAME_COLS*DEATH_FRAME_ROWS];
+		for(int i = 0; i< DEATH_FRAME_ROWS; i++) {
+			for(int j = 0; j<DEATH_FRAME_COLS; j++) {
+				deathFrames[index++] = imageCollector[i+DEATH_FRAME_ROW][j+ATTACK1_FRAME_COL];
+			}
 		}
+		index = 0;
 		//Initialize of animations
 		stayAnimation = new Animation<TextureRegion>(0.10f, stayFrames);
 		moveAnimation = new Animation<TextureRegion>(0.10f,moveFrames);
@@ -289,30 +297,7 @@ public class Hero  extends Entities{
 		entitieData.isAttacking = 0;
 		entitieData.skillDamage = 0.0f;
 	}
-	/** 
-	 *  I don't know what do this method, but his work
-	 */
-	public void frameFlip() {
-		if(sideView == 1)
-		{
-			if(!currentFrame.isFlipX()) {											    
-				currentFrame.flip(false, false);	
-			}
-			else {
-				currentFrame.flip(true, false);
-			}
-		}
-		else {
-			if(currentFrame.isFlipX()) {
-			
-				currentFrame.flip(false, false);
-			}
-			else {
-			
-				currentFrame.flip(true, false);
-			}
-		}
-	}
+	
 	@Override
 	public void dispose() {
 		allSheets.dispose();

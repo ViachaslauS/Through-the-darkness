@@ -3,11 +3,14 @@ package aiall;
 import java.sql.Time;
 import java.util.ArrayList;
 
+import javax.swing.plaf.basic.BasicInternalFrameTitlePane.MaximizeAction;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.steer.behaviors.FollowPath;
 import com.badlogic.gdx.ai.steer.utils.Path;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -34,32 +37,40 @@ public class AiCustom extends Entities {
 	Filter f = new Filter();
 	
 	
+	private Animation<TextureRegion> currentAnimation;
+
+	
 	//FollowPath followPath;
 	Path<Vector2, Pathparametrs> path;
 	public void picParam() {
-		//����� ���������� �������� � �����
+				// all columns and rows  in pic
 				PIC_FRAME_COLS = 10;
 				PIC_FRAME_ROWS = 10;
-				//���������� �������� �����
+				// stay animation cols and rows and from where begin
 				STAY_FRAME_COL = 0;
 				STAY_FRAME_COLS = 10;	
 				STAY_FRAME_ROW = 0;
 				STAY_FRAME_ROWS = 1;
-				//���������� �������� ��������
+				// for move
 				MOVE_FRAME_COL = 0;
 				MOVE_FRAME_COLS = 10;
-				MOVE_FRAME_ROW = 2;
+				MOVE_FRAME_ROW = 1;
 				MOVE_FRAME_ROWS = 1;
-				//���������� �������� �����1
+				// for attack
 				ATTACK1_FRAME_COL = 0;
 				ATTACK1_FRAME_COLS = 10;
-				ATTACK1_FRAME_ROW = 3;
+				ATTACK1_FRAME_ROW = 2;
 				ATTACK1_FRAME_ROWS = 1;
+				// for death
+				DEATH_FRAME_COL = 0;
+				DEATH_FRAME_COLS = 10;
+				DEATH_FRAME_ROW = 3;
+				DEATH_FRAME_ROWS = 1;
 	}
 	
 	
-	public AiCustom(Vector2 size,Vector2 coord, int id) {
-		super("aistats"+id);
+	public AiCustom(Vector2 size,Vector2 coord, int botLevel) {
+		super("aistats"+botLevel);
 		
 		//preferences = Gdx.app.getPreferences("aistats"+ id);
 		setSize(size);
@@ -71,53 +82,85 @@ public class AiCustom extends Entities {
 		entitieData.isAi = true;
 		//sideView = (float) sideView;
 		//isAttacking = false;
-		allSheets = new Texture(Gdx.files.internal("Hero.png"));
+		
 		steeringAgent = new SteeringAgent(coord, sideView, 0);
 		//followPath = new FollowPath<Vector2, Pathparametrs>(steeringAgent, path);
 		f.maskBits = RPGWorld.MASK_RUNNER;
 		f.categoryBits = RPGWorld.CATEGORY_RUNNER;
 		f.groupIndex = -1;
+		// Slava CRITICAL SECTION EDIT
+		//_______________________________________________________________________________
+		allSheets = new Texture(Gdx.files.internal("AI"+botLevel+".png"));
 		picParam();
 		
-		//���������� ���������� ����� ��������� �� �����
 		imageCollector = TextureRegion.split(allSheets,allSheets.getWidth()/PIC_FRAME_ROWS,allSheets.getHeight()/PIC_FRAME_COLS);
-		//������������� ���� TextureRegion'�� 
 		stayFrames = new TextureRegion[STAY_FRAME_COLS*STAY_FRAME_ROWS];
 		moveFrames = new TextureRegion[MOVE_FRAME_COLS*MOVE_FRAME_ROWS];
 		attack1Frames = new TextureRegion[ATTACK1_FRAME_COLS*ATTACK1_FRAME_ROWS];
-		//���������� TextureRegion'�� ���������
+		deathFrames = new TextureRegion[DEATH_FRAME_COLS*DEATH_FRAME_ROWS];
 		int index = 0;
-		for(int i=0;i<STAY_FRAME_ROWS;i++)  //���������� �����
+		for(int i=0;i<STAY_FRAME_ROWS;i++)  	
 			for(int j=0;j<STAY_FRAME_COLS;j++) {
 				stayFrames[index++] = imageCollector[i+STAY_FRAME_ROW][j+STAY_FRAME_COL];
 			}
 		index = 0;
-		for(int i=0;i<MOVE_FRAME_ROWS;i++)  //���������� ��������
+		for(int i=0;i<MOVE_FRAME_ROWS;i++)  		
 			for(int j=0;j<MOVE_FRAME_COLS;j++)
 				moveFrames[index++] = imageCollector[i+MOVE_FRAME_ROW][j+MOVE_FRAME_COL];
 		index = 0;
-		//������������� ���������� ��������
-		stayAnimation = new Animation<TextureRegion>(0.10f, stayFrames);
+		deathFrames = new TextureRegion[10];
+		for(int i = 0; i< DEATH_FRAME_ROWS; i++) {
+			for(int j = 0; j<DEATH_FRAME_COLS; j++) {
+				deathFrames[index++] = imageCollector[i+DEATH_FRAME_ROW][j+ATTACK1_FRAME_COL];
+			}
+		}
+		index = 0;
+		stayAnimation = new Animation<TextureRegion>(0.20f,stayFrames);
 		moveAnimation = new Animation<TextureRegion>(0.10f,moveFrames);
+		deathAnimation = new Animation<TextureRegion>(0.10f,deathFrames);
+		attack1Animation = new Animation<TextureRegion>(0.15f-botLevel/100,attack1Frames);
 		currentFrame = stayAnimation.getKeyFrame(0.10f, true);
-			
+		currentAnimation = stayAnimation;
+		
+		
+		// hp bar
+		fullHPBar = new Texture(Gdx.files.internal("fullloadbar.png"));
+		currentHPBar = new Texture(Gdx.files.internal("currentloadbar.png"));
+		//_________________________________________________________________________________________________
 	}
-	
-	  public void update() {
+		//SLAVA CRITICAL
+		public boolean isDead = false;
+		//___
+	  public void update(float delta) {
 		 
+		  //Slava CRITICAL SECTION
+		  //_________________________________________
+		  if(getHITPOINT() <=0) {
+			  entitieData.resetHitpoints();
+			  if(currentFrame == deathAnimation.getKeyFrames()[deathAnimation.getKeyFrames().length-1])
+				  isDead = true;
+			  else currentFrame = deathAnimation.getKeyFrame(CURRENT_DURATION,false);
+			  frameFlip();
+			  CURRENT_DURATION+=Gdx.graphics.getDeltaTime();
+			  return;
+		  }
+		  //_________________________________________
+		  
 		  time+= Gdx.graphics.getDeltaTime();
 		  entitieData.attackTime += Gdx.graphics.getDeltaTime();
 		  bulletTime += Gdx.graphics.getDeltaTime();
+		  if(entitieData.isAttacking == 0)
+			  currentFrame = stayAnimation.getKeyFrame(delta,true);
 		  if(bulletTime >= 5 && entitieData.isAttacking == -1) {
 			  bulletTime = 0;
 			  shoot();
 		  }
 		  
 		  
-		  if(time>=1) {
+		  //if(time>=1) {
 			  
-			  jump();
-		  }
+			//  jump();
+		//  }
 		  for(int i = 0; i< bullets.size(); i++)
 				 bullets.get(i).update(Gdx.graphics.getDeltaTime());
 		  
@@ -126,10 +169,11 @@ public class AiCustom extends Entities {
 		 move(all.y);
 		 
 		 sideView = (int) all.x;
-		 
+		 currentFrame = moveAnimation.getKeyFrame(delta,true);
 		 }
 		  updatePhysic();
 		  entitieData.updateData();
+		  frameFlip();
 		  
 		  
 	  }
@@ -181,6 +225,7 @@ public class AiCustom extends Entities {
 			    sensorFixture.setFilterData(f);
 	}
 	 public void deleteBot() {
+		 	
 			entitieBox.destroyFixture(physicsFixture);
 			entitieBox.destroyFixture(sensorFixture);
 			dispose();
@@ -194,6 +239,16 @@ public class AiCustom extends Entities {
 			bullets.add(bullet);
 			
 		}
-	
+
+		//Slava CRITICAL SECTION
+		//___________________________________________________
+		Texture fullHPBar;
+		Texture currentHPBar;
+		public void barAIDrawing(SpriteBatch batch) {
+			
+			batch.draw(fullHPBar, coordX+30, coordY + sizeY+20, 300%entitieData.getMAXHITPOINT(), 5);
+			batch.draw(currentHPBar, coordX+30, coordY + sizeY+20, 300%getHITPOINT(), 5);
+		}
+		//___________________________________________________
 	
 }
