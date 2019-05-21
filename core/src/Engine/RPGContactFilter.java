@@ -15,7 +15,7 @@ public class RPGContactFilter implements ContactFilter {
 	public boolean shouldCollide(Fixture fixtureA, Fixture fixtureB) {
 		Filter filterA = fixtureA.getFilterData();
 		Filter filterB = fixtureB.getFilterData();
-		if(filterA.categoryBits == filterB.categoryBits)
+		if((filterA.categoryBits == filterB.categoryBits)|| (filterA.categoryBits == RPGWorld.CATEGORY_BULLET && filterB.categoryBits == RPGWorld.CATEGORY_RUNNER) || (filterA.categoryBits == RPGWorld.CATEGORY_RUNNER && filterB.categoryBits == RPGWorld.CATEGORY_BULLET))
 			return false;
 		if(filterA.categoryBits != RPGWorld.CATEGORY_SCENERY && filterB.categoryBits != RPGWorld.CATEGORY_SCENERY)
 		{	

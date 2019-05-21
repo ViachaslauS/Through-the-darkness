@@ -49,6 +49,8 @@ public class ObjectData {
 	public boolean isAi = false;
 	public float attackTime = 0;
 	public boolean isInvisible = false;
+	public boolean shouldEvade = false;
+	public boolean shouldRemove = false;
 	public boolean isBull = false;
 	public float skillDamage = 0.0f;
 	

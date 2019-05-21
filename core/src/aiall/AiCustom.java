@@ -16,6 +16,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.Filter;
+import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 
 import Engine.RPGWorld;
@@ -26,6 +27,7 @@ public class AiCustom extends Entities {
 	//public float sideView;
 	//boolean isAttaking;
 	Vector3 all;
+	private int level;
 	Vector2 _coord;
 	private float time;
 	private float bulletTime = 0;
@@ -35,7 +37,7 @@ public class AiCustom extends Entities {
 	private float attack_time=0;
 	
 	Filter f = new Filter();
-	
+	Filter attf = new Filter();
 	
 	private Animation<TextureRegion> currentAnimation;
 
@@ -71,7 +73,7 @@ public class AiCustom extends Entities {
 	
 	public AiCustom(Vector2 size,Vector2 coord, int botLevel) {
 		super("aistats"+botLevel);
-		
+		this.level = botLevel;
 		//preferences = Gdx.app.getPreferences("aistats"+ id);
 		setSize(size);
 		setCoord(coord);
@@ -88,6 +90,11 @@ public class AiCustom extends Entities {
 		f.maskBits = RPGWorld.MASK_RUNNER;
 		f.categoryBits = RPGWorld.CATEGORY_RUNNER;
 		f.groupIndex = -1;
+		
+		attf.groupIndex = -5; // filter of attack
+		attf.categoryBits = RPGWorld.CATEGORY_RUNNER;
+		attf.maskBits = RPGWorld.MASK_RUNNER;
+		
 		// Slava CRITICAL SECTION EDIT
 		//_______________________________________________________________________________
 		allSheets = new Texture(Gdx.files.internal("AI"+botLevel+".png"));
@@ -151,16 +158,16 @@ public class AiCustom extends Entities {
 		  bulletTime += Gdx.graphics.getDeltaTime();
 		  if(entitieData.isAttacking == 0)
 			  currentFrame = stayAnimation.getKeyFrame(delta,true);
-		  if(bulletTime >= 5 && entitieData.isAttacking == -1) {
+		  if(bulletTime >= 2 && entitieData.isAttacking == -1  && !(isJump) && level == 2) {
 			  bulletTime = 0;
 			  shoot();
 		  }
 		  
 		  
-		  //if(time>=1) {
+		  if(time>=4 && level == 2) {
 			  
-			//  jump();
-		//  }
+			  jump();
+		  }
 		  for(int i = 0; i< bullets.size(); i++)
 				 bullets.get(i).update(Gdx.graphics.getDeltaTime());
 		  
@@ -171,6 +178,13 @@ public class AiCustom extends Entities {
 		 sideView = (int) all.x;
 		 currentFrame = moveAnimation.getKeyFrame(delta,true);
 		 }
+		  if(entitieData.shouldEvade)
+		  {
+			  entitieData.shouldEvade = false;
+			  entitieBox.applyLinearImpulse(new Vector2((400000*sideView*(-1)),0), new Vector2(coordX,coordY), true);
+		  }
+		  
+		  
 		  updatePhysic();
 		  entitieData.updateData();
 		  frameFlip();
@@ -199,6 +213,7 @@ public class AiCustom extends Entities {
 		entitieData.isAttacking = b;
 		
 	}
+	Fixture attackRange;
 	 @Override
 	protected void bodyInitialize() {
 		 CircleShape circlePolygon = new CircleShape();
@@ -208,6 +223,14 @@ public class AiCustom extends Entities {
 			sensorFixture = entitieBox.createFixture(circlePolygon,0f);
 			sensorFixture.setUserData(entitieData);
 			sensorFixture.setSensor(true);
+			
+			circlePolygon.setRadius(75);
+			circlePolygon.setPosition(new Vector2(75,coordY-75));
+			attackRange = entitieBox.createFixture(circlePolygon,0f);
+			attackRange.setUserData(entitieData);
+			attackRange.setSensor(true);
+			
+			
 			circlePolygon.dispose();
 			
 				PolygonShape polygon = new PolygonShape();
@@ -223,6 +246,7 @@ public class AiCustom extends Entities {
 				
 				physicsFixture.setFilterData(f);
 			    sensorFixture.setFilterData(f);
+			    attackRange.setFilterData(attf);
 	}
 	 public void deleteBot() {
 		 	

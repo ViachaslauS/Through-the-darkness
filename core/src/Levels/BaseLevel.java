@@ -65,6 +65,15 @@ public class BaseLevel implements GlobalWindow{
 		private float Time = 0.0f;
 		
 		
+		public enum State {
+			PAUSE,
+			RUN,
+			RESUME,
+			STOPPED
+		}
+
+		private State state = State.RUN;
+		
 		public BaseLevel(final RPG game_) {
 			assetManager = new AssetManager();
 			game = game_;
@@ -79,51 +88,70 @@ public class BaseLevel implements GlobalWindow{
 		public void render(float delta) {
 			
 			//level.render(camera);
+			switch(state) {
 			
-			Time+=delta;
-			Gdx.gl.glClearColor(0, 0.1f, 0, 1);
-			Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-			update(Time);
-			camera.position.set(hero.getCoordX(), /* hero.getCoordY() + */350.0f, 0);
-			if(camera.position.x < 640.0f) camera.position.x = 640.0f;
-			camera.update();
-			
-			game.batch.setProjectionMatrix(camera.combined);
-			
-			game.batch.begin();
-			
-			backgroundDraw();
-			
-			
-			game.batch.draw(hero.currentFrame, hero.getCoordX(), hero.getCoordY(), hero.getSizeX(), hero.getSizeY());
-			for(int i =0; i<bots.size();i++)
-			{
-				// Slava CRITICAL SECTION
-				// _______________________________
-				game.batch.draw(bots.get(i).currentFrame, bots.get(i).getCoordX(), bots.get(i).getCoordY(), bots.get(i).getSizeX(), bots.get(i).getSizeY());
-				bots.get(i).barAIDrawing(game.batch);
-				for(int j=0;j<bots.get(i).bullets.size();j++)  
-					bots.get(i).bullets.get(j).render(game.batch);
-				// ________________________________
+			case RUN:
+				renderRun(delta);
+				break;
+			case PAUSE:
+				renderPause(delta);
+				break;
 			}
 			
-			for(int i = 0; i < platforms.size;i++) {
-				platforms.get(i).draw(game.batch);
-			}
-			game.batch.end();
-			//cameraHUD.position.set(hero.getCoordX(), /* hero.getCoordY() + */350.0f, 0);
-			cameraHUD.update();
-			game.batch.setProjectionMatrix(cameraHUD.combined);
-			game.batch.begin();
 			
-			drawInterface();
-			// player interface is here
-			game.batch.end();
-			//debugRenderer.render(world, viewport.getCamera().combined);
-			debugRenderer.render(rpgWorld.world, viewport.getCamera().combined);
-		}
-		
-		
+			
+			
+			}
+private void renderRun(float delta) {
+	Time+=delta;
+	Gdx.gl.glClearColor(0, 0.1f, 0, 1);
+	Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+	update(Time);
+	camera.position.set(hero.getCoordX(), /* hero.getCoordY() + */350.0f, 0);
+	if(camera.position.x < 640.0f) camera.position.x = 640.0f;
+	camera.update();
+	
+	game.batch.setProjectionMatrix(camera.combined);
+	
+	game.batch.begin();
+	
+	backgroundDraw();
+	
+	
+	game.batch.draw(hero.currentFrame, hero.getCoordX(), hero.getCoordY(), hero.getSizeX(), hero.getSizeY());
+	for(int i =0; i<bots.size();i++)
+	{
+		// Slava CRITICAL SECTION
+		// _______________________________
+		game.batch.draw(bots.get(i).currentFrame, bots.get(i).getCoordX(), bots.get(i).getCoordY(), bots.get(i).getSizeX(), bots.get(i).getSizeY());
+		bots.get(i).barAIDrawing(game.batch);
+		for(int j=0;j<bots.get(i).bullets.size();j++)  
+			bots.get(i).bullets.get(j).render(game.batch);
+		// ________________________________
+	}
+	
+	for(int i = 0; i < platforms.size;i++) {
+		platforms.get(i).draw(game.batch);
+	}
+	game.batch.end();
+	//cameraHUD.position.set(hero.getCoordX(), /* hero.getCoordY() + */350.0f, 0);
+	cameraHUD.update();
+	game.batch.setProjectionMatrix(cameraHUD.combined);
+	game.batch.begin();
+	
+	drawInterface();
+	// player interface is here
+	game.batch.end();
+	//debugRenderer.render(world, viewport.getCamera().combined);
+	debugRenderer.render(rpgWorld.world, viewport.getCamera().combined);
+	}
+
+private void renderPause(float delta) {
+	if(Gdx.input.isKeyPressed(Keys.E)) {
+		state = State.RUN;
+		setGameState(state);
+	}
+}	
 		private void drawInterface() {
 			
 			UI.draw(game.batch,hero.getEntitieData());
@@ -154,6 +182,11 @@ public class BaseLevel implements GlobalWindow{
 		private void update(float delta)
 		{
 			// Exit from level to menu
+		
+			if(Gdx.input.isKeyPressed(Keys.E)) {
+				state = State.PAUSE;
+				setGameState(state);
+			}
 			if(Gdx.input.isKeyPressed(Keys.ESCAPE))
 				game.setScreen(new LevelLoading(game, new MainMenuScreen(game)));
 			
@@ -174,7 +207,7 @@ public class BaseLevel implements GlobalWindow{
 				
 				for(int j = 0; j < bots.get(i).bullets.size(); j++) {
 					if(bots.get(i).bullets.get(j).remove) {
-					//	bots.get(i).bullets.get(j).delete();
+						bots.get(i).bullets.get(j).delete();
 						bots.get(i).bullets.remove(j);
 					}
 				
@@ -269,13 +302,14 @@ public class BaseLevel implements GlobalWindow{
 
 		@Override
 		public void pause() {
-			// TODO Auto-generated method stub
+		this.state = State.PAUSE;
 			
 		}
 
 		@Override
 		public void resume() {
-			// TODO Auto-generated method stub
+			this.state = State.RUN;
+			
 			
 		}
 
@@ -304,5 +338,8 @@ public class BaseLevel implements GlobalWindow{
 			return bots;
 			}	
 		
+		public void setGameState (State s) {
+			this.state = s;
+		}
 		
 }
