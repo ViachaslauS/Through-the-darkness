@@ -24,7 +24,29 @@ public class RPGContactListener implements ContactListener{
 	
 	@Override
 	public void beginContact(Contact contact) {
-	
+		Array<Contact> contacts = world.world.getContactList();
+		for(int i = 0; i< contacts.size;i++) {
+			//if(contacts.get(i).isTouching()) {
+				if(contacts.get(i).getFixtureA().getUserData()!=null && contacts.get(i).getFixtureB().getUserData()!=null) {
+					if(contacts.get(i).getFixtureA().getUserData().getClass().getName() == "com.badlogic.gdx.physics.box2d.Fixture" && contacts.get(i).getFixtureB().getUserData().getClass().getName() == ("com.badlogic.gdx.physics.box2d.Fixture"))
+						continue;
+					ObjectData fixAData = recreate(contacts.get(i).getFixtureA());
+					ObjectData fixBData = recreate(contacts.get(i).getFixtureB());
+					if(contacts.get(i).getFixtureA().getUserData().getClass().getName() == "com.badlogic.gdx.physics.box2d.Fixture") {
+						if(!(fixAData.isAi) && !(fixAData.isBull) && fixBData.isBull) {
+							fixBData.shouldRemove = true;
+							fixAData.setHitpoint(5);
+						}
+											}
+					else
+						if(contacts.get(i).getFixtureB().getUserData().getClass().getName() == "com.badlogic.gdx.physics.box2d.Fixture")
+							if(!(fixBData.isAi) && !(fixBData.isBull) && fixAData.isBull) {
+								fixAData.shouldRemove = true;
+								fixBData.setHitpoint(5);
+							}
+				}
+			}
+		
 	
 	}
 	private ObjectData recreate(Fixture fixtureA) {
@@ -60,6 +82,13 @@ private void collisionWizard(Fixture receiver, Fixture dealer) {
 		aiReact(recData, dealData);
 		
 	}
+
+
+/**
+ * @param rec
+ *  set for bot isAtt = 0 if it daleko from hero
+ * @param deal 
+ */
 private void aiReact(ObjectData rec, ObjectData deal) {
 		
 		  if(rec.isAi) { rec.isAttacking = 0; } else deal.isAttacking = 0;
@@ -68,21 +97,22 @@ private void aiReact(ObjectData rec, ObjectData deal) {
 	@Override
 	public void preSolve(Contact contact, Manifold oldManifold) {
 		
-		WorldManifold manifold = contact.getWorldManifold();
-		
-		for(int i =0; i < manifold.getNumberOfContactPoints(); i++) {
-			if(contact.getFixtureA().getUserData() != null && contact.getFixtureB().getUserData() != null)
-			{
-				ObjectData fixAData = recreate(contact.getFixtureA());
-				ObjectData fixBData = recreate(contact.getFixtureB());
-				
-				if(fixAData.isBull && fixBData.isBull)
-					contact.setEnabled(false);
-				if((fixAData.isBull && !(fixBData.isAi)) || (fixBData.isBull && !(fixAData.isAi)))
-					contact.setEnabled(true);
-			}
-			
-		}
+		/*
+		 * WorldManifold manifold = contact.getWorldManifold();
+		 * 
+		 * for(int i =0; i < manifold.getNumberOfContactPoints(); i++) {
+		 * if(contact.getFixtureA().getUserData() != null &&
+		 * contact.getFixtureB().getUserData() != null) { ObjectData fixAData =
+		 * recreate(contact.getFixtureA()); ObjectData fixBData =
+		 * recreate(contact.getFixtureB());
+		 * 
+		 * if(fixAData.isBull && fixBData.isBull) contact.setEnabled(false);
+		 * if((fixAData.isBull && !(fixBData.isAi)) || (fixBData.isBull &&
+		 * !(fixAData.isAi))) contact.setEnabled(true); }
+		 * 
+		 * 
+		 * }
+		 */
 		
 		
 		

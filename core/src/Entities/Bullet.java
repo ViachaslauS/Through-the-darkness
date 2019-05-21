@@ -19,9 +19,9 @@ public class Bullet {
 	RPGWorld world;
 	Body box;
 	Filter f = new Filter();
-	public static final int speed = 20;
+	public static final int speed = 100;
 	private static Texture texture = new Texture(Gdx.files.internal("badlogic.jpg"));
-	public static int sideView;
+	private int sideView;
 	float x,y;
 	
 	public boolean remove = false;
@@ -35,18 +35,24 @@ public class Bullet {
 		f.groupIndex = 3;
 	}
 	public void update (float deltaTime) {
+		bulletData.updateData();
 		updatePhysic();
 		x += speed* deltaTime*sideView;
-		if( x > Gdx.graphics.getHeight()) {
+		if( x < 0) {
 			remove = true;
 		}
+		if(bulletData.shouldRemove)
+			remove = true;
 		
 	}
 	public void render (SpriteBatch batch) {
 		batch.draw(texture, x, y,16,16);
 	}
 	public void delete () {
-		texture.dispose();
+		
+		box.destroyFixture(physicsFixture);
+		box.destroyFixture(sensorFixture);
+		//texture.dispose();
 	}
 	public void setBody(RPGWorld world) {
 		this.world = world;
@@ -80,6 +86,8 @@ public class Bullet {
 		box.setBullet(true);
 		box.setTransform(this.x, this.y, 0);
 		bulletData.isBull = true;
+		physicsFixture.setFilterData(f);
+		sensorFixture.setFilterData(f);
 	}
 	
 	protected void updatePhysic() {

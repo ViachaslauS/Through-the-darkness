@@ -31,10 +31,19 @@ public class ObjectData {
 	 * 	if this parametr is true - entitie attack and do damage
 	 */
 	public int isAttacking = 0;
+	public boolean shouldEvade = false;
 	public boolean isAi = false;
+	/**
+	 * time for attack for bot 
+	 */
 	public float attackTime = 0;
+	/**
+	 * can go out of objects 
+	 */
 	public boolean isInvisible = false;
 	public boolean isBull = false;
+	// for remove bullet
+	public boolean shouldRemove = false;
 	public float skillDamage = 0.0f;
 	
 	protected float HITPOINT;

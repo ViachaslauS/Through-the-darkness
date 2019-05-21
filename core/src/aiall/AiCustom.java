@@ -27,6 +27,7 @@ public class AiCustom extends Entities {
 	Vector2 _coord;
 	private float time;
 	private float bulletTime = 0;
+	private int level;
 	SteeringAgent steeringAgent;
 	
 	public ArrayList<Bullet> bullets = new ArrayList<Bullet>();
@@ -59,9 +60,9 @@ public class AiCustom extends Entities {
 	}
 	
 	
-	public AiCustom(Vector2 size,Vector2 coord, int id) {
-		super("aistats"+id);
-		
+	public AiCustom(Vector2 size,Vector2 coord, int level) {
+		super("aistats"+level);
+		this.level = level;
 		//preferences = Gdx.app.getPreferences("aistats"+ id);
 		setSize(size);
 		setCoord(coord);
@@ -112,13 +113,14 @@ public class AiCustom extends Entities {
 		  time+= Gdx.graphics.getDeltaTime();
 		  entitieData.attackTime += Gdx.graphics.getDeltaTime();
 		  bulletTime += Gdx.graphics.getDeltaTime();
-		  if(bulletTime >= 5 && entitieData.isAttacking == -1 && !(isJump)) {
+		 
+		  if(bulletTime >= 2 && entitieData.isAttacking == -1 && !(isJump) && this.level == 2 ) {
 			  bulletTime = 0;
 			  shoot();
 		  }
 		  
 		  
-		  if(time>=1) {
+		  if(time>=1 && level == 2) {
 			  
 			  jump();
 		  }
@@ -132,6 +134,11 @@ public class AiCustom extends Entities {
 		 sideView = (int) all.x;
 		 
 		 }
+		  if(entitieData.shouldEvade)
+		  {
+			  entitieData.shouldEvade = false;
+			  entitieBox.applyLinearImpulse(new Vector2((400000*sideView*(-1)),0), new Vector2(coordX,coordY), true);
+		  }
 		  updatePhysic();
 		  entitieData.updateData();
 		  

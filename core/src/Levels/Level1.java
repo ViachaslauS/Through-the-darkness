@@ -80,11 +80,35 @@ public class Level1 implements GlobalWindow {
 		damageMaster = new DamageDeal(rpgWorld);
 		UI = new UserInterface();
 	}
+	
+	// state for pause/resume and run game
+	
+	public enum State {
+		PAUSE,
+		RUN,
+		RESUME,
+		STOPPED
+	}
+	
+	private State state = State.RUN;
 	@Override
 	public void render(float delta) {
 		
 		//level.render(camera);
+		switch(state) {
 		
+		case RUN:
+			renderRun(delta);
+		
+		break;
+		
+		case PAUSE:
+		renderPause(delta);
+			
+		}
+	}
+	
+	private void renderRun(float delta) {
 		Time+=delta;
 		Gdx.gl.glClearColor(0, 0.1f, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -121,7 +145,14 @@ public class Level1 implements GlobalWindow {
 		debugRenderer.render(rpgWorld.world, viewport.getCamera().combined);
 	}
 	
-	
+	private void renderPause(float delta) {
+		if(Gdx.input.isKeyPressed(Keys.E)) {
+			state = State.RUN;
+			setGameState(state);
+		}
+		
+		
+	}
 	
 	private void drawInterface() {
 		
@@ -155,6 +186,14 @@ public class Level1 implements GlobalWindow {
 	
 	private void update(float delta)
 	{
+		
+		if(Gdx.input.isKeyPressed(Keys.E)) {
+			state = State.PAUSE;
+			setGameState(state);
+		}
+		
+		
+		
 		// Exit from level to menu
 		if(Gdx.input.isKeyPressed(Keys.ESCAPE))
 			game.setScreen(new LevelLoading(game, new MainMenuScreen(game)));
@@ -176,7 +215,7 @@ public class Level1 implements GlobalWindow {
 			
 			for(int j = 0; j < bots.get(i).bullets.size(); j++) {
 				if(bots.get(i).bullets.get(j).remove) {
-				//	bots.get(i).bullets.get(j).delete();
+					bots.get(i).bullets.get(j).delete();
 					bots.get(i).bullets.remove(j);
 				}
 			
@@ -262,14 +301,13 @@ public class Level1 implements GlobalWindow {
 
 	@Override
 	public void pause() {
-		// TODO Auto-generated method stub
+		this.state = State.PAUSE;
 		
 	}
 
 	@Override
 	public void resume() {
-		// TODO Auto-generated method stub
-		
+	this.state = State.RUN;
 	}
 
 	@Override
@@ -288,19 +326,40 @@ public class Level1 implements GlobalWindow {
 	@Override
 	public Array<Platform> createEnvironment() {
 		Array<Platform> platforms = new Array<Platform>();
-		platforms.add(new Platform(new Vector2(0,-30), new Vector2(10000,100),rpgWorld)); // Earth platform
-		platforms.add( new Platform(new Vector2(1500,40), new Vector2(20,400), rpgWorld));
+		platforms.add(new Platform(new Vector2(0,-30), new Vector2(10000000,100),rpgWorld)); // Earth platform
+		platforms.add( new Platform(new Vector2(1200,150), new Vector2(150,30), rpgWorld));
+		platforms.add( new Platform(new Vector2(1500,200), new Vector2(150,300), rpgWorld));
+		platforms.add( new Platform(new Vector2(2200,150), new Vector2(150,30), rpgWorld));
+		platforms.add( new Platform(new Vector2(2500,220), new Vector2(150,30), rpgWorld));
+		platforms.add( new Platform(new Vector2(2900,300), new Vector2(400,30), rpgWorld));
+		platforms.add( new Platform(new Vector2(3900,200), new Vector2(150,30), rpgWorld));
+		platforms.add( new Platform(new Vector2(4100,350), new Vector2(150,30), rpgWorld));
+		platforms.add( new Platform(new Vector2(4250,450), new Vector2(150,30), rpgWorld));
+		platforms.add( new Platform(new Vector2(5400,0), new Vector2(20,1000), rpgWorld));
+		
+		
+		
 		return platforms;
 	}
 	
 	public ArrayList<AiCustom> bots;
 	public ArrayList<AiCustom> createEnemy() {
 		 bots = new ArrayList<AiCustom>();
-		bots.add(new AiCustom(new Vector2(150.0f,150.0f) , new Vector2(1100.0f,150.0f),2225));
-		bots.add(new AiCustom(new Vector2(150.0f,150.0f) , new Vector2(1300.0f,150.0f),2224));
+		bots.add(new AiCustom(new Vector2(150.0f,150.0f) , new Vector2(1100.0f,150.0f),1));
+		bots.add(new AiCustom(new Vector2(150.0f,150.0f) , new Vector2(1500.0f,150.0f),1));
+		bots.add(new AiCustom(new Vector2(150.0f,150.0f) , new Vector2(2100.0f,150.0f),2));
+		bots.add(new AiCustom(new Vector2(150.0f,150.0f) , new Vector2(2400.0f,150.0f),1));
+		bots.add(new AiCustom(new Vector2(150.0f,150.0f) , new Vector2(2900.0f,150.0f),2));
+		bots.add(new AiCustom(new Vector2(150.0f,150.0f) , new Vector2(3000.0f,150.0f),2));
+		bots.add(new AiCustom(new Vector2(150.0f,150.0f) , new Vector2(3700.0f,150.0f),1));
+		bots.add(new AiCustom(new Vector2(150.0f,150.0f) , new Vector2(4400.0f,150.0f),2));
+		bots.add(new AiCustom(new Vector2(150.0f,150.0f) , new Vector2(5200.0f,150.0f),3));
 		return bots;
 	}
 	
+	public void setGameState (State s) {
+		this.state = s;
+	}
 	
 	
 }
