@@ -25,14 +25,23 @@ public class DamageDeal {
 				if(contacts.get(i).getFixtureA().getUserData()!=null && contacts.get(i).getFixtureB().getUserData()!=null) {
 					if(contacts.get(i).getFixtureA().getUserData().getClass().getName() == "com.badlogic.gdx.physics.box2d.Fixture" && contacts.get(i).getFixtureB().getUserData().getClass().getName() == ("com.badlogic.gdx.physics.box2d.Fixture"))
 						{
-						aiAttack(contacts.get(i).getFixtureA(),contacts.get(i).getFixtureB());
 						
 						continue;}
 					if(contacts.get(i).getFixtureA().getUserData().getClass().getName() == "com.badlogic.gdx.physics.box2d.Fixture")
+						{	if(contacts.get(i).getFixtureB().getFilterData().groupIndex == -5)
+							aiAttack(contacts.get(i).getFixtureA(),contacts.get(i).getFixtureB());
+						else
 						collisionWizard(contacts.get(i).getFixtureA(),contacts.get(i).getFixtureB());
+						}
+						
 					else
 						if(contacts.get(i).getFixtureB().getUserData().getClass().getName() == "com.badlogic.gdx.physics.box2d.Fixture")
+							{	
+							if(contacts.get(i).getFixtureA().getFilterData().groupIndex == -5)
+								aiAttack(contacts.get(i).getFixtureA(),contacts.get(i).getFixtureB());
+							else
 							collisionWizard(contacts.get(i).getFixtureB(),contacts.get(i).getFixtureA());
+							}
 				}
 			}
 		//}
@@ -64,11 +73,10 @@ public class DamageDeal {
 		private void aiAttack(Fixture receiver, Fixture dealer) {
 			Fixture recDataFix = (Fixture) receiver.getUserData();
 			ObjectData recData = (ObjectData) recDataFix.getUserData();
-			Fixture dealDataFix = (Fixture) dealer.getUserData();
-			ObjectData dealData = (ObjectData) dealDataFix.getUserData();
+			ObjectData dealData = (ObjectData) dealer.getUserData();
 			
 			if(recData.isAi && recData.isAttacking == -1) {
-			 if(recData.attackTime >=2) {
+			 if(recData.attackTime >=1) {
 				 recData.attackTime =0;
 				 recData.isAttacking = 0;
 				 dealData.setHitpoint(recData.getDAMAGE());
@@ -77,7 +85,7 @@ public class DamageDeal {
 				 
 			}
 			if(dealData.isAi && dealData.isAttacking == -1) {
-				if(dealData.attackTime >=2) {
+				if(dealData.attackTime >=1) {
 					dealData.attackTime =0;
 					dealData.isAttacking = 0;
 					recData.setHitpoint(dealData.getDAMAGE());
@@ -90,6 +98,3 @@ public class DamageDeal {
 	
 	
 }
-
-
-

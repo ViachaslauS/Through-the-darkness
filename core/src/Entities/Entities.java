@@ -320,9 +320,13 @@ public class Entities {
 		for(int i=0;i<contactList.size;i++) {
 			Contact contact = contactList.get(i);
 			// Check all contacts in world between player
-			if(contact.isTouching() && (contact.getFixtureA() == physicsFixture && contact.getFixtureB().getUserData() == null) || (contact.getFixtureB() == physicsFixture && contact.getFixtureA().getUserData() == null)) {
+			if (contact.isTouching()
+					&& (contact.getFixtureA() == physicsFixture  && contact.getFixtureB().getUserData() == null )
+					|| (contact.getFixtureB() == physicsFixture  && contact.getFixtureA().getUserData() == null )) {
 				WorldManifold manifold = contact.getWorldManifold();
-				boolean below = true;
+				// Slava CRITICAL SECTION
+				boolean below = true;if(manifold.getNumberOfContactPoints() == 0)
+					return false;
 				for(int j=0;j<manifold.getNumberOfContactPoints();j++) {
 					below &= (manifold.getPoints()[j].y < physicsFixture.getBody().getPosition().y);
 				}
@@ -356,8 +360,11 @@ public class Entities {
 			// Check all contacts in world between player
 			if(contact.isTouching() && (contact.getFixtureA() == physicsFixture || contact.getFixtureB() == physicsFixture)) {
 				WorldManifold manifold = contact.getWorldManifold();
+				//Slava CRITICAL SECTION
+				if(manifold.getNumberOfContactPoints() == 0)
+					return true;
 				for(int j=0;j<manifold.getNumberOfContactPoints();j++) {
-					below &= !(manifold.getPoints()[j].y - physicsFixture.getShape().getRadius()  > physicsFixture.getBody().getPosition().y- physicsFixture.getShape().getRadius());
+					below &= !(manifold.getPoints()[j].y  > physicsFixture.getBody().getPosition().y + 30);
 					//below = ((manifold.getPoints()[j].y - physicsFixture.getShape().getRadius()+10) < (physicsFixture.getBody().getPosition().y-physicsFixture.getShape().getRadius()));
 					if(!below) {
 						if(coordX+sizeX/2 > manifold.getPoints()[j].x) {

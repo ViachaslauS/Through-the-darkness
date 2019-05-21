@@ -64,6 +64,8 @@ public class Level1 implements GlobalWindow {
 	
 	UserInterface UI;
 	
+	Array<Platform> platforms;
+	
 	private int mapCounter = 0; 
 	private float centreMapCoord = 0.0f;
 	
@@ -112,6 +114,9 @@ public class Level1 implements GlobalWindow {
 			// ________________________________
 		}
 		
+		for(int i = 0; i < platforms.size;i++) {
+			platforms.get(i).draw(game.batch);
+		}
 		game.batch.end();
 		//cameraHUD.position.set(hero.getCoordX(), /* hero.getCoordY() + */350.0f, 0);
 		cameraHUD.update();
@@ -299,10 +304,10 @@ public class Level1 implements GlobalWindow {
 	}
 	@Override
 	public Array<Platform> createEnvironment() {
-		Array<Platform> platforms = new Array<Platform>();
+		platforms = new Array<Platform>();
 		platforms.add(new Platform(new Vector2(0,-30), new Vector2(10000,100),rpgWorld)); // Earth platform
 		platforms.add(new Platform(new Vector2(1500,40), new Vector2(20,400), rpgWorld));
-		platforms.add(new Platform(new Vector2(2200,200), new Vector2(300,20), rpgWorld));
+		platforms.add(new Platform(new Vector2(2200,250), new Vector2(300,20), rpgWorld));
 		return platforms;
 	}
 	

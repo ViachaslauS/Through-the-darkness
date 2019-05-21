@@ -1,5 +1,8 @@
 package Engine;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -16,9 +19,10 @@ public class Platform {
 	Rectangle bounds;
 	Body platformBox;
 	Fixture PhysicFixture;
-	
+	Vector2 size;
 	Filter f = new Filter();
 	
+	Texture texture;
 	
 	public Vector2 getPosition() {
 		return position;
@@ -35,12 +39,18 @@ public class Platform {
 	public void setBounds(Rectangle bounds) {
 		this.bounds = bounds;
 	}
-
+	
+	public Texture getTexture() {
+		return texture;
+	}
+	
 	public Platform(Vector2 pos,Vector2 size, RPGWorld rpgWorld) {
 		position = pos;
 		bounds = new Rectangle();
 		bounds.width = size.x;
 		bounds.height = size.y;
+		this.size = size;
+		texture = new Texture(Gdx.files.internal("platformtexture.png"));
 		
 		BodyDef bodyDef = new BodyDef();
 		bodyDef.type = BodyType.StaticBody;
@@ -60,6 +70,10 @@ public class Platform {
 				PhysicFixture.setFilterData(f);
 		
 		
+	}
+
+	public void draw(SpriteBatch batch) {
+		batch.draw(texture,position.x - size.x/2,position.y - size.y/2,size.x,size.y);
 	}
 	
 }

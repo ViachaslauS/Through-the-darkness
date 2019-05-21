@@ -34,6 +34,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import Engine.Platform;
 import Levels.GlobalWindow;
 import Levels.Level1;
+import Levels.Level2;
 
 public class MainMenuScreen implements GlobalWindow{
 	
@@ -89,7 +90,7 @@ public class MainMenuScreen implements GlobalWindow{
 		stage.draw();
 		
 		if(btnPlay.isPressed()) {
-			game.setScreen(new LevelLoading(game, new Level1(game)));
+			game.setScreen(new LevelLoading(game, new Level2(game)));
 			dispose();
 		}
 		if(btnExit.isPressed()) {
