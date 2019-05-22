@@ -22,6 +22,11 @@ public class RPGContactFilter implements ContactFilter {
 			ObjectData fixAData = recreate(fixtureA);
 		ObjectData fixBData = recreate(fixtureB);
 		
+		if(fixtureA.getUserData().getClass().getName() == "com.badlogic.gdx.physics.box2d.Fixture" && fixtureB.getUserData().getClass().getName() == "com.badlogic.gdx.physics.box2d.Fixture")
+			if(fixAData.isAi && !(fixBData.isBull) && !(fixBData.isAi))
+				return false;
+			else if(fixBData.isAi && !(fixAData.isBull) && !(fixAData.isAi))
+					return false;
 			if(fixAData.isInvisible || fixBData.isInvisible)
 			return false;
 			

@@ -54,6 +54,8 @@ public class ObjectData {
 	public boolean isBull = false;
 	public float skillDamage = 0.0f;
 	
+	public int sideView = 1;
+	
 	private float HITPOINT;
 	protected float MANA;
 	protected float ARMOR;
@@ -168,6 +170,8 @@ public class ObjectData {
 	private void checkStats() {
 		if(HITPOINT > MAXHITPOINT)
 			HITPOINT = MAXHITPOINT;
+		//if(HITPOINT < 0)
+		//	HITPOINT = 0;
 		if(MANA > MAXMANA)
 			MANA = MAXMANA;
 		if(MANA < 0)

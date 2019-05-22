@@ -49,7 +49,6 @@ public class Bullet {
 		batch.draw(texture, x, y,16,16);
 	}
 	public void delete () {
-		
 		box.destroyFixture(physicsFixture);
 		box.destroyFixture(sensorFixture);
 		//texture.dispose();

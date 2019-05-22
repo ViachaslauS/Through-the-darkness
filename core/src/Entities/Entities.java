@@ -208,6 +208,10 @@ public class Entities {
 	public void setSizeY(float sizeY) {
 		this.sizeY = sizeY;
 	}
+	
+	public Body getBody() {
+		return entitieBox;
+	}
 
 	/** Get Damage
 		(descrease HITPOINT of entities)
@@ -275,7 +279,7 @@ public class Entities {
 		
 		CircleShape circlePolygon = new CircleShape();
 		circlePolygon.setRadius(75);
-		circlePolygon.setPosition(new Vector2(75,coordY-sizeY/2));
+		circlePolygon.setPosition(new Vector2(75,75));
 		
 		//Gdx.app.log("Sprite Coord", ""+ entitieBox.getGravityScale());
 		sensorFixture = entitieBox.createFixture(circlePolygon,0f);
@@ -284,10 +288,10 @@ public class Entities {
 		circlePolygon.dispose();
 		
 			PolygonShape polygon = new PolygonShape();
-			polygon.setAsBox(38, 75,new Vector2(75,coordY-sizeY/2),0);
+			polygon.setAsBox(38, 75,new Vector2(75,75),0);
 			physicsFixture = entitieBox.createFixture(polygon, 0.0f);
 			polygon.dispose();
-			physicsFixture.setDensity(10000);
+			physicsFixture.setDensity(0.0f);
 			physicsFixture.setSensor(false);
 			physicsFixture.setUserData(sensorFixture);
 			entitieBox.setBullet(true);
@@ -315,7 +319,7 @@ public class Entities {
 
 	protected boolean isEntitieGrounded() {
 		//get all contacts in world
-		
+		boolean below = false;
 		Array<Contact> contactList = rpgWorld.world.getContactList();
 		for(int i=0;i<contactList.size;i++) {
 			Contact contact = contactList.get(i);
@@ -325,28 +329,32 @@ public class Entities {
 					|| (contact.getFixtureB() == physicsFixture  && contact.getFixtureA().getUserData() == null )) {
 				WorldManifold manifold = contact.getWorldManifold();
 				// Slava CRITICAL SECTION
-				boolean below = true;if(manifold.getNumberOfContactPoints() == 0)
+				
+				if(manifold.getPoints() == null)
 					return false;
 				for(int j=0;j<manifold.getNumberOfContactPoints();j++) {
-					below &= (manifold.getPoints()[j].y < physicsFixture.getBody().getPosition().y);
+					below = (manifold.getPoints()[j].y < physicsFixture.getBody().getPosition().y);
 				}
 				if(below) {
 					return true;
 				}
 			}
 		}
-		return false;
+		return below;
 	}
 	protected void move(float coords) {
-		if((isCanMove() && isEntitieGrounded()) || (isCanMove() && !isEntitieGrounded()))
+		if(isCanMove())
 			coordX+=coords*Gdx.graphics.getDeltaTime();
 		else
 			if(sideView == moveOut)
 				coordX+=coords*Gdx.graphics.getDeltaTime();
 			else
-				setCoord(physicsFixture.getBody().getPosition()); 
+				setCoord(physicsFixture.getBody().getPosition());
 	}
 	
+	/**
+	 *  1 - move right to out, -1 - left, 0 - you have some problems, bro
+	 */
 	private int moveOut = 0;
 	/**
 	 * check the lets on the way
@@ -355,6 +363,8 @@ public class Entities {
 	private boolean isCanMove() {
 		Array<Contact> contactList = rpgWorld.world.getContactList();
 		boolean below = true;
+		boolean rez = true;
+		moveOut = 0;
 		for(int i=0;i<contactList.size;i++) {
 			Contact contact = contactList.get(i);
 			// Check all contacts in world between player
@@ -362,23 +372,32 @@ public class Entities {
 				WorldManifold manifold = contact.getWorldManifold();
 				//Slava CRITICAL SECTION
 				if(manifold.getNumberOfContactPoints() == 0)
-					return true;
+					continue;
 				for(int j=0;j<manifold.getNumberOfContactPoints();j++) {
-					below &= !(manifold.getPoints()[j].y  > physicsFixture.getBody().getPosition().y + 30);
-					//below = ((manifold.getPoints()[j].y - physicsFixture.getShape().getRadius()+10) < (physicsFixture.getBody().getPosition().y-physicsFixture.getShape().getRadius()));
+					below = !(manifold.getPoints()[j].y  > coordY  + 25);
+					rez &= below;
 					if(!below) {
 						if(coordX+sizeX/2 > manifold.getPoints()[j].x) {
-							
+							if(moveOut == -1) {
+								//moveOut = 0;	
+								continue;
+							}
 							moveOut = 1;
 						}
 						else {
+							if(moveOut == 1) {
+								//moveOut = 0;
+								continue;
+							}
 							moveOut = -1;
 						}
-						return below;
+						
 					}
 				}
 			}
 		}
-		return below;
+		return rez;
 	}
+
+	
 }

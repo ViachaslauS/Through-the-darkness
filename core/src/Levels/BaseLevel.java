@@ -79,6 +79,7 @@ public class BaseLevel implements GlobalWindow{
 			game = game_;
 			rpgWorld = new RPGWorld();
 			rpgWorld.setEnvironment(createEnvironment(), createEnemy());
+			rpgWorld.world.setAutoClearForces(true);
 			//world = new World(new Vector2(0,-100), true);
 			debugRenderer = new Box2DDebugRenderer(true, true, true, true, true, true);
 			damageMaster = new DamageDeal(rpgWorld);
@@ -147,7 +148,9 @@ private void renderRun(float delta) {
 	}
 
 private void renderPause(float delta) {
-	if(Gdx.input.isKeyPressed(Keys.E)) {
+	Gdx.gl.glClearColor(0, 0.1f, 0, 1);
+	Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+	if(Gdx.input.isKeyJustPressed(Keys.E)) {
 		state = State.RUN;
 		setGameState(state);
 	}
@@ -183,7 +186,7 @@ private void renderPause(float delta) {
 		{
 			// Exit from level to menu
 		
-			if(Gdx.input.isKeyPressed(Keys.E)) {
+			if(Gdx.input.isKeyJustPressed(Keys.E)) {
 				state = State.PAUSE;
 				setGameState(state);
 			}
@@ -193,6 +196,7 @@ private void renderPause(float delta) {
 			damageMaster.update();
 			//Gdx.app.log("Hitpoints of ai and hero",""+ ai.getHITPOINT()+"  "+hero.getHITPOINT());
 			if(hero.getHITPOINT() <= 0.0f) {
+				hero.getEntitieData().resetHitpoints();
 				if(hero.death()) {
 					
 					//dispose();
@@ -228,6 +232,7 @@ private void renderPause(float delta) {
 			}
 			//_________________________________________________
 			rpgWorld.world.step(1/1000f, 100, 100);
+			rpgWorld.world.setContinuousPhysics(false);
 		}
 		
 		private void check_path() {
@@ -268,7 +273,7 @@ private void renderPause(float delta) {
 			//Background
 			background = assetManager.get("Battleground1.png",Texture.class);
 			//Player
-			hero = new Hero(new Vector2(150.0f,150.0f),new Vector2(600.0f,150.0f),assetManager);
+			hero = new Hero(new Vector2(150.0f,150.0f),new Vector2(600.0f,300.0f),assetManager);
 			//ai = new AiCustom(new Vector2(150.0f,150.0f) , new Vector2(900.0f,150.0f),2225);
 			//hero.setBody(world);
 			hero.setBody(rpgWorld);
@@ -329,7 +334,6 @@ private void renderPause(float delta) {
 		//Override!!!
 		public Array<Platform> createEnvironment() {
 			return platforms;
-			
 		}
 		
 		public ArrayList<AiCustom> bots;

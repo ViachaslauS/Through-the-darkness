@@ -155,6 +155,7 @@ public class Hero  extends Entities{
 				//coordX += 500 * Gdx.graphics.getDeltaTime();
 				move(500);
 				sideView = 1;
+				entitieData.sideView = 1;
 				return;	
 			}
 			if(Gdx.input.isKeyPressed(Keys.A) || Gdx.input.isKeyPressed(Keys.LEFT)) {    //move left
@@ -166,6 +167,7 @@ public class Hero  extends Entities{
 				//coordX -= 500 * Gdx.graphics.getDeltaTime();
 				move(-500);
 				sideView = -1;
+				entitieData.sideView = -1;
 				
 				return;
 			}
@@ -284,8 +286,10 @@ public class Hero  extends Entities{
 		}
 		if(isEntitieGrounded()) {
 			isJump = true;
-			entitieBox.applyLinearImpulse(new Vector2(0,1100), new Vector2(coordX,coordY), true);
+			entitieBox.applyLinearImpulse(new Vector2(0,1250), new Vector2(coordX,coordY), true);
 		}
+		else
+			reset();
 	}
 	/**
 	 * reset current animation and action

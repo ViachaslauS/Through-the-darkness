@@ -176,12 +176,13 @@ public class AiCustom extends Entities {
 		 move(all.y);
 		 
 		 sideView = (int) all.x;
+		 entitieData.sideView = (int) all.x;
 		 currentFrame = moveAnimation.getKeyFrame(delta,true);
 		 }
 		  if(entitieData.shouldEvade)
 		  {
 			  entitieData.shouldEvade = false;
-			  entitieBox.applyLinearImpulse(new Vector2((400000*sideView*(-1)),0), new Vector2(coordX,coordY), true);
+			  entitieBox.applyLinearImpulse(new Vector2((400000*sideView),0), new Vector2(coordX,coordY), true);
 		  }
 		  
 		  
@@ -218,14 +219,14 @@ public class AiCustom extends Entities {
 	protected void bodyInitialize() {
 		 CircleShape circlePolygon = new CircleShape();
 			circlePolygon.setRadius(300);
-			circlePolygon.setPosition(new Vector2(75,coordY-75));
+			circlePolygon.setPosition(new Vector2(75,75));
 			//Gdx.app.log("Sprite Coord", ""+ entitieBox.getGravityScale());
 			sensorFixture = entitieBox.createFixture(circlePolygon,0f);
 			sensorFixture.setUserData(entitieData);
 			sensorFixture.setSensor(true);
 			
 			circlePolygon.setRadius(75);
-			circlePolygon.setPosition(new Vector2(75,coordY-75));
+			circlePolygon.setPosition(new Vector2(75,75));
 			attackRange = entitieBox.createFixture(circlePolygon,0f);
 			attackRange.setUserData(entitieData);
 			attackRange.setSensor(true);
@@ -234,10 +235,10 @@ public class AiCustom extends Entities {
 			circlePolygon.dispose();
 			
 				PolygonShape polygon = new PolygonShape();
-				polygon.setAsBox(38, 75,new Vector2(75,coordY-75),0);
+				polygon.setAsBox(38, 75,new Vector2(75,75),0);
 				physicsFixture = entitieBox.createFixture(polygon, 0.0f);
 				polygon.dispose();
-				physicsFixture.setDensity(10000);
+				physicsFixture.setDensity(0.0f);
 				physicsFixture.setSensor(false);
 				physicsFixture.setUserData(sensorFixture);
 				entitieBox.setBullet(true);
@@ -249,9 +250,11 @@ public class AiCustom extends Entities {
 			    attackRange.setFilterData(attf);
 	}
 	 public void deleteBot() {
-		 	
+		 	entitieBox.destroyFixture(attackRange);
 			entitieBox.destroyFixture(physicsFixture);
 			entitieBox.destroyFixture(sensorFixture);
+			for(int i = 0; i < bullets.size();i++)
+				bullets.get(i).delete();
 			dispose();
 			
 		}

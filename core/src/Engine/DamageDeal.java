@@ -53,7 +53,8 @@ public class DamageDeal {
 		ObjectData recData = (ObjectData) recDataFix.getUserData();
 		ObjectData dealData = (ObjectData) dealer.getUserData();
 		
-		if(dealData.isAttacking == 1 ) {
+		if(dealData.isAttacking == 1) {
+			if((dealer.getBody().getPosition().x > receiver.getBody().getPosition().x && dealData.sideView < 0) || (dealer.getBody().getPosition().x < receiver.getBody().getPosition().x && dealData.sideView > 0))
 			recData.setHitpoint(dealData.getSkillDamage());
 			dealData.isAttacking = 2;
 		}
