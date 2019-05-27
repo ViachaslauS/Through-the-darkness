@@ -23,10 +23,10 @@ public class DamageDeal {
 		for(int i = 0; i< contacts.size;i++) {
 			//if(contacts.get(i).isTouching()) {
 				if(contacts.get(i).getFixtureA().getUserData()!=null && contacts.get(i).getFixtureB().getUserData()!=null) {
-					if(contacts.get(i).getFixtureA().getUserData().getClass().getName() == "com.badlogic.gdx.physics.box2d.Fixture" && contacts.get(i).getFixtureB().getUserData().getClass().getName() == ("com.badlogic.gdx.physics.box2d.Fixture"))
-						{
+					if(contacts.get(i).getFixtureA().getUserData().getClass().getName() == "com.badlogic.gdx.physics.box2d.Fixture" && contacts.get(i).getFixtureB().getUserData().getClass().getName() == "com.badlogic.gdx.physics.box2d.Fixture")
+						continue;
 						
-						continue;}
+				
 					if(contacts.get(i).getFixtureA().getUserData().getClass().getName() == "com.badlogic.gdx.physics.box2d.Fixture")
 						{	if(contacts.get(i).getFixtureB().getFilterData().groupIndex == -5)
 							aiAttack(contacts.get(i).getFixtureA(),contacts.get(i).getFixtureB());
@@ -47,6 +47,7 @@ public class DamageDeal {
 		//}
 	}
 
+	
 	private void collisionWizard(Fixture receiver, Fixture dealer) {
 		
 		Fixture recDataFix = (Fixture) receiver.getUserData();
@@ -62,12 +63,12 @@ public class DamageDeal {
 	}
 	
 	private void aiReact(ObjectData rec, ObjectData deal) {
-	if(rec.isAi) {
+	if(rec.isAi && rec.isAttacking == 0) {
 		rec.isAttacking = -1;
 		
 	}
 	else
-	if(deal.isAi){deal.isAttacking = -1;}
+	if(deal.isAi && deal.isAttacking == 0){deal.isAttacking = -1;}
 		
 	}
 		
@@ -76,36 +77,39 @@ public class DamageDeal {
 			ObjectData recData = (ObjectData) recDataFix.getUserData();
 			ObjectData dealData = (ObjectData) dealer.getUserData();
 			
-			if(recData.isAi && recData.isAttacking == -1) {
-			 if(recData.attackTime >=1) {
+			if(recData.isAi) {
+				 recData.isAttacking = -2;
+			 if(recData.attackTime >=2) {
 				 recData.attackTime =0;
-				 recData.isAttacking = 0;
+			
 				 dealData.setHitpoint(recData.getDAMAGE());
 				 
 			 }
 			 else {
-				 if(recData.isAi && dealData.isAttacking == 1)
+				 if(dealData.isAttacking == 1)
 					 recData.shouldEvade = true;
 			 }
 			 
 				 
 			}
 			 
-			if(dealData.isAi && dealData.isAttacking == -1) {
+			if(dealData.isAi ) {
+				dealData.isAttacking = -2;
 				if(dealData.attackTime >=1) {
 					dealData.attackTime =0;
-					dealData.isAttacking = 0;
+					
 					recData.setHitpoint(dealData.getDAMAGE());
 				}
 				else {
-					 if(dealData.isAi && recData.isAttacking == 1)
+					 if(recData.isAttacking == 1)
 						 dealData.shouldEvade = true;
 				 }
 			}
 			
 			
 		}
-	
+		
+
 	
 	
 }

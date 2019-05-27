@@ -151,6 +151,9 @@ public class AiCustom extends Entities {
 			  CURRENT_DURATION+=Gdx.graphics.getDeltaTime();
 			  return;
 		  }
+		  updatePhysic();
+		  entitieData.updateData();
+		  frameFlip();
 		  //_________________________________________
 		  
 		  time+= Gdx.graphics.getDeltaTime();
@@ -182,13 +185,12 @@ public class AiCustom extends Entities {
 		  if(entitieData.shouldEvade)
 		  {
 			  entitieData.shouldEvade = false;
-			  entitieBox.applyLinearImpulse(new Vector2((400000*sideView),0), new Vector2(coordX,coordY), true);
+			  entitieBox.applyLinearImpulse(new Vector2(0,100000000), new Vector2(coordX,coordY), true);
+			 // entitieBox.applyAngularImpulse(20000000f, true);
 		  }
 		  
 		  
-		  updatePhysic();
-		  entitieData.updateData();
-		  frameFlip();
+		
 		  
 		  
 	  }

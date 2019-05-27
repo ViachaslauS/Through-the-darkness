@@ -286,7 +286,7 @@ public class Hero  extends Entities{
 		}
 		if(isEntitieGrounded()) {
 			isJump = true;
-			entitieBox.applyLinearImpulse(new Vector2(0,1250), new Vector2(coordX,coordY), true);
+			entitieBox.applyLinearImpulse(new Vector2(0,1450), new Vector2(coordX,coordY), true);
 		}
 		else
 			reset();

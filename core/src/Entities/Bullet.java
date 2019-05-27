@@ -80,7 +80,7 @@ public class Bullet {
 		polygon.dispose();
 		physicsFixture.setDensity(0);
 		box.setGravityScale(0);
-		physicsFixture.setSensor(false);
+		physicsFixture.setSensor(true);
 		physicsFixture.setUserData(sensorFixture);
 		box.setBullet(true);
 		box.setTransform(this.x, this.y, 0);

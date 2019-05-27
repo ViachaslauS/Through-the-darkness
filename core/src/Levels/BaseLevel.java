@@ -105,6 +105,8 @@ public class BaseLevel implements GlobalWindow{
 				break;
 			case SKILLS_MENU:
 				renderSkillMenu(delta);
+			default:
+				break;
 			}
 			
 			
@@ -344,7 +346,7 @@ private void drawInterface() {
 			//level = new Level1();
 			//hero.getEntitieData().setNewBuff(BuffType.MANA, 50, 15, true);
 			hero.getEntitieData().setNewBuff(BuffType.HITPOINTS, 100f, 100, true);
-			//hero.getEntitieData().setNewBuff(BuffType.REGEN_FREQUENCY, 50, 100,false);
+
 			
 		}
 

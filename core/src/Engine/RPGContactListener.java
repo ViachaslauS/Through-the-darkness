@@ -28,25 +28,65 @@ public class RPGContactListener implements ContactListener{
 		Array<Contact> contacts = world.world.getContactList();
 		for(int i = 0; i< contacts.size;i++) {
 			//if(contacts.get(i).isTouching()) {
+			
+			// collision bullet w/ stenki
+			if(contacts.get(i).getFixtureA().getUserData() == null && contacts.get(i).getFixtureB().getUserData() != null) {
+				ObjectData fixData = recreate(contacts.get(i).getFixtureB());
+				if(fixData.isBull)
+					fixData.shouldRemove = true;
+			}
+			if(contacts.get(i).getFixtureB().getUserData() == null && contacts.get(i).getFixtureA().getUserData() != null) {
+				ObjectData fixData = recreate(contacts.get(i).getFixtureA());
+				if(fixData.isBull)
+					fixData.shouldRemove = true;
+			}
+			
+			
+			
+			
+			
+			
+			
 				if(contacts.get(i).getFixtureA().getUserData()!=null && contacts.get(i).getFixtureB().getUserData()!=null) {
-					if(contacts.get(i).getFixtureA().getUserData().getClass().getName() == "com.badlogic.gdx.physics.box2d.Fixture" && contacts.get(i).getFixtureB().getUserData().getClass().getName() == ("com.badlogic.gdx.physics.box2d.Fixture"))
-						continue;
 					ObjectData fixAData = recreate(contacts.get(i).getFixtureA());
 					ObjectData fixBData = recreate(contacts.get(i).getFixtureB());
+					if(contacts.get(i).getFixtureA().getUserData().getClass().getName() == "com.badlogic.gdx.physics.box2d.Fixture" && contacts.get(i).getFixtureB().getUserData().getClass().getName() == "com.badlogic.gdx.physics.box2d.Fixture")
+						{			stopBot(contacts.get(i).getFixtureA(),contacts.get(i).getFixtureB());
+						continue;
+						
+						}
+				
 					if(contacts.get(i).getFixtureA().getUserData().getClass().getName() == "com.badlogic.gdx.physics.box2d.Fixture") {
-						if(!(fixAData.isAi) && !(fixAData.isBull) && fixBData.isBull) {
+						if(fixBData.isBull) {
 							fixBData.shouldRemove = true;
+						if(!(fixAData.isAi) && !(fixAData.isBull)) {
+						
 							fixAData.setHitpoint(5);
 						}
+					}
 											}
 					else
 						if(contacts.get(i).getFixtureB().getUserData().getClass().getName() == "com.badlogic.gdx.physics.box2d.Fixture")
-							if(!(fixBData.isAi) && !(fixBData.isBull) && fixAData.isBull) {
+							if(fixAData.isBull) {
 								fixAData.shouldRemove = true;
+							if(!(fixBData.isAi) && !(fixBData.isBull) && fixAData.isBull) {
+							
 								fixBData.setHitpoint(5);
 							}
+						}
 				}
 			}
+		
+	}
+	
+	private void stopBot(Fixture rec, Fixture deal) {
+		ObjectData fixAData = recreate(rec);
+		ObjectData fixBData = recreate(deal);
+		if(fixAData.isAi)
+			fixAData.isAttacking = 0;
+		if(fixBData.isAi)
+			fixBData.isAttacking = 0;
+		
 		
 	}
 	private ObjectData recreate(Fixture fixtureA) {
@@ -74,12 +114,23 @@ public class RPGContactListener implements ContactListener{
 			}
 		
 	}
+	// Function for razreshat dvigatsya botu if hero otoshel ot ran
+	private void checkAi(ObjectData fixA, ObjectData fixB)
+	{
+		if(fixA.isAi && fixA.isAttacking == -2)
+			fixA.isAttacking = -1;
+		if(fixB.isAi && fixB.isAttacking == -2)
+			fixB.isAttacking = -1;
+	}
 private void collisionWizard(Fixture receiver, Fixture dealer) {
 		
-		Fixture recDataFix = (Fixture) receiver.getUserData();
-		ObjectData recData = (ObjectData) recDataFix.getUserData();
-		ObjectData dealData = (ObjectData) dealer.getUserData();
-		aiReact(recData, dealData);
+	ObjectData fixAData = recreate(receiver);
+	ObjectData fixBData = recreate(dealer);
+	if(fixAData.isAttacking == -1 || fixBData.isAttacking == -1)
+		aiReact(fixAData, fixBData);
+		checkAi(fixAData,fixBData);
+		
+	
 		
 	}
 private void aiReact(ObjectData rec, ObjectData deal) {
