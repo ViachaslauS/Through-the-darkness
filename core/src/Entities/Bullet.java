@@ -68,14 +68,14 @@ public class Bullet {
 	private void bodyInitialize() {
 		CircleShape circlePolygon = new CircleShape();
 		circlePolygon.setRadius(8);
-		circlePolygon.setPosition(new Vector2(8,this.y-86));
+		circlePolygon.setPosition(new Vector2(8,8));
 		sensorFixture = box.createFixture(circlePolygon,0f);
 		sensorFixture.setUserData(bulletData);
 		sensorFixture.setSensor(true);
 		circlePolygon.dispose();
 		
 		PolygonShape polygon = new PolygonShape();
-		polygon.setAsBox(8, 8,new Vector2(8,this.y-86),0);
+		polygon.setAsBox(8, 8,new Vector2(8,8),0);
 		physicsFixture = box.createFixture(polygon, 0.0f);
 		polygon.dispose();
 		physicsFixture.setDensity(0);

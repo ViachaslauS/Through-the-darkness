@@ -24,7 +24,7 @@ public class Level1 extends BaseLevel{
 			bots.add(new AiCustom(new Vector2(150.0f,150.0f) , new Vector2(1100.0f,180.0f),1));
 			bots.add(new AiCustom(new Vector2(150.0f,150.0f) , new Vector2(1500.0f,150.0f),1));
 			bots.add(new AiCustom(new Vector2(150.0f,150.0f) , new Vector2(2100.0f,150.0f),2));
-			bots.add(new AiCustom(new Vector2(150.0f,150.0f) , new Vector2(2400.0f,180.0f),1));
+			bots.add(new AiCustom(new Vector2(150.0f,150.0f) , new Vector2(2400.0f,210.0f),1));
 			bots.add(new AiCustom(new Vector2(150.0f,150.0f) , new Vector2(2900.0f,150.0f),2));
 			bots.add(new AiCustom(new Vector2(150.0f,150.0f) , new Vector2(3000.0f,150.0f),2));
 			bots.add(new AiCustom(new Vector2(150.0f,150.0f) , new Vector2(3700.0f,150.0f),1));
@@ -54,6 +54,8 @@ return platforms;
 		assetManager.load("Hero.png", Texture.class);
 		assetManager.load("sprintSound.wav",Sound.class);
 		assetManager.load("dark_skills.png",Texture.class);
+		assetManager.load("niceBG.jpg",Texture.class);
+		assetManager.load("woodenBG.jpg",Texture.class);
 	}
 
 }

@@ -60,7 +60,7 @@ public class Platform {
 		platformBox.setTransform(pos, 0);
 		PhysicFixture = platformBox.createFixture(polygon, 0);
 		PhysicFixture.setDensity(0.0f);
-		PhysicFixture.setFriction(0);
+		PhysicFixture.setFriction(0.1f);
 		polygon.dispose();
 		
 		//fitler

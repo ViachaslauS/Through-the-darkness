@@ -111,7 +111,7 @@ public class MainMenuScreen implements GlobalWindow{
 	
 	@Override
 	public void show() {
-viewport = new FitViewport(VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
+		viewport = new FitViewport(VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
 		
 		mainImage = assetManager.get("mainImage.jpg", Texture.class);
 		allSheets = assetManager.get("buttons.png", Texture.class);

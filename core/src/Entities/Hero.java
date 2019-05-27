@@ -75,6 +75,8 @@ public class Hero  extends Entities{
 		setCoord(heroCoord);
 		sideView = 1; 
 		allSheets = manager.get("Hero.png",Texture.class);
+		shift = manager.get("sprintSound.wav",Sound.class)	 ;
+		skills = manager.get("dark_skills.png",Texture.class);
 		entitieData.isAi = false;
 		picParam();
 		
@@ -108,23 +110,21 @@ public class Hero  extends Entities{
 			}
 		}
 		index = 0;
-		//Initialize of animations
-		stayAnimation = new Animation<TextureRegion>(0.10f, stayFrames);
-		moveAnimation = new Animation<TextureRegion>(0.10f,moveFrames);
-		attack1Animation = new Animation<TextureRegion>(ANIMATION_SPEED*(1-entitieData.stats.ATKSPEED()),attack1Frames);
-		deathAnimation = new Animation<TextureRegion>(0.10f,deathFrames);
-		currentFrame = stayAnimation.getKeyFrame(0.10f, true);
-		
-		// Add fucking teleport
-		shift = manager.get("sprintSound.wav",Sound.class)	 ;
-		skills = manager.get("dark_skills.png",Texture.class);
 		TextureRegion[][] temp = TextureRegion.split(skills,skills.getWidth()/10,skills.getHeight()/10);
 		teleportFrames = new TextureRegion[10];
 		for(int i=0;i<10;i++) {
 			teleportFrames[i] = temp[0][i];
 			attack1Frames[i] = temp[1][i];
 		}
-		teleportAnimation = new Animation<TextureRegion>(ANIMATION_SPEED*(1-entitieData.stats.ATKSPEED()),teleportFrames);
+		//Initialize of animations
+		stayAnimation = new Animation<TextureRegion>(0.10f, stayFrames);
+		moveAnimation = new Animation<TextureRegion>(0.10f,moveFrames);
+		attack1Animation = new Animation<TextureRegion>(ANIMATION_SPEED*(1-entitieData.stats.ATKSPEED()),attack1Frames);
+		deathAnimation = new Animation<TextureRegion>(0.10f,deathFrames);
+		teleportAnimation = new Animation<TextureRegion>(ANIMATION_SPEED*(1-entitieData.stats.ATKSPEED()),teleportFrames);	
+		
+		currentFrame = stayAnimation.getKeyFrame(0.10f, true);
+		// Add fucking teleport
 		
 		
 	}
@@ -344,5 +344,9 @@ public class Hero  extends Entities{
 		sensorFixture.setFilterData(f);
 	}
 	
-	
+	public void updateStats() {
+		
+		attack1Animation.setFrameDuration(ANIMATION_SPEED*(1-entitieData.stats.ATKSPEED()));
+		teleportAnimation.setFrameDuration(ANIMATION_SPEED*(1-entitieData.stats.ATKSPEED()));
+	}
 }

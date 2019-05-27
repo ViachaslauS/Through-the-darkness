@@ -273,8 +273,8 @@ public class AiCustom extends Entities {
 		Texture currentHPBar;
 		public void barAIDrawing(SpriteBatch batch) {
 			
-			batch.draw(fullHPBar, coordX+30, coordY + sizeY+20, 300%entitieData.getMAXHITPOINT(), 5);
-			batch.draw(currentHPBar, coordX+30, coordY + sizeY+20, 300%getHITPOINT(), 5);
+			batch.draw(fullHPBar, coordX+30, coordY + sizeY+20, entitieData.getMAXHITPOINT()%300, 5);
+			batch.draw(currentHPBar, coordX+30, coordY + sizeY+20, getHITPOINT()%300, 5);
 		}
 		//___________________________________________________
 	

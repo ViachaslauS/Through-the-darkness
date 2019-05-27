@@ -14,6 +14,7 @@ public class PlayerStats {
 	
 	private int freestats;
 	
+	
 	Preferences pref;
 	public PlayerStats(String object) {
 		pref = Gdx.app.getPreferences(object);
@@ -38,6 +39,7 @@ public class PlayerStats {
 		pref.putFloat("Agility", 1.0f);
 		pref.putFloat("Intel", 1.0f);
 		pref.putInteger("FreeStatements", 0);
+		pref.flush();
 	}
 	public void ADDEXP(float exp) {
 		experience+=exp;
@@ -50,7 +52,7 @@ public class PlayerStats {
 			freestats+=3;
 		}
 	}
-	public float HP() {
+	public float MAXHP() {
 		return (float) (power*1.1);
 	}
 	public float DAMAGE() {
@@ -63,7 +65,7 @@ public class PlayerStats {
 		return (float) (agility*0.007<0.75 ? agility*0.007 : 0.75);
 	}
 	
-	public float MANA() {
+	public float MAXMANA() {
 		return (float)(intelligency*1.1);
 	}
 	public float MANAREG() {
@@ -71,5 +73,26 @@ public class PlayerStats {
 	}
 	public float HPREG() {
 		return (float)(power*1.05);
+	}
+	
+	public void setPower(float power) {
+		this.power = power;
+	}
+	public float getPower() {
+		return power;
+	}
+	
+	public void setIntel(float intel) {
+		this.intelligency = intel;
+	}
+	public float getIntel() {
+		return intelligency;
+	}
+	
+	public void setAgility(float agility) {
+		this.agility = agility;
+	}
+	public float getAgility() {
+		return agility;
 	}
 }

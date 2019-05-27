@@ -307,6 +307,9 @@ public class Entities {
 		if(!isPhysicUpdatingActive)
 			return;
 		//Gdx.app.log("velocity", ""+entitieBox.getLinearVelocity().y);
+		
+		updateCollisions();
+		
 		if(entitieBox.getLinearVelocity().y == 0 || (entitieBox.getLinearVelocity().y < 0.0f && isEntitieGrounded())) {
 			coordY = entitieBox.getPosition().y;
 		}
@@ -315,6 +318,10 @@ public class Entities {
 		}
 		entitieBox.setTransform(coordX, coordY, 0);
 		//Gdx.app.log("Gravity and speed",""+entitieBox.getGravityScale()+"  "+ entitieBox.getLinearVelocity());
+	}
+
+	private void updateCollisions() {
+		
 	}
 
 	protected boolean isEntitieGrounded() {
@@ -345,11 +352,14 @@ public class Entities {
 	protected void move(float coords) {
 		if(isCanMove())
 			coordX+=coords*Gdx.graphics.getDeltaTime();
+			//entitieBox.setTransform(entitieBox.getPosition().x +coords*Gdx.graphics.getDeltaTime(),entitieBox.getPosition().y, 0);		
 		else
 			if(sideView == moveOut)
 				coordX+=coords*Gdx.graphics.getDeltaTime();
-			else
-				setCoord(physicsFixture.getBody().getPosition());
+				//entitieBox.setTransform(entitieBox.getPosition().x +coords*Gdx.graphics.getDeltaTime(),entitieBox.getPosition().y, 0);
+				else
+				setCoord(entitieBox.getPosition());
+		//setCoord(entitieBox.getPosition());
 	}
 	
 	/**
@@ -377,11 +387,13 @@ public class Entities {
 					below = !(manifold.getPoints()[j].y  > coordY  + 25);
 					rez &= below;
 					if(!below) {
-						if(coordX+sizeX/2 > manifold.getPoints()[j].x) {
+						if(coordX+sizeX/2 + 19> manifold.getPoints()[j].x) {
+							
 							if(moveOut == -1) {
 								//moveOut = 0;	
 								continue;
 							}
+							
 							moveOut = 1;
 						}
 						else {
@@ -389,6 +401,7 @@ public class Entities {
 								//moveOut = 0;
 								continue;
 							}
+							
 							moveOut = -1;
 						}
 						

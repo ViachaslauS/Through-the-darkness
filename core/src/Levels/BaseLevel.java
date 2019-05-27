@@ -5,21 +5,20 @@ import java.util.ArrayList;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.mygdx.game.LevelLoading;
-import com.mygdx.game.MainMenuScreen;
 import com.mygdx.game.RPG;
 
 import Engine.DamageDeal;
@@ -27,6 +26,7 @@ import Engine.Platform;
 import Engine.RPGWorld;
 import Engine.UserInterface;
 import Entities.Hero;
+import Entities.Buff.BuffType;
 import aiall.AiCustom;
 
 public class BaseLevel implements GlobalWindow{
@@ -40,6 +40,8 @@ public class BaseLevel implements GlobalWindow{
 		SpriteBatch batch;
 		BitmapFont font;                        //font
 		Texture background;
+		Texture backgroundSkills;
+		Texture gameMenuScreen;
 		
 		OrthographicCamera camera;
 		FitViewport viewport;
@@ -69,7 +71,8 @@ public class BaseLevel implements GlobalWindow{
 			PAUSE,
 			RUN,
 			RESUME,
-			STOPPED
+			STOPPED,
+			SKILLS_MENU
 		}
 
 		private State state = State.RUN;
@@ -77,9 +80,12 @@ public class BaseLevel implements GlobalWindow{
 		public BaseLevel(final RPG game_) {
 			assetManager = new AssetManager();
 			game = game_;
+			World.setVelocityThreshold(0.01f);
 			rpgWorld = new RPGWorld();
 			rpgWorld.setEnvironment(createEnvironment(), createEnemy());
 			rpgWorld.world.setAutoClearForces(true);
+			rpgWorld.world.setContinuousPhysics(false);
+			rpgWorld.world.setWarmStarting(false);
 			//world = new World(new Vector2(0,-100), true);
 			debugRenderer = new Box2DDebugRenderer(true, true, true, true, true, true);
 			damageMaster = new DamageDeal(rpgWorld);
@@ -88,7 +94,7 @@ public class BaseLevel implements GlobalWindow{
 		@Override
 		public void render(float delta) {
 			
-			//level.render(camera);
+			checkCurrentState();
 			switch(state) {
 			
 			case RUN:
@@ -97,12 +103,34 @@ public class BaseLevel implements GlobalWindow{
 			case PAUSE:
 				renderPause(delta);
 				break;
+			case SKILLS_MENU:
+				renderSkillMenu(delta);
 			}
 			
 			
 			
 			
 			}
+/**
+ * @return false if state not changed
+ */
+private boolean checkCurrentState() {
+		State newState = null;
+		//state = State.RUN;
+		if(Gdx.input.isKeyJustPressed(Keys.TAB))
+			newState = State.SKILLS_MENU;
+		if(Gdx.input.isKeyJustPressed(Keys.ESCAPE))
+			newState = State.PAUSE;
+		if(newState == null)
+			return false;
+		if(state != newState) {
+			state = newState;
+		}
+		else {
+			state = State.RUN;
+		}
+		return true;
+}
 private void renderRun(float delta) {
 	Time+=delta;
 	Gdx.gl.glClearColor(0, 0.1f, 0, 1);
@@ -147,20 +175,37 @@ private void renderRun(float delta) {
 	debugRenderer.render(rpgWorld.world, viewport.getCamera().combined);
 	}
 
-private void renderPause(float delta) {
+private void renderSkillMenu(float delta) {
 	Gdx.gl.glClearColor(0, 0.1f, 0, 1);
 	Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-	if(Gdx.input.isKeyJustPressed(Keys.E)) {
-		state = State.RUN;
-		setGameState(state);
-	}
+	
+//	if(checkCurrentState())
+//		return;
+	// if(Gdx.input.isKeyJustPressed(Keys.TAB)) { state = State.RUN; return; }
+	game.batch.begin();
+	game.batch.draw(backgroundSkills, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+	game.batch.end();
+}
+
+private void renderPause(float delta) {
+		Gdx.gl.glClearColor(0, 0.1f, 0, 1);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+//		if(checkCurrentState())
+//			return;
+//		  if(Gdx.input.isKeyJustPressed(Keys.ESCAPE)) { state = State.RUN;
+//		  setGameState(state); return; }
+		 game.batch.begin();
+		 game.batch.draw(gameMenuScreen, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		 game.batch.end();
 }	
-		private void drawInterface() {
+	
+private void drawInterface() {
 			
 			UI.draw(game.batch,hero.getEntitieData());
 			
 		}
-		// OVERRIDE!
+// OVERRIDE!
+		@Override
 		public  void managerLoad() {
 			
 		}
@@ -184,18 +229,26 @@ private void renderPause(float delta) {
 		
 		private void update(float delta)
 		{
-			// Exit from level to menu
-		
-			if(Gdx.input.isKeyJustPressed(Keys.E)) {
-				state = State.PAUSE;
-				setGameState(state);
+			if(Gdx.input.isTouched()) {
+				Vector3 touchPos = new Vector3(Gdx.input.getX(),Gdx.input.getY(),0);
+				camera.unproject(touchPos);
+				Gdx.app.log("coords of touch "," "+touchPos);
 			}
-			if(Gdx.input.isKeyPressed(Keys.ESCAPE))
-				game.setScreen(new LevelLoading(game, new MainMenuScreen(game)));
 			
+			// Exit from level to menu
+//		if(checkCurrentState())
+//			return;
+//		 if(Gdx.input.isKeyJustPressed(Keys.ESCAPE))  { 
+//			 state = State.PAUSE;
+//			 setGameState(state); return; 
+//		 }
+//		 //Go to skills panel
+//		 if(Gdx.input.isKeyJustPressed(Keys.TAB)) { 
+//			 state = State.SKILLS_MENU; return;
+//		 }
 			damageMaster.update();
 			//Gdx.app.log("Hitpoints of ai and hero",""+ ai.getHITPOINT()+"  "+hero.getHITPOINT());
-			if(hero.getHITPOINT() <= 0.0f) {
+			if(hero.getHITPOINT() <= 0.0f || hero.getCoordY() < -100) {
 				hero.getEntitieData().resetHitpoints();
 				if(hero.death()) {
 					
@@ -232,7 +285,7 @@ private void renderPause(float delta) {
 			}
 			//_________________________________________________
 			rpgWorld.world.step(1/1000f, 100, 100);
-			rpgWorld.world.setContinuousPhysics(false);
+			Gdx.app.log("fps",""+Gdx.graphics.getFramesPerSecond());
 		}
 		
 		private void check_path() {
@@ -272,6 +325,8 @@ private void renderPause(float delta) {
 			
 			//Background
 			background = assetManager.get("Battleground1.png",Texture.class);
+			backgroundSkills = assetManager.get("niceBG.jpg",Texture.class);
+			gameMenuScreen = assetManager.get("woodenBG.jpg",Texture.class);
 			//Player
 			hero = new Hero(new Vector2(150.0f,150.0f),new Vector2(600.0f,300.0f),assetManager);
 			//ai = new AiCustom(new Vector2(150.0f,150.0f) , new Vector2(900.0f,150.0f),2225);
@@ -287,6 +342,9 @@ private void renderPause(float delta) {
 			
 			createMapObjects();
 			//level = new Level1();
+			//hero.getEntitieData().setNewBuff(BuffType.MANA, 50, 15, true);
+			hero.getEntitieData().setNewBuff(BuffType.HITPOINTS, 100f, 100, true);
+			//hero.getEntitieData().setNewBuff(BuffType.REGEN_FREQUENCY, 50, 100,false);
 			
 		}
 
@@ -332,6 +390,7 @@ private void renderPause(float delta) {
 			return assetManager.getProgress();
 		}
 		//Override!!!
+		@Override
 		public Array<Platform> createEnvironment() {
 			return platforms;
 		}

@@ -55,7 +55,7 @@ public class DamageDeal {
 		
 		if(dealData.isAttacking == 1) {
 			if((dealer.getBody().getPosition().x > receiver.getBody().getPosition().x && dealData.sideView < 0) || (dealer.getBody().getPosition().x < receiver.getBody().getPosition().x && dealData.sideView > 0))
-			recData.setHitpoint(dealData.getSkillDamage());
+			recData.setHitpoint(dealData.getDAMAGE());
 			dealData.isAttacking = 2;
 		}
 		aiReact(recData, dealData);
