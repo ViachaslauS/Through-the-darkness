@@ -39,6 +39,9 @@ public class Hero  extends Entities{
 	private Sound shift;
 	Animation<TextureRegion> currentAnimation;
 	Animation<TextureRegion>[] allAnimations;
+	
+	private Animation<TextureRegion> attack2Animation;
+	private TextureRegion[] attack2Frames;
 	public void picParam() {
 		//Count of sprites in image
 				PIC_FRAME_COLS = 10;
@@ -92,6 +95,7 @@ public class Hero  extends Entities{
 		stayFrames = new TextureRegion[STAY_FRAME_COLS*STAY_FRAME_ROWS];
 		moveFrames = new TextureRegion[MOVE_FRAME_COLS*MOVE_FRAME_ROWS];
 		attack1Frames = new TextureRegion[ATTACK1_FRAME_COLS*ATTACK1_FRAME_ROWS];
+		attack2Frames = new TextureRegion[8];
 		//include to TextureRegions sprites
 		int index = 0;
 		for(int i=0;i<STAY_FRAME_ROWS;i++)  
@@ -116,10 +120,14 @@ public class Hero  extends Entities{
 			teleportFrames[i] = temp[0][i];
 			attack1Frames[i] = temp[1][i];
 		}
+		for(int i = 0; i<8; i++) {
+			attack2Frames[i] = temp[3][i];
+		}
 		//Initialize of animations
 		stayAnimation = new Animation<TextureRegion>(0.10f, stayFrames);
 		moveAnimation = new Animation<TextureRegion>(0.10f,moveFrames);
 		attack1Animation = new Animation<TextureRegion>(ANIMATION_SPEED*(1-entitieData.stats.ATKSPEED()),attack1Frames);
+		attack2Animation = new Animation<TextureRegion>(0.1f,attack2Frames);
 		deathAnimation = new Animation<TextureRegion>(0.10f,deathFrames);
 		teleportAnimation = new Animation<TextureRegion>(ANIMATION_SPEED*(1-entitieData.stats.ATKSPEED()),teleportFrames);	
 		
@@ -131,7 +139,7 @@ public class Hero  extends Entities{
 
 	@Override
 	public void update(float delta) {
-		
+		updateStats();
 		entitieData.updateData();
 		updatePhysic();
 		
@@ -180,7 +188,8 @@ public class Hero  extends Entities{
 		switch(currentAction) {
 		case 1:attack1();   	break;
 		case 2:teleport();	    break;
-		case 3:jump();		    break;
+		case 3:jump();		   return false;
+		case 4:attack2();       break;
 		default: return false;
 		}
 		return true;
@@ -218,7 +227,15 @@ public class Hero  extends Entities{
 			currentAnimation = stayAnimation;
 			jump();
 		}
+		//attack2
+		if(Gdx.input.isKeyPressed(Keys.NUM_2)) {
+			currentAction = 4;
+			currentAnimation = attack2Animation;
+			attack2();
+		}
 	}
+
+
 	/** Check, was li pressed S button
 	 * @return
 	 * If button was pressed then true
@@ -245,6 +262,7 @@ public class Hero  extends Entities{
 			return true;
 		}
 		CURRENT_DURATION+=Gdx.graphics.getDeltaTime();	
+		frameFlip();
 		return false;
 	}
 	public void attack1() {
@@ -257,9 +275,43 @@ public class Hero  extends Entities{
 			move(200*sideView);
 		}
 		
-		frameFlip();
+		//frameFlip();
 		return;
 		
+	}
+	int attackinInThisFrame = 0;
+	private void attack2() {
+		if(refresh()) {
+			attackinInThisFrame = 0;
+			
+			return;
+		}
+		if(!Gdx.input.isKeyPressed(Keys.NUM_2) && (currentFrame == currentAnimation.getKeyFrames()[3] || currentFrame == currentAnimation.getKeyFrames()[5] || currentFrame == currentAnimation.getKeyFrames()[7]))
+			reset();
+		if(currentFrame == currentAnimation.getKeyFrames()[2] && attackinInThisFrame!=2) {
+			if(entitieData.isAttacking == 2) {
+				attackinInThisFrame = 2;
+				entitieData.isAttacking = 0;
+			}
+			else
+				entitieData.isAttacking = 1;
+		}
+		if(currentFrame == currentAnimation.getKeyFrames()[4] && attackinInThisFrame!=4) {
+			if(entitieData.isAttacking == 2) {
+				attackinInThisFrame = 4;
+				entitieData.isAttacking = 0;
+			}
+			else
+				entitieData.isAttacking = 1;
+		}
+		if(currentFrame == currentAnimation.getKeyFrames()[6] && attackinInThisFrame!=6) {
+			if(entitieData.isAttacking == 2) {
+				attackinInThisFrame = 6;
+				entitieData.isAttacking = 0;
+			}
+			else
+				entitieData.isAttacking = 1;
+		}
 	}
 	public void teleport() {
 		if(refresh()) {
@@ -269,10 +321,10 @@ public class Hero  extends Entities{
 		 entitieData.isInvisible = true;
 		if(currentFrame == currentAnimation.getKeyFrames()[4] || currentFrame == currentAnimation.getKeyFrames()[5] || currentFrame == currentAnimation.getKeyFrames()[6]) {
 			//coordX+=1000*Gdx.graphics.getDeltaTime()*sideView/(1-stats.ATKSPEED());
-			move(1000*sideView/(1-entitieData.stats.ATKSPEED()));
-			Gdx.app.log("Player coord", String.valueOf(coordX));
+			move(750*sideView/(1-entitieData.stats.ATKSPEED()));
+	
 		}
-		frameFlip();
+		//frameFlip();
 		return;
 	}
 	private boolean isJump = false;
@@ -286,7 +338,7 @@ public class Hero  extends Entities{
 		}
 		if(isEntitieGrounded()) {
 			isJump = true;
-			entitieBox.applyLinearImpulse(new Vector2(0,1450), new Vector2(coordX,coordY), true);
+			entitieBox.applyLinearImpulse(new Vector2(0,1450), entitieBox.getPosition(), true);
 		}
 		else
 			reset();

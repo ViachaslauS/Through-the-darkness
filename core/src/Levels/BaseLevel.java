@@ -286,7 +286,10 @@ private void drawInterface() {
 					
 			}
 			//_________________________________________________
+			rpgWorld.world.step(1/1000f, 100,100);
 			rpgWorld.world.step(1/1000f, 100, 100);
+		
+	
 			Gdx.app.log("fps",""+Gdx.graphics.getFramesPerSecond());
 		}
 		
@@ -345,9 +348,9 @@ private void drawInterface() {
 			createMapObjects();
 			//level = new Level1();
 			//hero.getEntitieData().setNewBuff(BuffType.MANA, 50, 15, true);
-			hero.getEntitieData().setNewBuff(BuffType.HITPOINTS, 100f, 100, true);
+			hero.getEntitieData().setNewBuff(BuffType.HITPOINTS, 100f, 1000, true);
+			hero.getEntitieData().setNewBuff(BuffType.MANA, 100, 1000, true);
 
-			
 		}
 
 		/**

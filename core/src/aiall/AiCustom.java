@@ -185,7 +185,7 @@ public class AiCustom extends Entities {
 		  if(entitieData.shouldEvade)
 		  {
 			  entitieData.shouldEvade = false;
-			  entitieBox.applyLinearImpulse(new Vector2(0,100000000), new Vector2(coordX,coordY), true);
+			  entitieBox.applyLinearImpulse(new Vector2(1000,1000), new Vector2(coordX,coordY), true);
 			 // entitieBox.applyAngularImpulse(20000000f, true);
 		  }
 		  

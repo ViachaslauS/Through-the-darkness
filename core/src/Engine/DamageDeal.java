@@ -5,6 +5,8 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.WorldManifold;
 import com.badlogic.gdx.utils.Array;
 
+import Entities.Buff.BuffType;
+
 public class DamageDeal {
 
 	RPGWorld world;

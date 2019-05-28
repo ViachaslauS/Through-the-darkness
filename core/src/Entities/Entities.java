@@ -295,7 +295,7 @@ public class Entities {
 			physicsFixture.setSensor(false);
 			physicsFixture.setUserData(sensorFixture);
 			entitieBox.setBullet(true);
-			entitieBox.setGravityScale(1000f);
+			entitieBox.setGravityScale(500f);
 			entitieBox.setTransform(coordX, coordY, 0);
 			//entitieBox.setUserData(entitieData);
 	}
@@ -316,7 +316,11 @@ public class Entities {
 		else {
 			coordY += Gdx.graphics.getDeltaTime()*entitieBox.getLinearVelocity().y;
 		}
-		entitieBox.setTransform(coordX, coordY, 0);
+		if(entitieBox.getLinearVelocity().x !=0) {
+			coordX += Gdx.graphics.getDeltaTime()*entitieBox.getLinearVelocity().x;
+			//return;
+		}
+		entitieBox.setTransform(coordX, coordY,0);
 		//Gdx.app.log("Gravity and speed",""+entitieBox.getGravityScale()+"  "+ entitieBox.getLinearVelocity());
 	}
 
@@ -350,14 +354,18 @@ public class Entities {
 		return below;
 	}
 	protected void move(float coords) {
-		if(isCanMove())
-			coordX+=coords*Gdx.graphics.getDeltaTime();
+		//if(isCanMove())
+		//entitieBox.applyLinearImpulse(new Vector2(100*sideView,0), entitieBox.getPosition(), true);
+			entitieBox.setLinearVelocity(new Vector2(coords*Gdx.graphics.getDeltaTime()*50,entitieBox.getLinearVelocity().y));
+			//coordX+=coords*Gdx.graphics.getDeltaTime();
 			//entitieBox.setTransform(entitieBox.getPosition().x +coords*Gdx.graphics.getDeltaTime(),entitieBox.getPosition().y, 0);		
-		else
-			if(sideView == moveOut)
-				coordX+=coords*Gdx.graphics.getDeltaTime();
+		//else
+		//	if(sideView == moveOut)
+		//		entitieBox.setLinearVelocity(new Vector2(coords*Gdx.graphics.getDeltaTime(),entitieBox.getLinearVelocity().y));
+			
+				//coordX+=coords*Gdx.graphics.getDeltaTime();
 				//entitieBox.setTransform(entitieBox.getPosition().x +coords*Gdx.graphics.getDeltaTime(),entitieBox.getPosition().y, 0);
-				else
+		//		else
 				setCoord(entitieBox.getPosition());
 		//setCoord(entitieBox.getPosition());
 	}
