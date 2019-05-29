@@ -49,12 +49,14 @@ public class ObjectData {
 	 */
 	public int isAttacking = 0;
 	public boolean isAi = false;
+	private boolean isBoss = false;
 	public float attackTime = 0;
 	public boolean isInvisible = false;
 	public boolean shouldEvade = false;
 	public boolean shouldRemove = false;
 	public boolean isBull = false;
 	public float skillDamage = 1.0f;
+	public boolean isMustAttack = false;
 	
 	public int sideView = 1;
 	
@@ -71,6 +73,7 @@ public class ObjectData {
 		
 		preferences = Gdx.app.getPreferences(object);
 		stats = new PlayerStats(object+"_stat");
+		isBoss = object.equals("aistats3");
 		loadPref();
 		buffs = new Array<Buff>();
 	}
@@ -136,7 +139,7 @@ public class ObjectData {
 
 	private void loadPref() {
 		
-		MAXHITPOINT = 100.0f * stats.MAXHP();
+		MAXHITPOINT = 100.0f * stats.MAXHP()*(isBoss? 10:1);
 		MAXMANA = 100.0f * stats.MAXMANA();
 		HITPOINT = preferences.getFloat("HITPOINT", MAXHITPOINT);
 		DAMAGE = preferences.getFloat("DAMAGE", 25.0f) * stats.DAMAGE();
@@ -280,5 +283,9 @@ public class ObjectData {
 	
 	public Array<Buff> getBuffs() {
 		return buffs;
+	}
+	
+	public void resetBuffs() {
+		buffs.clear();
 	}
 }

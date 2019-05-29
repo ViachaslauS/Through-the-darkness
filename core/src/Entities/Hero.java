@@ -286,8 +286,7 @@ public class Hero  extends Entities{
 			
 			return;
 		}
-		if(!Gdx.input.isKeyPressed(Keys.NUM_2) && (currentFrame == currentAnimation.getKeyFrames()[3] || currentFrame == currentAnimation.getKeyFrames()[5] || currentFrame == currentAnimation.getKeyFrames()[7]))
-			reset();
+		
 		if(currentFrame == currentAnimation.getKeyFrames()[2] && attackinInThisFrame!=2) {
 			if(entitieData.isAttacking == 2) {
 				attackinInThisFrame = 2;
@@ -312,6 +311,8 @@ public class Hero  extends Entities{
 			else
 				entitieData.isAttacking = 1;
 		}
+		if(!Gdx.input.isKeyPressed(Keys.NUM_2) && (currentFrame == currentAnimation.getKeyFrames()[3] || currentFrame == currentAnimation.getKeyFrames()[5] || currentFrame == currentAnimation.getKeyFrames()[7]))
+			reset();
 	}
 	public void teleport() {
 		if(refresh()) {
@@ -352,6 +353,7 @@ public class Hero  extends Entities{
 		currentAction = 0;
 		entitieData.isAttacking = 0;
 		entitieData.skillDamage = 0.0f;
+		CURRENT_DURATION = 0.0f;
 	}
 	
 	@Override

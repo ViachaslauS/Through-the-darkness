@@ -113,10 +113,10 @@ public class MainMenuScreen implements GlobalWindow{
 	public void show() {
 		viewport = new FitViewport(VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
 		
-		mainImage = assetManager.get("mainImage.jpg", Texture.class);
+		mainImage = assetManager.get("mainImage.png", Texture.class);
 		allSheets = assetManager.get("buttons.png", Texture.class);
 		imageCollector = TextureRegion.split(allSheets, allSheets.getWidth()/2, allSheets.getHeight()/2);
-		soundtrack = assetManager.get("menuSound.mp3", Music.class);
+		soundtrack = assetManager.get("mainMusic.mp3", Music.class);
 		
 		playMusic();
 		stage = new Stage(viewport);
@@ -209,8 +209,8 @@ public class MainMenuScreen implements GlobalWindow{
 	public void managerLoad() {
 		assetManager.load("menu_font.fnt", BitmapFont.class);
 		assetManager.load("buttons.png", Texture.class);
-		assetManager.load("mainImage.jpg", Texture.class);
-		assetManager.load("menuSound.mp3", Music.class);
+		assetManager.load("mainImage.png", Texture.class);
+		assetManager.load("mainMusic.mp3", Music.class);
 		
 	}
 

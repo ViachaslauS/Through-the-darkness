@@ -2,7 +2,9 @@ package Entities;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -19,14 +21,26 @@ public class Bullet {
 	RPGWorld world;
 	Body box;
 	Filter f = new Filter();
-	public static final int speed = 100;
-	private static Texture texture = new Texture(Gdx.files.internal("badlogic.jpg"));
+	public static final int speed = 200;
+	private static Texture texture = new Texture(Gdx.files.internal("bullets.png"));
+	
+	public static TextureRegion[][] allBullets;
+	TextureRegion[] bulletFrames;
+	Animation<TextureRegion> bulletAnimation;
+	TextureRegion currentFrame;
 	private int sideView;
 	float x,y;
 	
 	public boolean remove = false;
 	
 	public Bullet (float x, float y, int side) {
+		
+		allBullets = TextureRegion.split(texture, texture.getWidth()/10, texture.getHeight()/10);
+		bulletFrames = new TextureRegion[4];
+		for(int i=0;i<4;i++) {
+			bulletFrames[i] = allBullets[1][i];
+		}
+		bulletAnimation = new Animation<TextureRegion>(0.05f,bulletFrames);
 		this.x = x;
 		this.y = y;
 		sideView = side;
@@ -36,7 +50,8 @@ public class Bullet {
 	}
 	public void update (float deltaTime) {
 		bulletData.updateData();
-		updatePhysic();
+		box.setTransform(x, y, 0);
+		//updatePhysic();
 		x += speed* deltaTime*sideView;
 		if( x < 0) {
 			remove = true;
@@ -45,8 +60,14 @@ public class Bullet {
 			remove = true;
 		
 	}
-	public void render (SpriteBatch batch) {
-		batch.draw(texture, x, y,16,16);
+	float DURATION = 0.0f;
+	public void render (SpriteBatch batch,float delta) {
+		currentFrame = bulletAnimation.getKeyFrame(DURATION,true);
+		DURATION+=Gdx.graphics.getDeltaTime();
+		if(DURATION > bulletAnimation.getAnimationDuration()*2)
+			DURATION = 0.0f;
+		frameFlip();
+		batch.draw(currentFrame, x, y,64,64);
 	}
 	public void delete () {
 		box.destroyFixture(physicsFixture);
@@ -67,15 +88,15 @@ public class Bullet {
 	
 	private void bodyInitialize() {
 		CircleShape circlePolygon = new CircleShape();
-		circlePolygon.setRadius(8);
-		circlePolygon.setPosition(new Vector2(8,8));
+		circlePolygon.setRadius(32);
+		circlePolygon.setPosition(new Vector2(32,32));
 		sensorFixture = box.createFixture(circlePolygon,0f);
 		sensorFixture.setUserData(bulletData);
 		sensorFixture.setSensor(true);
 		circlePolygon.dispose();
 		
 		PolygonShape polygon = new PolygonShape();
-		polygon.setAsBox(8, 8,new Vector2(8,8),0);
+		polygon.setAsBox(32, 32,new Vector2(32,32),0);
 		physicsFixture = box.createFixture(polygon, 0.0f);
 		polygon.dispose();
 		physicsFixture.setDensity(0);
@@ -96,8 +117,28 @@ public class Bullet {
 		else {
 			y += Gdx.graphics.getDeltaTime()*box.getLinearVelocity().y;
 		}
-		box.setTransform(x, y, 0);
+		
 		//Gdx.app.log("Gravity and speed",""+entitieBox.getGravityScale()+"  "+ entitieBox.getLinearVelocity());
 	}
-
+	public void frameFlip() {
+		if(sideView == 1)
+		{
+			if(!currentFrame.isFlipX()) {											    
+				currentFrame.flip(false, false);	
+			}
+			else {
+				currentFrame.flip(true, false);
+			}
+		}
+		else {
+			if(currentFrame.isFlipX()) {
+			
+				currentFrame.flip(false, false);
+			}
+			else {
+			
+				currentFrame.flip(true, false);
+			}
+		}
+	}
 }

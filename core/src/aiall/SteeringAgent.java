@@ -160,7 +160,9 @@ public class SteeringAgent implements Steerable<Vector2> {
 		// TODO Auto-generated method stub
 		
 	}
+	
 	public Vector3 update( float orientation) {
+		
 		if (orientation != _orientation)
 		{
 			_independentorientation = true;

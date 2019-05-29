@@ -79,30 +79,33 @@ public class DamageDeal {
 			ObjectData recData = (ObjectData) recDataFix.getUserData();
 			ObjectData dealData = (ObjectData) dealer.getUserData();
 			
-			if(recData.isAi) {
-				 recData.isAttacking = -2;
-			 if(recData.attackTime >=2) {
-				 recData.attackTime =0;
-			
-				 dealData.setHitpoint(recData.getDAMAGE());
-				 
-			 }
-			 else {
-				 if(dealData.isAttacking == 1)
-					 recData.shouldEvade = true;
-			 }
-			 
-				 
-			}
-			 
-			if(dealData.isAi ) {
-				dealData.isAttacking = -2;
-				if(dealData.attackTime >=1) {
-					dealData.attackTime =0;
-					
+//			if(recData.isAi) {
+//				// recData.isAttacking = -2;
+//			 if(recData.isAttacking == -2) {
+//				 recData.attackTime = 0;
+//				 recData.isAttacking = -3;
+//				 dealData.setHitpoint(recData.getDAMAGE());
+//				 
+//			 }
+//			 else {
+//				 if(dealData.isAttacking == 1)
+//					 recData.shouldEvade = true;
+//			 }
+//			 
+//				 
+//			}
+//			 
+			if(dealData.isAi) {
+			//	dealData.isAttacking = -2;
+				if(dealData.isAttacking == -2) {
+					dealData.attackTime = 0;
+					dealData.isAttacking = -3;
 					recData.setHitpoint(dealData.getDAMAGE());
 				}
 				else {
+					if(dealData.isAttacking != -3) {
+						dealData.isMustAttack = true;
+					}
 					 if(recData.isAttacking == 1)
 						 dealData.shouldEvade = true;
 				 }

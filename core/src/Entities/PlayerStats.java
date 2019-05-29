@@ -12,15 +12,18 @@ public class PlayerStats {
 	private float agility;
 	private float intelligency;
 	
-	private int freestats;
-	
+	private int statsPoints;
+	private int skillPoints;
 	
 	Preferences pref;
 	public PlayerStats(String object) {
 		pref = Gdx.app.getPreferences(object);
+		if(object.equals("aistats3_stat")) {
+			startStats(1);
+		}
 		int isBegin = pref.getInteger("FirstLaunch", 0);
 		if(isBegin == 0) {
-			startStats();
+			startStats(1);
 		}
 		//pref.clear(); // REMOVE!!!
 		experience = pref.getFloat("Exp",0.0f);
@@ -28,17 +31,19 @@ public class PlayerStats {
 		power = pref.getFloat("Power", 1.0f);
 		agility = pref.getFloat("Agility", 1.0f);
 		intelligency = pref.getFloat("Intel",1.0f);
-		freestats = pref.getInteger("FreeStatements", 0);
+		statsPoints = pref.getInteger("StatsPoints", 0);
+		skillPoints = pref.getInteger("SkillPoints",0);
 	}
-	void startStats() {
+	void startStats(int level) {
 		pref.clear();
 		pref.putInteger("FirstLaunch", 1);
 		pref.putFloat("Exp", 0.0f);
 		pref.putInteger("Level", 1);
-		pref.putFloat("Power", 1.0f);
-		pref.putFloat("Agility", 1.0f);
-		pref.putFloat("Intel", 1.0f);
-		pref.putInteger("FreeStatements", 0);
+		pref.putFloat("Power", 1.0f*level);
+		pref.putFloat("Agility", 1.0f*level);
+		pref.putFloat("Intel", 1.0f*level);
+		pref.putInteger("StatsPoints", 0);
+		pref.putInteger("SkillPoints",0);
 		pref.flush();
 	}
 	public void ADDEXP(float exp) {
@@ -49,7 +54,8 @@ public class PlayerStats {
 		if(experience >= level*10) {
 			experience = 0.0f;
 			level++;
-			freestats+=3;
+			statsPoints+=3;
+			skillPoints+=1;
 		}
 	}
 	public float MAXHP() {
@@ -94,5 +100,20 @@ public class PlayerStats {
 	}
 	public float getAgility() {
 		return agility;
+	}
+	public float getExp() {
+		return experience;
+	}
+	public int getLevel() {
+		return level;
+	}
+	public float getMaxExp() {
+		return level*10f;
+	}
+	public int getStatsPoints() {
+		return statsPoints;
+	}
+	public int getSkillPoints() {
+		return skillPoints;
 	}
 }

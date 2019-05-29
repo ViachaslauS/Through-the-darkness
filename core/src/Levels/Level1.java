@@ -21,6 +21,7 @@ public class Level1 extends BaseLevel{
 	//@Override
 	public ArrayList<AiCustom> createEnemy() {
 		 bots = new ArrayList<AiCustom>();
+		 	bots.add(new AiCustom(new Vector2(300.0f,300.0f) , new Vector2(5800.0f,180.0f),3));
 			bots.add(new AiCustom(new Vector2(150.0f,150.0f) , new Vector2(1100.0f,180.0f),1));
 			bots.add(new AiCustom(new Vector2(150.0f,150.0f) , new Vector2(1500.0f,150.0f),1));
 			bots.add(new AiCustom(new Vector2(150.0f,150.0f) , new Vector2(2100.0f,150.0f),2));

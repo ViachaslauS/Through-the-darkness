@@ -134,6 +134,9 @@ private boolean checkCurrentState() {
 		return true;
 }
 private void renderRun(float delta) {
+	
+	checkOnAdmin();
+	
 	Time+=delta;
 	Gdx.gl.glClearColor(0, 0.1f, 0, 1);
 	Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -147,8 +150,9 @@ private void renderRun(float delta) {
 	game.batch.begin();
 	
 	backgroundDraw();
-	
-	
+	for(int i = 0; i < platforms.size;i++) {
+		platforms.get(i).draw(game.batch);
+	}
 	game.batch.draw(hero.currentFrame, hero.getCoordX(), hero.getCoordY(), hero.getSizeX(), hero.getSizeY());
 	for(int i =0; i<bots.size();i++)
 	{
@@ -157,12 +161,8 @@ private void renderRun(float delta) {
 		game.batch.draw(bots.get(i).currentFrame, bots.get(i).getCoordX(), bots.get(i).getCoordY(), bots.get(i).getSizeX(), bots.get(i).getSizeY());
 		bots.get(i).barAIDrawing(game.batch);
 		for(int j=0;j<bots.get(i).bullets.size();j++)  
-			bots.get(i).bullets.get(j).render(game.batch);
+			bots.get(i).bullets.get(j).render(game.batch,delta);
 		// ________________________________
-	}
-	
-	for(int i = 0; i < platforms.size;i++) {
-		platforms.get(i).draw(game.batch);
 	}
 	game.batch.end();
 	//cameraHUD.position.set(hero.getCoordX(), /* hero.getCoordY() + */350.0f, 0);
@@ -171,11 +171,13 @@ private void renderRun(float delta) {
 	game.batch.begin();
 	
 	drawInterface();
+	
 	// player interface is here
 	game.batch.end();
 	//debugRenderer.render(world, viewport.getCamera().combined);
 	debugRenderer.render(rpgWorld.world, viewport.getCamera().combined);
 	}
+
 
 private void renderSkillMenu(float delta) {
 	Gdx.gl.glClearColor(0, 0.1f, 0, 1);
@@ -185,7 +187,7 @@ private void renderSkillMenu(float delta) {
 //		return;
 	// if(Gdx.input.isKeyJustPressed(Keys.TAB)) { state = State.RUN; return; }
 	game.batch.begin();
-	game.batch.draw(backgroundSkills, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+	game.batch.draw(gameMenuScreen, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 	game.batch.end();
 }
 
@@ -236,18 +238,7 @@ private void drawInterface() {
 				camera.unproject(touchPos);
 				Gdx.app.log("coords of touch "," "+touchPos);
 			}
-			
-			// Exit from level to menu
-//		if(checkCurrentState())
-//			return;
-//		 if(Gdx.input.isKeyJustPressed(Keys.ESCAPE))  { 
-//			 state = State.PAUSE;
-//			 setGameState(state); return; 
-//		 }
-//		 //Go to skills panel
-//		 if(Gdx.input.isKeyJustPressed(Keys.TAB)) { 
-//			 state = State.SKILLS_MENU; return;
-//		 }
+
 			damageMaster.update();
 			//Gdx.app.log("Hitpoints of ai and hero",""+ ai.getHITPOINT()+"  "+hero.getHITPOINT());
 			if(hero.getHITPOINT() <= 0.0f || hero.getCoordY() < -100) {
@@ -276,10 +267,11 @@ private void drawInterface() {
 				//bots.get(i).update(delta);
 				//if(bots.get(i).getHITPOINT() <= 0.0f) {
 				//	bots.get(i).deleteBot();
-				//	bots.remove(i);
+				//	bots.remove(i);22
 				//}
 				bots.get(i).update(delta);
 				if(bots.get(i).isDead) {
+					hero.getEntitieData().stats.ADDEXP(bots.get(i).level*bots.get(i).level);
 					bots.get(i).deleteBot();
 					bots.remove(i);
 				}
@@ -290,7 +282,11 @@ private void drawInterface() {
 			rpgWorld.world.step(1/1000f, 100, 100);
 		
 	
-			Gdx.app.log("fps",""+Gdx.graphics.getFramesPerSecond());
+			Gdx.app.log("exp",""+hero.getEntitieData().stats.getExp()+"/"+
+			hero.getEntitieData().stats.getMaxExp()+"  level: "+
+			hero.getEntitieData().stats.getLevel()+"  free stats: "+
+			hero.getEntitieData().stats.getStatsPoints()+"  free skill:"+ 
+			hero.getEntitieData().stats.getSkillPoints());
 		}
 		
 		private void check_path() {
@@ -348,7 +344,7 @@ private void drawInterface() {
 			createMapObjects();
 			//level = new Level1();
 			//hero.getEntitieData().setNewBuff(BuffType.MANA, 50, 15, true);
-			hero.getEntitieData().setNewBuff(BuffType.HITPOINTS, 100f, 1000, true);
+			//hero.getEntitieData().setNewBuff(BuffType.HITPOINTS, 100f, 1000, true);
 			hero.getEntitieData().setNewBuff(BuffType.MANA, 100, 1000, true);
 
 		}
@@ -409,5 +405,13 @@ private void drawInterface() {
 		public void setGameState (State s) {
 			this.state = s;
 		}
-		
+		private void checkOnAdmin() {
+			if(Gdx.input.isKeyPressed(Keys.I) && Gdx.input.isKeyPressed(Keys.NUM_9)) {
+				hero.getEntitieData().setNewBuff(BuffType.HITPOINTS, 100f, 1000, true);
+				hero.getEntitieData().setNewBuff(BuffType.MANA, 100, 1000, true);
+
+			}
+			if(Gdx.input.isKeyPressed(Keys.R))
+				hero.getEntitieData().resetBuffs();
+		}
 }
