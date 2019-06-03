@@ -31,7 +31,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
-import Engine.Platform;
+import Environment.Platform;
 import Levels.GlobalWindow;
 import Levels.Level1;
 import Levels.Level2;

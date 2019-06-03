@@ -29,6 +29,21 @@ public class RPGContactListener implements ContactListener{
 		for(int i = 0; i< contacts.size;i++) {
 			//if(contacts.get(i).isTouching()) {
 			
+			
+			if(contacts.get(i).getFixtureA().getUserData()!= null)  {//___________________________________________
+				if(contacts.get(i).getFixtureA().getUserData().getClass().getName().equals("Engine.DynamicObjectsData"))
+				{
+					nearButton(contacts.get(i).getFixtureA().getUserData());
+					continue;
+				}
+			}
+			if(contacts.get(i).getFixtureB().getUserData()!= null) {
+				if(contacts.get(i).getFixtureB().getUserData().getClass().getName().equals("Engine.DynamicObjectsData"))
+				{
+					nearButton(contacts.get(i).getFixtureB().getUserData());
+					continue;
+				}
+			}
 			// collision bullet w/ stenki
 			if(contacts.get(i).getFixtureA().getUserData() == null && contacts.get(i).getFixtureB().getUserData() != null) {
 				ObjectData fixData = recreate(contacts.get(i).getFixtureB());
@@ -40,10 +55,6 @@ public class RPGContactListener implements ContactListener{
 				if(fixData.isBull)
 					fixData.shouldRemove = true;
 			}
-			
-			
-			
-			
 			
 			
 			
@@ -79,6 +90,8 @@ public class RPGContactListener implements ContactListener{
 		
 	}
 	
+	
+
 	private void stopBot(Fixture rec, Fixture deal) {
 		ObjectData fixAData = recreate(rec);
 		ObjectData fixBData = recreate(deal);
@@ -102,6 +115,21 @@ public class RPGContactListener implements ContactListener{
 		Array<Contact> contacts = world.world.getContactList();
 		for(int i = 0; i< contacts.size;i++) {
 			//if(contacts.get(i).isTouching()) {
+			if(contacts.get(i).getFixtureA().getUserData()!= null)  {//___________________________________________
+				if(contacts.get(i).getFixtureA().getUserData().getClass().getName().equals("Engine.DynamicObjectsData"))
+				{
+					notNearButton(contacts.get(i).getFixtureA(),contacts.get(i).getFixtureA());
+					continue;
+				}
+			}
+			if(contacts.get(i).getFixtureB().getUserData()!= null) {
+				if(contacts.get(i).getFixtureB().getUserData().getClass().getName().equals("Engine.DynamicObjectsData"))
+				{
+					notNearButton(contacts.get(i).getFixtureA(),contacts.get(i).getFixtureB());
+					continue;
+				}
+			}
+			
 				if(contacts.get(i).getFixtureA().getUserData()!=null && contacts.get(i).getFixtureB().getUserData()!=null) {
 					if(contacts.get(i).getFixtureA().getUserData().getClass().getName() == "com.badlogic.gdx.physics.box2d.Fixture" && contacts.get(i).getFixtureB().getUserData().getClass().getName() == ("com.badlogic.gdx.physics.box2d.Fixture"))
 						continue;
@@ -164,8 +192,41 @@ private void aiReact(ObjectData rec, ObjectData deal) {
 
 	@Override
 	public void postSolve(Contact contact, ContactImpulse impulse) {
-		// TODO Auto-generated method stub
-		
+
+					if(contact.getFixtureA().getUserData()!= null && contact.getFixtureB().getUserData()!= null) {//___________________________________________
+						if(contact.getFixtureA().getUserData().getClass().getName().equals("Engine.DynamicObjectsData"))
+						{
+							notNearButton(contact.getFixtureA(),contact.getFixtureB());
+						}
+						if(contact.getFixtureB().getUserData().getClass().getName().equals("Engine.DynamicObjectsData"))
+						{
+							notNearButton(contact.getFixtureB(),contact.getFixtureA());
+						}
+					}
+		//___________________________________________
+					
+	}
+	
+private void nearButton(Object button) {
+	//DynamicObjectsData data = (DynamicObjectsData) button;
+	//data.isNear = true;
+}
+private void notNearButton(Fixture button, Fixture userData2) {
+		DynamicObjectsData data = (DynamicObjectsData) button.getUserData();
+		if(userData2.getUserData().getClass().getName().equals("Engine.ObjectData")) {
+			ObjectData playerData = (ObjectData) userData2.getUserData();
+			if(playerData.isAi == true)
+				return;
+		}
+		if(userData2.getUserData().getClass().getName().equals("com.badlogic.gdx.physics.box2d.Fixture")) {
+			Fixture fixPlayer = (Fixture) userData2.getUserData();
+			if(fixPlayer.getUserData().getClass().getName().equals("Engine.ObjectData")) {
+				ObjectData tempData = (ObjectData) fixPlayer.getUserData();
+				if(tempData.isAi) 
+					return;
+			}
+		}
+		data.isNear = false;
 	}
 	
 	public void setEntitie(Entities ent) {

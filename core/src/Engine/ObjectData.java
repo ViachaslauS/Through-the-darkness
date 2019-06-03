@@ -55,6 +55,8 @@ public class ObjectData {
 	public boolean shouldEvade = false;
 	public boolean shouldRemove = false;
 	public boolean isBull = false;
+	
+
 	public float skillDamage = 1.0f;
 	public boolean isMustAttack = false;
 	
@@ -65,10 +67,6 @@ public class ObjectData {
 	protected float ARMOR;
 	protected float DAMAGE;
 	
-	private float addIntel;
-	private float addAgility;
-	private float addPower;
-	
 	public ObjectData(String object) { 
 		
 		preferences = Gdx.app.getPreferences(object);
@@ -76,6 +74,7 @@ public class ObjectData {
 		isBoss = object.equals("aistats3");
 		loadPref();
 		buffs = new Array<Buff>();
+
 	}
 	
 	public float getHITPOINT() {
@@ -91,7 +90,7 @@ public class ObjectData {
 	}
 	
 	public float getDAMAGE() {
-		return DAMAGE+stats.DAMAGE();
+		return (DAMAGE+stats.DAMAGE())*skillDamage;
 	}
 	
 	/**
@@ -132,7 +131,7 @@ public class ObjectData {
 	
 	public void setNewBuff(BuffType what, float value, float durating,boolean cycling) {
 		buffs.add(new Buff(what, value, durating,cycling));
-		addStats(buffs.get(buffs.size-1));
+		addStats(buffs.get(buffs.size-1).type,buffs.get(buffs.size-1).value);
 		
 	}
 	
@@ -168,7 +167,7 @@ public class ObjectData {
 	}
 	public float getRegenTime() {
 		return regenTime;
-	}
+	} 
 	Hero hero;
 	
 	/**
@@ -189,6 +188,9 @@ public class ObjectData {
 		return false;
 	}
 	
+	public void setNewAbility(BuffType what, float value) {
+		addStats(what,value);
+	}
 	/**
 	 *  check on max and min values
 	 */
@@ -213,16 +215,16 @@ public class ObjectData {
 	/**
 	 *  if entitie get buff, inscrease parameters
 	 */
-	private void addStats(Buff buff) {
-			switch(buff.type) {
-			case POWER:stats.setPower(stats.getPower()+buff.value); break;
-			case AGILITY:stats.setAgility(stats.getAgility()+buff.value); break; 
-			case INTELLIGENCY:stats.setIntel(stats.getIntel()+buff.value); break; 
-			case HITPOINTS: HITPOINT+=buff.value; break; 
-			case MANA: MANA+=buff.value ; break; 
-			case ARMOR: ARMOR+=buff.value ; break; 
-			case DAMAGE: DAMAGE+=buff.value ; break;
-			case REGEN_FREQUENCY: regenTime-=buff.value; break;
+	private void addStats(BuffType type, float value) {
+			switch(type) {
+			case POWER:stats.setPower(stats.getPower()+value); break;
+			case AGILITY:stats.setAgility(stats.getAgility()+value); break; 
+			case INTELLIGENCY:stats.setIntel(stats.getIntel()+value); break; 
+			case HITPOINTS: HITPOINT+=value; break; 
+			case MANA: MANA+=value ; break; 
+			case ARMOR: ARMOR+=value ; break; 
+			case DAMAGE: DAMAGE+=value ; break;
+			case REGEN_FREQUENCY: regenTime-=value; break;
 			default: break;
 			}
 	}
@@ -251,7 +253,7 @@ public class ObjectData {
 			}
 			else
 				if(buffs.get(i).isCycle) {
-					addStats(buffs.get(i));
+					addStats(buffs.get(i).type, buffs.get(i).value);
 				}
 		}
 	}
@@ -288,4 +290,5 @@ public class ObjectData {
 	public void resetBuffs() {
 		buffs.clear();
 	}
+	
 }

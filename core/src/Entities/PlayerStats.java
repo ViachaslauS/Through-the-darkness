@@ -116,4 +116,13 @@ public class PlayerStats {
 	public int getSkillPoints() {
 		return skillPoints;
 	}
+	public void addPower(float pow) {
+		power+=pow;
+	}
+	public void addAgility(float ag) {
+		agility+=ag;
+	}
+	public void addIntel(float intel) {
+		intelligency+=intel;
+	}
 }

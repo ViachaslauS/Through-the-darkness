@@ -1,4 +1,4 @@
-package Engine;
+package Environment;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
@@ -8,21 +8,28 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+
+import Engine.RPGWorld;
+import Engine.TriggerListener;
+
 import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.physics.box2d.Fixture;
 
 public class Platform {
 	
 
-	Vector2 position;
-	Rectangle bounds;
-	Body platformBox;
-	Fixture PhysicFixture;
-	Vector2 size;
-	Filter f = new Filter();
+	protected Vector2 position;
+	protected	Rectangle bounds;
+	protected	Body platformBox;
+	protected	Fixture PhysicFixture;
+	protected	Vector2 size;
+	protected	Filter f = new Filter();
 	
-	Texture texture;
+	protected	Texture texture;
+	
+	protected int id;
 	
 	public Vector2 getPosition() {
 		return position;
@@ -44,7 +51,12 @@ public class Platform {
 		return texture;
 	}
 	
-	public Platform(Vector2 pos,Vector2 size, RPGWorld rpgWorld) {
+	public Platform(int id,Vector2 pos,Vector2 size, RPGWorld rpgWorld) {
+	
+		this.id = id;
+		
+		TriggerListener.objects.add(id, true);
+		
 		position = pos;
 		bounds = new Rectangle();
 		bounds.width = size.x;
@@ -72,8 +84,12 @@ public class Platform {
 		
 	}
 
+	public void update(SpriteBatch batch) {
+		//batch.draw(texture,position.x - size.x/2,position.y - size.y/2,size.x,size.y);
+		draw(batch);
+	}
+	
 	public void draw(SpriteBatch batch) {
 		batch.draw(texture,position.x - size.x/2,position.y - size.y/2,size.x,size.y);
 	}
-	
 }

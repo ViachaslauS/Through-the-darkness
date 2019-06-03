@@ -8,7 +8,11 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.RPG;
 
-import Engine.Platform;
+import Environment.ActivatingObject;
+import Environment.MovementPlatform;
+import Environment.Platform;
+import Environment.SecretPlatform;
+import Environment.ShowablePlatform;
 import aiall.AiCustom;
 
 public class Level1 extends BaseLevel{
@@ -37,17 +41,19 @@ public class Level1 extends BaseLevel{
 	//@Override
 	public Array<Platform> createEnvironment() {
 		platforms = new Array<Platform>();
-		platforms.add(new Platform(new Vector2(0,-30), new Vector2(10000000,100),rpgWorld)); // Earth platform
-		platforms.add( new Platform(new Vector2(1200,150), new Vector2(150,30), rpgWorld));
-		platforms.add( new Platform(new Vector2(1500,100), new Vector2(150,300), rpgWorld));
-		platforms.add( new Platform(new Vector2(2200,150), new Vector2(150,30), rpgWorld));
-		platforms.add( new Platform(new Vector2(2500,220), new Vector2(150,30), rpgWorld));
-		platforms.add( new Platform(new Vector2(2900,280), new Vector2(400,30), rpgWorld));
-		platforms.add( new Platform(new Vector2(3900,200), new Vector2(150,30), rpgWorld));
-		platforms.add( new Platform(new Vector2(4100,350), new Vector2(150,30), rpgWorld));
-		platforms.add( new Platform(new Vector2(4250,450), new Vector2(150,30), rpgWorld));
-		platforms.add( new Platform(new Vector2(5400,0), new Vector2(20,1000), rpgWorld));
-return platforms;
+		platforms.add(new Platform(platforms.size,new Vector2(0,-30), new Vector2(10000000,100),rpgWorld)); // Earth platform
+		platforms.add( new Platform(platforms.size,new Vector2(1200,150), new Vector2(150,30), rpgWorld));
+		platforms.add( new Platform(platforms.size,new Vector2(1500,100), new Vector2(150,300), rpgWorld));
+		platforms.add( new Platform(platforms.size,new Vector2(2200,150), new Vector2(150,30), rpgWorld));
+		platforms.add( new Platform(platforms.size,new Vector2(2500,220), new Vector2(150,30), rpgWorld));
+		platforms.add( new Platform(platforms.size,new Vector2(2900,280), new Vector2(400,30), rpgWorld));
+		platforms.add( new Platform(platforms.size,new Vector2(3900,200), new Vector2(150,30), rpgWorld));
+		platforms.add( new Platform(platforms.size,new Vector2(4100,350), new Vector2(150,30), rpgWorld));
+		platforms.add( new Platform(platforms.size,new Vector2(4250,450), new Vector2(150,30), rpgWorld)); 
+		platforms.add( new Platform(platforms.size,new Vector2(5400,0), new Vector2(20,1000), rpgWorld));
+		platforms.add( new Platform(platforms.size,new Vector2(0,450), new Vector2(10,1000), rpgWorld));
+		platforms.add(new Platform(platforms.size, new Vector2(SS*2,SS*3), new Vector2(SS,SS), rpgWorld));
+		return platforms;
 		}
 	//@Override
 	public  void managerLoad() {

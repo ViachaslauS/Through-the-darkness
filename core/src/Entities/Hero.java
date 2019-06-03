@@ -42,6 +42,8 @@ public class Hero  extends Entities{
 	
 	private Animation<TextureRegion> attack2Animation;
 	private TextureRegion[] attack2Frames;
+	
+	int[] skillsLevel = new int[3];
 	public void picParam() {
 		//Count of sprites in image
 				PIC_FRAME_COLS = 10;
@@ -83,7 +85,7 @@ public class Hero  extends Entities{
 		entitieData.isAi = false;
 		picParam();
 		
-		
+		skillsLevel[0] = skillsLevel[1] = skillsLevel[2] = 1;
 		// filter
 				f.maskBits = RPGWorld.MASK_PLAYER;
 				f.categoryBits = RPGWorld.CATEGORY_PLAYER;
@@ -206,7 +208,7 @@ public class Hero  extends Entities{
 		if(Gdx.input.isKeyJustPressed(Keys.NUM_1)) {
 			currentAction = 1;
 			currentAnimation = attack1Animation;
-			entitieData.skillDamage = 100.0f;
+			entitieData.skillDamage = 1.8f;
 			attack1();
 			return;
 		}
@@ -231,6 +233,7 @@ public class Hero  extends Entities{
 		if(Gdx.input.isKeyPressed(Keys.NUM_2)) {
 			currentAction = 4;
 			currentAnimation = attack2Animation;
+			entitieData.skillDamage = 1.2f;
 			attack2();
 		}
 	}
@@ -354,6 +357,7 @@ public class Hero  extends Entities{
 		entitieData.isAttacking = 0;
 		entitieData.skillDamage = 0.0f;
 		CURRENT_DURATION = 0.0f;
+		entitieData.skillDamage = 1.0f;
 	}
 	
 	@Override

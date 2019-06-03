@@ -8,7 +8,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.RPG;
 
-import Engine.Platform;
+import Environment.Platform;
 import aiall.AiCustom;
 
 public class Level2 extends BaseLevel{
@@ -29,9 +29,9 @@ public class Level2 extends BaseLevel{
 	//@Override
 	public Array<Platform> createEnvironment() {
 		platforms = new Array<Platform>();
-		platforms.add(new Platform(new Vector2(0,-30), new Vector2(10000,100),rpgWorld)); // Earth platform
-		platforms.add(new Platform(new Vector2(1500,40), new Vector2(20,400), rpgWorld));
-		platforms.add(new Platform(new Vector2(2200,250), new Vector2(300,20), rpgWorld));
+		platforms.add(new Platform(0,new Vector2(0,-30), new Vector2(10000,100),rpgWorld)); // Earth platform
+		platforms.add(new Platform(1,new Vector2(1500,40), new Vector2(20,400), rpgWorld));
+		platforms.add(new Platform(2,new Vector2(2200,250), new Vector2(300,20), rpgWorld));
 		return platforms;
 		}
 	//@Override

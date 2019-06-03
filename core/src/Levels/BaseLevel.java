@@ -22,14 +22,21 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.mygdx.game.RPG;
 
 import Engine.DamageDeal;
-import Engine.Platform;
 import Engine.RPGWorld;
 import Engine.UserInterface;
 import Entities.Hero;
 import Entities.Buff.BuffType;
+import Environment.Platform;
 import aiall.AiCustom;
 
 public class BaseLevel implements GlobalWindow{
+
+		/**
+		 * standart size
+		 */
+		public static final float SS = 75f;
+	
+		private static final float MAP_MAX_HEIGHT = 5000f;
 
 		final RPG game;
 		
@@ -141,8 +148,13 @@ private void renderRun(float delta) {
 	Gdx.gl.glClearColor(0, 0.1f, 0, 1);
 	Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 	update(Time);
-	camera.position.set(hero.getCoordX(), /* hero.getCoordY() + */350.0f, 0);
+	camera.position.set(hero.getCoordX(), hero.getCoordY()+80, 0);
 	if(camera.position.x < 640.0f) camera.position.x = 640.0f;
+	if(camera.position.y < 360 )
+		camera.position.y = 360;
+	if(camera.position.y > MAP_MAX_HEIGHT-360)
+		camera.position.y = MAP_MAX_HEIGHT-360;
+	Gdx.app.log("camera coord", ""+ (hero.getCoordY()-260));
 	camera.update();
 	
 	game.batch.setProjectionMatrix(camera.combined);
@@ -151,7 +163,7 @@ private void renderRun(float delta) {
 	
 	backgroundDraw();
 	for(int i = 0; i < platforms.size;i++) {
-		platforms.get(i).draw(game.batch);
+		platforms.get(i).update(game.batch);
 	}
 	game.batch.draw(hero.currentFrame, hero.getCoordX(), hero.getCoordY(), hero.getSizeX(), hero.getSizeY());
 	for(int i =0; i<bots.size();i++)
@@ -226,9 +238,11 @@ private void drawInterface() {
 				mapCounter--;
 				centreMapCoord-=1280;
 			}
-			game.batch.draw(background, centreMapCoord-1280, 0,1280,720);
-			game.batch.draw(background, centreMapCoord, 0,1280,720);
-			game.batch.draw(background, centreMapCoord+1280, 0,1280,720);
+			//float coordYBG = (camera.position.y - 360f)/MAP_MAX_HEIGHT*720;
+			
+			game.batch.draw(background, centreMapCoord-1280, camera.position.y-360,1280,720);
+			game.batch.draw(background, centreMapCoord, camera.position.y-360,1280,720);
+			game.batch.draw(background, centreMapCoord+1280, camera.position.y-360,1280,720);
 		}
 		
 		private void update(float delta)
@@ -282,11 +296,11 @@ private void drawInterface() {
 			rpgWorld.world.step(1/1000f, 100, 100);
 		
 	
-			Gdx.app.log("exp",""+hero.getEntitieData().stats.getExp()+"/"+
-			hero.getEntitieData().stats.getMaxExp()+"  level: "+
-			hero.getEntitieData().stats.getLevel()+"  free stats: "+
-			hero.getEntitieData().stats.getStatsPoints()+"  free skill:"+ 
-			hero.getEntitieData().stats.getSkillPoints());
+//			Gdx.app.log("exp",""+hero.getEntitieData().stats.getExp()+"/"+
+//			hero.getEntitieData().stats.getMaxExp()+"  level: "+
+//			hero.getEntitieData().stats.getLevel()+"  free stats: "+
+//			hero.getEntitieData().stats.getStatsPoints()+"  free skill:"+ 
+//			hero.getEntitieData().stats.getSkillPoints());
 		}
 		
 		private void check_path() {

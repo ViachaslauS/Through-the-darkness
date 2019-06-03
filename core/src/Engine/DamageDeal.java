@@ -1,5 +1,7 @@
 package Engine;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.WorldManifold;
@@ -24,10 +26,18 @@ public class DamageDeal {
 		Array<Contact> contacts = world.world.getContactList();
 		for(int i = 0; i< contacts.size;i++) {
 			//if(contacts.get(i).isTouching()) {
+			
+			
+				
+				
 				if(contacts.get(i).getFixtureA().getUserData()!=null && contacts.get(i).getFixtureB().getUserData()!=null) {
 					if(contacts.get(i).getFixtureA().getUserData().getClass().getName() == "com.badlogic.gdx.physics.box2d.Fixture" && contacts.get(i).getFixtureB().getUserData().getClass().getName() == "com.badlogic.gdx.physics.box2d.Fixture")
 						continue;
-						
+					// Slavino govno
+					//_____________________________	
+					if(checkOnButton(contacts,i))
+						continue;
+					//________________________________________________
 				
 					if(contacts.get(i).getFixtureA().getUserData().getClass().getName() == "com.badlogic.gdx.physics.box2d.Fixture")
 						{	if(contacts.get(i).getFixtureB().getFilterData().groupIndex == -5)
@@ -50,6 +60,45 @@ public class DamageDeal {
 	}
 
 	
+	private boolean checkOnButton(Array<Contact> contacts, int i) {
+		if(contacts.get(i).getFixtureA().getUserData()!=null && contacts.get(i).getFixtureB().getUserData()!=null) {
+			// Slavino govno
+			//_____________________________	
+			if(contacts.get(i).getFixtureA().getUserData().getClass().getName().equals("Engine.DynamicObjectsData"))
+			{
+				checkButtons(contacts.get(i).getFixtureA(),contacts.get(i).getFixtureB());
+				return true;
+			}
+			if(contacts.get(i).getFixtureB().getUserData().getClass().getName().equals("Engine.DynamicObjectsData"))
+			{
+				checkButtons(contacts.get(i).getFixtureB(),contacts.get(i).getFixtureA());
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private void checkButtons(Fixture button_, Fixture player_) {
+		DynamicObjectsData button = (DynamicObjectsData)button_.getUserData();
+		if(player_.getUserData().getClass().getName().equals("Engine.ObjectData")) {
+			ObjectData playerData = (ObjectData) player_.getUserData();
+			if(playerData.isAi == true)
+				return;
+		}
+		if(player_.getUserData().getClass().getName().equals("com.badlogic.gdx.physics.box2d.Fixture")) {
+			Fixture fixPlayer = (Fixture) player_.getUserData();
+			if(fixPlayer.getUserData().getClass().getName().equals("Engine.ObjectData")) {
+				ObjectData tempData = (ObjectData) fixPlayer.getUserData();
+				if(tempData.isAi) 
+					return;
+			}
+		}
+		if(Gdx.input.isKeyJustPressed(Keys.F)) {
+			TriggerListener.objects.add(button.id,!TriggerListener.objects.get(button.id)); 
+		}
+		button.isNear = true;
+	}
+
 	private void collisionWizard(Fixture receiver, Fixture dealer) {
 		
 		Fixture recDataFix = (Fixture) receiver.getUserData();

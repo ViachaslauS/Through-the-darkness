@@ -3,7 +3,7 @@ package Levels;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.utils.Array;
 
-import Engine.Platform;
+import Environment.Platform;
 
 public interface GlobalWindow extends Screen{
 	
