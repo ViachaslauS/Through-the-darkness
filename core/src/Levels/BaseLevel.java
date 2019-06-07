@@ -1,10 +1,18 @@
 package Levels;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -29,12 +37,17 @@ import Entities.Buff.BuffType;
 import Environment.Platform;
 import aiall.AiCustom;
 
-public class BaseLevel implements GlobalWindow{
+public class BaseLevel implements GlobalWindow, Serializable{
+
+		/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2823973721578840873L;
 
 		/**
 		 * standart size
 		 */
-		public static final float SS = 75f;
+		public static final float SS = 80f;
 	
 		private static final float MAP_MAX_HEIGHT = 5000f;
 
@@ -213,6 +226,15 @@ private void renderPause(float delta) {
 		 game.batch.begin();
 		 game.batch.draw(gameMenuScreen, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		 game.batch.end();
+		
+		 FileHandle file = new FileHandle("level.dat");
+		 file.length();	
+		 try(ObjectOutputStream stream = new ObjectOutputStream(new FileOutputStream(file))) {
+			 
+		 }
+		 catch(Exception ex) {
+			 
+		 }
 }	
 	
 private void drawInterface() {
@@ -315,6 +337,7 @@ private void drawInterface() {
 		
 		@Override
 		public void dispose () {
+			
 			font.dispose();
 			batch.dispose();
 			background.dispose();
@@ -325,9 +348,10 @@ private void drawInterface() {
 
 		@Override
 		public void show() {
-
+			
+			
 			batch = new SpriteBatch();
-
+			
 			// camera
 			camera = new OrthographicCamera();
 			camera.setToOrtho(false, RPG.WINDOW_WIDTH, RPG.WINDOW_HEIGHT);
@@ -343,7 +367,7 @@ private void drawInterface() {
 			backgroundSkills = assetManager.get("niceBG.jpg",Texture.class);
 			gameMenuScreen = assetManager.get("woodenBG.jpg",Texture.class);
 			//Player
-			hero = new Hero(new Vector2(150.0f,150.0f),new Vector2(600.0f,300.0f),assetManager);
+			hero = new Hero(new Vector2(150.0f,150.0f),new Vector2(SS*2,20*SS),assetManager);
 			//ai = new AiCustom(new Vector2(150.0f,150.0f) , new Vector2(900.0f,150.0f),2225);
 			//hero.setBody(world);
 			hero.setBody(rpgWorld);

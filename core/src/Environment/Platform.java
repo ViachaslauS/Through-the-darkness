@@ -58,6 +58,9 @@ public class Platform {
 		TriggerListener.objects.add(id, true);
 		
 		position = pos;
+		position.x+=size.x/2;
+		position.y+=size.y/2;
+		
 		bounds = new Rectangle();
 		bounds.width = size.x;
 		bounds.height = size.y;

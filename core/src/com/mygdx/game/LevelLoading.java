@@ -1,9 +1,12 @@
 package com.mygdx.game;
 
+import java.util.Map;
+
 import javax.naming.spi.DirStateFactory.Result;
 import javax.xml.transform.Templates;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Sound;
@@ -13,6 +16,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
+import Levels.BaseLevel;
 import Levels.GlobalWindow;
 
 /**
@@ -63,6 +67,7 @@ public class LevelLoading implements Screen {
         batch.end();
 		
         if(loadingWindow.isLoaded()) {
+        	
         	game.setScreen(loadingWindow);
         }
 	}
