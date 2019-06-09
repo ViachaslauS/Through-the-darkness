@@ -53,11 +53,11 @@ public class UserInterface {
 	public void draw(SpriteBatch batch, ObjectData objectData) {
 		coordsX = fullHP.getTexture().getWidth()+40;
 		clearDrawed();
-		batch.draw(emptyBar, 20,720-70,objectData.MAXHITPOINT*3,70);
-		batch.draw(fullHP, 40,720-70,objectData.getHITPOINT()*3,70);
+		batch.draw(emptyBar, 20,900-70,objectData.MAXHITPOINT*3,70);
+		batch.draw(fullHP, 40,900-70,objectData.getHITPOINT()*3,70);
 		//batch.draw(fullHP, 20, Gdx.graphics.getHeight()-50,objectData.MAXHITPOINT*5,50, objectData.HITPOINT*5, 50, 1, 1, 0, false);
-		batch.draw(emptyBar,20,720-110,objectData.MAXMANA*3,70);
-		batch.draw(fullMANA, 40,720-110,objectData.MANA*3,70);
+		batch.draw(emptyBar,20,900-110,objectData.MAXMANA*3,70);
+		batch.draw(fullMANA, 40,900-110,objectData.MANA*3,70);
 		
 		batch.draw(attack1, 10, 10,75,75);
 		
@@ -81,7 +81,7 @@ public class UserInterface {
 		case INTELLIGENCY:drawOneBuff(batch,2,buff.isCycle);break;
 		case HITPOINTS:drawOneBuff(batch,3,buff.isCycle);break;
 		case MANA:drawOneBuff(batch,4,buff.isCycle);break;
-		case DAMAGE:drawOneBuff(batch,5,buff.isCycle);break;
+		case DAMAGE:drawOneBuff(batch,5,buff.isCycle);break; 
 		case ARMOR:drawOneBuff(batch,6,buff.isCycle);break;
 		case REGEN_FREQUENCY:drawOneBuff(batch,7,buff.isCycle);break;
 		}
@@ -92,13 +92,13 @@ public class UserInterface {
 			if(isDrawed[i][1] == true)
 				return;
 			isDrawed[i][1] = true;
-			batch.draw(buffIcons[i][1], coordsX,720-60,50,50);
+			batch.draw(buffIcons[i][1], coordsX,900-60,50,50);
 		}
 		else {
 			if(isDrawed[i][0] == true)
 				return;
 			isDrawed[i][0] = true;
-			batch.draw(buffIcons[i][0],coordsX,720-60,50,50);
+			batch.draw(buffIcons[i][0],coordsX,900-60,50,50);
 		}
 		coordsX+=60;
 	}

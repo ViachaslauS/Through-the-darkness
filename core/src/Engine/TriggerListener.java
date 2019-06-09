@@ -6,5 +6,5 @@ import java.util.Objects;
 public class TriggerListener {
 
 	public static ArrayList<Boolean> objects = new ArrayList<Boolean>();
-
+	
 }

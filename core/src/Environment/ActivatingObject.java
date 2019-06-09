@@ -40,6 +40,9 @@ public class ActivatingObject extends Platform{
 		activated = new Texture(Gdx.files.internal("game_button_pressed.png"));
 	}
 	
+	/**
+	 * if need only one activating, comment 2 if() block
+	 */
 	@Override
 	public void update(SpriteBatch batch) {
 		

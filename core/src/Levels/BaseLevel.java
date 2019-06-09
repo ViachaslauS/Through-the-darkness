@@ -56,7 +56,7 @@ public class BaseLevel implements GlobalWindow, Serializable{
 		protected AssetManager assetManager;
 		
 		DamageDeal damageMaster;
-		
+		 
 		SpriteBatch batch;
 		BitmapFont font;                        //font
 		Texture background;
@@ -77,7 +77,7 @@ public class BaseLevel implements GlobalWindow, Serializable{
 		RPGWorld rpgWorld;
 		Box2DDebugRenderer debugRenderer;
 		
-		UserInterface UI;
+		transient UserInterface UI;
 		
 		Array<Platform> platforms;
 		
@@ -167,7 +167,6 @@ private void renderRun(float delta) {
 		camera.position.y = 360;
 	if(camera.position.y > MAP_MAX_HEIGHT-360)
 		camera.position.y = MAP_MAX_HEIGHT-360;
-	Gdx.app.log("camera coord", ""+ (hero.getCoordY()-260));
 	camera.update();
 	
 	game.batch.setProjectionMatrix(camera.combined);
@@ -227,14 +226,9 @@ private void renderPause(float delta) {
 		 game.batch.draw(gameMenuScreen, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		 game.batch.end();
 		
-		 FileHandle file = new FileHandle("level.dat");
-		 file.length();	
-		 try(ObjectOutputStream stream = new ObjectOutputStream(new FileOutputStream(file))) {
-			 
-		 }
-		 catch(Exception ex) {
-			 
-		 }
+		 //FileHandle file = new FileHandle("level.dat");
+		 	
+		
 }	
 	
 private void drawInterface() {
@@ -251,20 +245,20 @@ private void drawInterface() {
 		private void backgroundDraw() {
 			
 			float coord = hero.getCoordX();
-			if(coord/1280 > mapCounter)
+			if(coord/1600 > mapCounter)
 			{
 				mapCounter++;
-				centreMapCoord+=1280;
+				centreMapCoord+=1600;
 			}
-			if(coord/1280 < mapCounter) {
+			if(coord/1600 < mapCounter) {
 				mapCounter--;
-				centreMapCoord-=1280;
+				centreMapCoord-=1600;
 			}
 			//float coordYBG = (camera.position.y - 360f)/MAP_MAX_HEIGHT*720;
 			
-			game.batch.draw(background, centreMapCoord-1280, camera.position.y-360,1280,720);
-			game.batch.draw(background, centreMapCoord, camera.position.y-360,1280,720);
-			game.batch.draw(background, centreMapCoord+1280, camera.position.y-360,1280,720);
+			game.batch.draw(background, centreMapCoord-1600, camera.position.y-450,1600,900);
+			game.batch.draw(background, centreMapCoord, camera.position.y-450,1600,900);
+			game.batch.draw(background, centreMapCoord+1600, camera.position.y-450,1600,900);
 		}
 		
 		private void update(float delta)
@@ -354,13 +348,13 @@ private void drawInterface() {
 			
 			// camera
 			camera = new OrthographicCamera();
-			camera.setToOrtho(false, RPG.WINDOW_WIDTH, RPG.WINDOW_HEIGHT);
-			viewport = new FitViewport(RPG.WINDOW_WIDTH, RPG.WINDOW_HEIGHT, camera);
+			camera.setToOrtho(false, 1600, 900);
+			viewport = new FitViewport(1600, 900, camera);
 			
 			//camera HUD
 			cameraHUD = new OrthographicCamera();		
-			cameraHUD.setToOrtho(false, RPG.WINDOW_WIDTH, RPG.WINDOW_HEIGHT);
-			viewportHUD = new FitViewport(RPG.WINDOW_WIDTH, RPG.WINDOW_HEIGHT, cameraHUD);
+			cameraHUD.setToOrtho(false, 1600, 900);
+			viewportHUD = new FitViewport(1600, 900, cameraHUD);
 			
 			//Background
 			background = assetManager.get("Battleground1.png",Texture.class);
@@ -385,6 +379,15 @@ private void drawInterface() {
 			//hero.getEntitieData().setNewBuff(BuffType.HITPOINTS, 100f, 1000, true);
 			hero.getEntitieData().setNewBuff(BuffType.MANA, 100, 1000, true);
 
+			
+			 try(ObjectOutputStream stream = new ObjectOutputStream(new FileOutputStream("level.dat"))) {
+				 stream.writeObject(this);
+				 stream.close();
+			 }
+			 catch(Exception ex) {
+				 Gdx.app.log("ERROR", ex.getMessage());
+			 }
+			
 		}
 
 		/**

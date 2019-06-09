@@ -9,7 +9,9 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.RPG;
 
+import Environment.ActivatingObject;
 import Environment.Platform;
+import Environment.Trigger;
 import aiall.AiCustom;
 
 public class Level2 extends BaseLevel{
@@ -22,6 +24,8 @@ public class Level2 extends BaseLevel{
 	//@Override
 	public ArrayList<AiCustom> createEnemy() {
 		 bots = new ArrayList<AiCustom>();
+			bots.add(new AiCustom(new Vector2(300.0f,300.0f) , new Vector2(4*SS,15*SS),3));
+			
 		//bots.add(new AiCustom(new Vector2(150.0f,150.0f) , new Vector2(1100.0f,150.0f),1));
 		//bots.add(new AiCustom(new Vector2(150.0f,150.0f) , new Vector2(1300.0f,150.0f),1));
 		return bots;

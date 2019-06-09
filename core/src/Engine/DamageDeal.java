@@ -93,8 +93,11 @@ public class DamageDeal {
 					return;
 			}
 		}
-		if(Gdx.input.isKeyJustPressed(Keys.F)) {
-			TriggerListener.objects.add(button.id,!TriggerListener.objects.get(button.id)); 
+		if(Gdx.input.isKeyJustPressed(Keys.F) && !button.isTrigger) {
+			TriggerListener.objects.set(button.id,!TriggerListener.objects.get(button.id)); 
+		}
+		if(button.isTrigger) {
+			TriggerListener.objects.set(button.id,true); 
 		}
 		button.isNear = true;
 	}
