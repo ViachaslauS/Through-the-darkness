@@ -21,6 +21,14 @@ public class RPGContactFilter implements ContactFilter {
 		if(fixtureB.getUserData()!= null)
 			if(fixtureB.getUserData().getClass().getName().equals("Engine.DynamicObjectsData"))
 				return true;
+		
+		  if((filterA.groupIndex == -4 && filterB.groupIndex == -2) ||
+		 (filterA.groupIndex == -2 && filterB.groupIndex == -4))
+			  return true;
+
+		  if((filterA.groupIndex == -4 && filterB.groupIndex == -1) ||
+		 (filterA.groupIndex == -1 && filterB.groupIndex == -4))
+			  return false;
 		if((filterA.categoryBits == filterB.categoryBits)|| (filterA.categoryBits == RPGWorld.CATEGORY_BULLET && filterB.categoryBits == RPGWorld.CATEGORY_RUNNER) || (filterA.categoryBits == RPGWorld.CATEGORY_RUNNER && filterB.categoryBits == RPGWorld.CATEGORY_BULLET))
 			return false;
 		if(filterA.categoryBits != RPGWorld.CATEGORY_SCENERY && filterB.categoryBits != RPGWorld.CATEGORY_SCENERY)

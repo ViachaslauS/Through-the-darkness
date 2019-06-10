@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.RPG;
@@ -14,6 +15,8 @@ import Environment.Platform;
 import Environment.SecretPlatform;
 import Environment.ShowablePlatform;
 import aiall.AiCustom;
+import aiall.Level1Ai;
+import aiall.Level2Ai;
 
 public class Level1 extends BaseLevel{
 	
@@ -26,15 +29,15 @@ public class Level1 extends BaseLevel{
 	public ArrayList<AiCustom> createEnemy() {
 		 bots = new ArrayList<AiCustom>();
 		 	bots.add(new AiCustom(new Vector2(300.0f,300.0f) , new Vector2(5800.0f,180.0f),3));
-			bots.add(new AiCustom(new Vector2(150.0f,150.0f) , new Vector2(1100.0f,180.0f),1));
-			bots.add(new AiCustom(new Vector2(150.0f,150.0f) , new Vector2(1500.0f,150.0f),1));
-			bots.add(new AiCustom(new Vector2(150.0f,150.0f) , new Vector2(2100.0f,150.0f),2));
-			bots.add(new AiCustom(new Vector2(150.0f,150.0f) , new Vector2(2400.0f,210.0f),1));
-			bots.add(new AiCustom(new Vector2(150.0f,150.0f) , new Vector2(2900.0f,150.0f),2));
-			bots.add(new AiCustom(new Vector2(150.0f,150.0f) , new Vector2(3000.0f,150.0f),2));
-			bots.add(new AiCustom(new Vector2(150.0f,150.0f) , new Vector2(3700.0f,150.0f),1));
-			bots.add(new AiCustom(new Vector2(150.0f,150.0f) , new Vector2(4400.0f,150.0f),2));
-			bots.add(new AiCustom(new Vector2(150.0f,150.0f) , new Vector2(5200.0f,150.0f),2));
+			bots.add(new Level1Ai(new Vector2(150.0f,150.0f) , new Vector2(1100.0f,180.0f),1));
+			bots.add(new Level1Ai(new Vector2(150.0f,150.0f) , new Vector2(1500.0f,150.0f),1));
+			bots.add(new Level2Ai(new Vector2(150.0f,150.0f) , new Vector2(2100.0f,150.0f),2));
+			bots.add(new Level1Ai(new Vector2(150.0f,150.0f) , new Vector2(2400.0f,210.0f),1));
+			bots.add(new Level2Ai(new Vector2(150.0f,150.0f) , new Vector2(2900.0f,150.0f),2));
+			bots.add(new Level2Ai(new Vector2(150.0f,150.0f) , new Vector2(3000.0f,150.0f),2));
+			bots.add(new Level1Ai(new Vector2(150.0f,150.0f) , new Vector2(3700.0f,150.0f),1));
+			bots.add(new Level2Ai(new Vector2(150.0f,150.0f) , new Vector2(4400.0f,150.0f),2));
+			bots.add(new Level2Ai(new Vector2(150.0f,150.0f) , new Vector2(5200.0f,150.0f),2));
 			return bots;
 	}	
 	
@@ -63,6 +66,46 @@ public class Level1 extends BaseLevel{
 		assetManager.load("dark_skills.png",Texture.class);
 		assetManager.load("niceBG.jpg",Texture.class);
 		assetManager.load("woodenBG.jpg",Texture.class);
+		assetManager.load("buttons.png",Texture.class);
+		assetManager.load("menu_font.fnt",BitmapFont.class);
+		assetManager.load("armor_blocked.png", Texture.class);
+		assetManager.load("armor_earned.png", Texture.class);
+		assetManager.load("armor_unearned.png", Texture.class);
+		assetManager.load("armor2_blocked.png", Texture.class);
+		assetManager.load("armor2_earned.png", Texture.class);
+		assetManager.load("armor2_unearned.png", Texture.class);
+		assetManager.load("buff_blocked.png", Texture.class);
+		assetManager.load("buff_earned.png", Texture.class);
+		assetManager.load("buff_unearned.png", Texture.class);
+		assetManager.load("cooldown_blocked.png", Texture.class);
+		assetManager.load("cooldown_earned.png", Texture.class);		
+		assetManager.load("cooldown_unearned.png", Texture.class);
+		assetManager.load("duration_blocked.png", Texture.class);
+		assetManager.load("duration_earned.png", Texture.class);
+		assetManager.load("duration_unearned.png", Texture.class);
+		assetManager.load("HP_earned.png", Texture.class);
+		assetManager.load("HP_unearned.png", Texture.class);
+		assetManager.load("magic_blocked.png", Texture.class);
+		assetManager.load("magic_earned.png", Texture.class);
+		assetManager.load("magic_unearned.png", Texture.class);
+		assetManager.load("MANA_earned.png", Texture.class);
+		assetManager.load("MANA_unearned.png", Texture.class);
+		assetManager.load("max_blocked.png", Texture.class);
+		assetManager.load("max_earned.png", Texture.class);
+		assetManager.load("max_unearned.png", Texture.class);
+		assetManager.load("regen_blocked.png", Texture.class);
+		assetManager.load("regen_earned.png", Texture.class);
+		assetManager.load("regen_unearned.png", Texture.class);
+		assetManager.load("teleport_blocked.png", Texture.class);
+		assetManager.load("teleport_earned.png", Texture.class);
+		assetManager.load("teleport_unearned.png", Texture.class);
+		assetManager.load("tripple_blocked.png", Texture.class);
+		assetManager.load("tripple_earned.png", Texture.class);
+		assetManager.load("tripple_unearned.png", Texture.class);
+		assetManager.load("vampire_blocked.png", Texture.class);
+		assetManager.load("vampire_earned.png", Texture.class);
+		assetManager.load("vampire_unearned.png", Texture.class);
+		
 	}
 
 }

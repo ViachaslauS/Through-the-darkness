@@ -1,23 +1,16 @@
 package Levels;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -25,8 +18,16 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.mygdx.game.LevelLoading;
+import com.mygdx.game.MainMenuScreen;
 import com.mygdx.game.RPG;
 
 import Engine.DamageDeal;
@@ -37,17 +38,12 @@ import Entities.Buff.BuffType;
 import Environment.Platform;
 import aiall.AiCustom;
 
-public class BaseLevel implements GlobalWindow, Serializable{
-
-		/**
-	 * 
-	 */
-	private static final long serialVersionUID = -2823973721578840873L;
+public class BaseLevel implements GlobalWindow{
 
 		/**
 		 * standart size
 		 */
-		public static final float SS = 80f;
+		public static final float SS = 75f;
 	
 		private static final float MAP_MAX_HEIGHT = 5000f;
 
@@ -56,7 +52,7 @@ public class BaseLevel implements GlobalWindow, Serializable{
 		protected AssetManager assetManager;
 		
 		DamageDeal damageMaster;
-		 
+		
 		SpriteBatch batch;
 		BitmapFont font;                        //font
 		Texture background;
@@ -77,7 +73,7 @@ public class BaseLevel implements GlobalWindow, Serializable{
 		RPGWorld rpgWorld;
 		Box2DDebugRenderer debugRenderer;
 		
-		transient UserInterface UI;
+		UserInterface UI;
 		
 		Array<Platform> platforms;
 		
@@ -167,6 +163,7 @@ private void renderRun(float delta) {
 		camera.position.y = 360;
 	if(camera.position.y > MAP_MAX_HEIGHT-360)
 		camera.position.y = MAP_MAX_HEIGHT-360;
+	Gdx.app.log("camera coord", ""+ (hero.getCoordY()-260));
 	camera.update();
 	
 	game.batch.setProjectionMatrix(camera.combined);
@@ -186,8 +183,11 @@ private void renderRun(float delta) {
 		bots.get(i).barAIDrawing(game.batch);
 		for(int j=0;j<bots.get(i).bullets.size();j++)  
 			bots.get(i).bullets.get(j).render(game.batch,delta);
-		// ________________________________
 	}
+		for(int j=0;j<hero.bullets.size();j++)  
+			hero.bullets.get(j).render(game.batch,delta);
+		// ________________________________
+	
 	game.batch.end();
 	//cameraHUD.position.set(hero.getCoordX(), /* hero.getCoordY() + */350.0f, 0);
 	cameraHUD.update();
@@ -206,29 +206,26 @@ private void renderRun(float delta) {
 private void renderSkillMenu(float delta) {
 	Gdx.gl.glClearColor(0, 0.1f, 0, 1);
 	Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-	
-//	if(checkCurrentState())
-//		return;
-	// if(Gdx.input.isKeyJustPressed(Keys.TAB)) { state = State.RUN; return; }
+	Gdx.input.setInputProcessor(stageSk);
+	stageSk.act(Math.min(Gdx.graphics.getDeltaTime(),1/60f));	
+	checkClick();
 	game.batch.begin();
 	game.batch.draw(gameMenuScreen, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 	game.batch.end();
+	stageSk.draw();
 }
 
 private void renderPause(float delta) {
 		Gdx.gl.glClearColor(0, 0.1f, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-//		if(checkCurrentState())
-//			return;
-//		  if(Gdx.input.isKeyJustPressed(Keys.ESCAPE)) { state = State.RUN;
-//		  setGameState(state); return; }
+		Gdx.input.setInputProcessor(stage);
+		stage.act(Math.min(Gdx.graphics.getDeltaTime(),1/60f));	
+		
 		 game.batch.begin();
 		 game.batch.draw(gameMenuScreen, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		 game.batch.end();
-		
-		 //FileHandle file = new FileHandle("level.dat");
-		 	
-		
+		 stage.draw();
+		 checkKeys();
 }	
 	
 private void drawInterface() {
@@ -245,20 +242,20 @@ private void drawInterface() {
 		private void backgroundDraw() {
 			
 			float coord = hero.getCoordX();
-			if(coord/1600 > mapCounter)
+			if(coord/1280 > mapCounter)
 			{
 				mapCounter++;
-				centreMapCoord+=1600;
+				centreMapCoord+=1280;
 			}
-			if(coord/1600 < mapCounter) {
+			if(coord/1280 < mapCounter) {
 				mapCounter--;
-				centreMapCoord-=1600;
+				centreMapCoord-=1280;
 			}
 			//float coordYBG = (camera.position.y - 360f)/MAP_MAX_HEIGHT*720;
 			
-			game.batch.draw(background, centreMapCoord-1600, camera.position.y-450,1600,900);
-			game.batch.draw(background, centreMapCoord, camera.position.y-450,1600,900);
-			game.batch.draw(background, centreMapCoord+1600, camera.position.y-450,1600,900);
+			game.batch.draw(background, centreMapCoord-1280, camera.position.y-360,1280,720);
+			game.batch.draw(background, centreMapCoord, camera.position.y-360,1280,720);
+			game.batch.draw(background, centreMapCoord+1280, camera.position.y-360,1280,720);
 		}
 		
 		private void update(float delta)
@@ -279,6 +276,17 @@ private void drawInterface() {
 				}
 			}
 			else {
+				for(int i = 0; i< hero.bullets.size(); i++) {
+					
+				
+						if(hero.bullets.get(i).remove) {
+							hero.bullets.get(i).delete();
+							hero.bullets.remove(i);
+						}
+					
+					
+					
+				}
 				hero.update(delta);	
 				//hero.giveDamage(0.1f);
 			}
@@ -331,7 +339,6 @@ private void drawInterface() {
 		
 		@Override
 		public void dispose () {
-			
 			font.dispose();
 			batch.dispose();
 			background.dispose();
@@ -342,26 +349,29 @@ private void drawInterface() {
 
 		@Override
 		public void show() {
-			
-			
+
 			batch = new SpriteBatch();
-			
+
 			// camera
 			camera = new OrthographicCamera();
-			camera.setToOrtho(false, 1600, 900);
-			viewport = new FitViewport(1600, 900, camera);
+			camera.setToOrtho(false, RPG.WINDOW_WIDTH, RPG.WINDOW_HEIGHT);
+			viewport = new FitViewport(RPG.WINDOW_WIDTH, RPG.WINDOW_HEIGHT, camera);
 			
 			//camera HUD
 			cameraHUD = new OrthographicCamera();		
-			cameraHUD.setToOrtho(false, 1600, 900);
-			viewportHUD = new FitViewport(1600, 900, cameraHUD);
+			cameraHUD.setToOrtho(false, RPG.WINDOW_WIDTH, RPG.WINDOW_HEIGHT);
+			viewportHUD = new FitViewport(RPG.WINDOW_WIDTH, RPG.WINDOW_HEIGHT, cameraHUD);
+			
+			createPause();
+			createSkill();
+			
 			
 			//Background
 			background = assetManager.get("Battleground1.png",Texture.class);
 			backgroundSkills = assetManager.get("niceBG.jpg",Texture.class);
 			gameMenuScreen = assetManager.get("woodenBG.jpg",Texture.class);
 			//Player
-			hero = new Hero(new Vector2(150.0f,150.0f),new Vector2(SS*2,20*SS),assetManager);
+			hero = new Hero(new Vector2(150.0f,150.0f),new Vector2(600.0f,300.0f),assetManager);
 			//ai = new AiCustom(new Vector2(150.0f,150.0f) , new Vector2(900.0f,150.0f),2225);
 			//hero.setBody(world);
 			hero.setBody(rpgWorld);
@@ -379,15 +389,6 @@ private void drawInterface() {
 			//hero.getEntitieData().setNewBuff(BuffType.HITPOINTS, 100f, 1000, true);
 			hero.getEntitieData().setNewBuff(BuffType.MANA, 100, 1000, true);
 
-			
-			 try(ObjectOutputStream stream = new ObjectOutputStream(new FileOutputStream("level.dat"))) {
-				 stream.writeObject(this);
-				 stream.close();
-			 }
-			 catch(Exception ex) {
-				 Gdx.app.log("ERROR", ex.getMessage());
-			 }
-			
 		}
 
 		/**
@@ -455,4 +456,443 @@ private void drawInterface() {
 			if(Gdx.input.isKeyPressed(Keys.R))
 				hero.getEntitieData().resetBuffs();
 		}
+		
+		Stage stage;
+		Table table;
+		// buttons for menu
+		TextureRegion buttonUpTex, buttonDownTex, buttonOverTex;
+		TextButton btnCnt, btnExit, btnMenu;
+		TextButton.TextButtonStyle tbs;
+		TextureRegion[][] imageCollector;
+		Texture allSheets;
+		
+		
+		
+		public void createPause() {
+			stage = new Stage(viewportHUD);
+			allSheets = assetManager.get("buttons.png");
+			
+			imageCollector = TextureRegion.split(allSheets, allSheets.getWidth()/2, allSheets.getHeight()/2);
+			buttonUpTex = imageCollector[0][0];
+			buttonDownTex = imageCollector[0][0];
+			buttonOverTex = imageCollector[0][1]; 
+			font = assetManager.get("menu_font.fnt", BitmapFont.class);
+			tbs = new TextButton.TextButtonStyle();
+			
+			
+			tbs.font = font;
+			tbs.up = new TextureRegionDrawable(new TextureRegion(buttonUpTex));
+			tbs.over = new TextureRegionDrawable(new TextureRegion(buttonOverTex));
+			tbs.down = new TextureRegionDrawable(new TextureRegion(buttonDownTex));
+			btnMenu = new TextButton("Menu", tbs);
+			btnExit = new TextButton("Exit", tbs);
+			btnCnt = new TextButton("Continue", tbs);
+			
+			table = new Table();
+			
+			table.row();
+			table.add(btnCnt).width(350).height(300).padRight(900);
+			table.row();
+			table.add(btnMenu).width(350).height(300).left();
+			table.row();
+			table.add(btnExit).width(350).height(300).left();
+			table.setFillParent(true);
+			table.pack();
+			
+			table.getColor().a = 0f;
+			
+			stage.addActor(table);
+			table.addAction(Actions.fadeIn(2f));
+			
+			
+		}
+	
+		public void checkKeys() {
+			if(btnCnt.isPressed()) {
+				state = State.RUN;
+			}
+			if(btnExit.isPressed()) {
+				Gdx.app.exit();
+			}
+			if(btnMenu.isPressed()) {
+				game.setScreen(new LevelLoading(game, new MainMenuScreen(game)));
+			}
+		}
+		
+		// for skills
+		Stage stageSk;
+		Table tableSk;
+		
+	/*
+	 * TextureRegion buttonUpTex, buttonDownTex, buttonOverTex; TextButton btnCnt,
+	 * btnExit, btnMenu; TextButton.TextButtonStyle tbs; TextureRegion[][]
+	 * imageCollector; Texture allSheets;
+	 */
+		ImageButton btnTeleport, btnArmor, btnArmor2, btnBuff, btnCooldown, btnDuration, btnHP, btnMagic, btnMana, btnMax, btnRegen, btnTripple, btnVampire;
+	
+		
+		public void createSkill() {
+			load();
+			stageSk = new Stage(viewportHUD);
+			
+			
+			//Button armor
+			Texture armorUp = assetManager.get("armor_unearned.png", Texture.class);
+			Texture armorOver = assetManager.get("armor_blocked.png", Texture.class);
+			Texture armorDown = assetManager.get("armor_earned.png", Texture.class);
+			ImageButton.ImageButtonStyle armorStyle = new ImageButton.ImageButtonStyle();
+			armorStyle.imageUp = new TextureRegionDrawable(new TextureRegion(armorUp));
+			armorStyle.imageOver = new TextureRegionDrawable(new TextureRegion(armorOver));
+			armorStyle.imageDown = new TextureRegionDrawable(new TextureRegion(armorDown));
+			
+			btnArmor = new ImageButton(armorStyle);
+			
+			
+			
+			// button Armor2
+			Texture armor2Up = assetManager.get("armor2_unearned.png", Texture.class);
+			Texture armor2Over = assetManager.get("armor2_blocked.png", Texture.class);
+			Texture armor2Down = assetManager.get("armor2_earned.png", Texture.class);
+			ImageButton.ImageButtonStyle armor2Style = new ImageButton.ImageButtonStyle();
+			armor2Style.imageUp = new TextureRegionDrawable(new TextureRegion(armor2Up));
+			armor2Style.imageOver = new TextureRegionDrawable(new TextureRegion(armor2Over));
+			armor2Style.imageDown = new TextureRegionDrawable(new TextureRegion(armor2Down));
+			
+			btnArmor2 = new ImageButton(armor2Style);
+			
+			//Button buff
+			Texture buffUp = assetManager.get("buff_unearned.png", Texture.class);
+			Texture buffOver = assetManager.get("buff_blocked.png", Texture.class);
+			Texture buffDown = assetManager.get("buff_earned.png", Texture.class);
+			ImageButton.ImageButtonStyle buffStyle = new ImageButton.ImageButtonStyle();
+			buffStyle.imageUp = new TextureRegionDrawable(new TextureRegion(buffUp));
+			buffStyle.imageOver = new TextureRegionDrawable(new TextureRegion(buffOver));
+			buffStyle.imageDown = new TextureRegionDrawable(new TextureRegion(buffDown));
+			
+			btnBuff = new ImageButton(buffStyle);
+			
+			// Button cooldown 
+			Texture cooldownUp = assetManager.get("cooldown_unearned.png", Texture.class);
+			Texture cooldownOver = assetManager.get("cooldown_blocked.png", Texture.class);
+			Texture cooldownDown = assetManager.get("cooldown_earned.png", Texture.class);
+			ImageButton.ImageButtonStyle cooldownStyle = new ImageButton.ImageButtonStyle();
+			cooldownStyle.imageUp = new TextureRegionDrawable(new TextureRegion(cooldownUp));
+			cooldownStyle.imageOver = new TextureRegionDrawable(new TextureRegion(cooldownOver));
+			cooldownStyle.imageDown = new TextureRegionDrawable(new TextureRegion(cooldownDown));
+			
+			btnCooldown = new ImageButton(cooldownStyle);
+			
+			
+			// Button duration
+			Texture durationUp = assetManager.get("duration_unearned.png", Texture.class);
+			Texture durationOver = assetManager.get("duration_blocked.png", Texture.class);
+			Texture durationDown = assetManager.get("duration_earned.png", Texture.class);
+			ImageButton.ImageButtonStyle durationStyle = new ImageButton.ImageButtonStyle();
+			durationStyle.imageUp = new TextureRegionDrawable(new TextureRegion(durationUp));
+			durationStyle.imageOver = new TextureRegionDrawable(new TextureRegion(durationOver));
+			durationStyle.imageDown = new TextureRegionDrawable(new TextureRegion(durationDown));
+			
+			btnDuration = new ImageButton(durationStyle);
+			
+			// button HP
+			Texture hpUp = assetManager.get("HP_unearned.png", Texture.class);
+			Texture hpDown = assetManager.get("HP_earned.png", Texture.class);
+			ImageButton.ImageButtonStyle hpStyle = new ImageButton.ImageButtonStyle();
+			hpStyle.imageUp = new TextureRegionDrawable(new TextureRegion(hpUp));
+			hpStyle.imageDown = new TextureRegionDrawable(new TextureRegion(hpDown));
+			
+			btnHP = new ImageButton(hpStyle);
+			
+			
+			// Button Magic
+			Texture magicUp = assetManager.get("magic_unearned.png", Texture.class);
+			Texture magicOver = assetManager.get("magic_blocked.png", Texture.class);
+			Texture magicDown = assetManager.get("magic_earned.png", Texture.class);
+			ImageButton.ImageButtonStyle magicStyle = new ImageButton.ImageButtonStyle();
+			magicStyle.imageUp = new TextureRegionDrawable(new TextureRegion(magicUp));
+			magicStyle.imageOver = new TextureRegionDrawable(new TextureRegion(magicOver));
+			magicStyle.imageDown = new TextureRegionDrawable(new TextureRegion(magicDown));
+			
+			btnMagic = new ImageButton(magicStyle);
+			
+			// Button Mana
+			
+			Texture manaUp = assetManager.get("MANA_unearned.png", Texture.class);
+			Texture manaDown = assetManager.get("MANA_earned.png", Texture.class);
+			ImageButton.ImageButtonStyle manaStyle = new ImageButton.ImageButtonStyle();
+			manaStyle.imageUp = new TextureRegionDrawable(new TextureRegion(manaUp));
+			manaStyle.imageDown = new TextureRegionDrawable(new TextureRegion(manaDown));
+			
+			btnMana = new ImageButton(manaStyle);
+			
+			// Button max
+			Texture maxUp = assetManager.get("max_unearned.png", Texture.class);
+			Texture maxOver = assetManager.get("max_blocked.png", Texture.class);
+			Texture maxDown = assetManager.get("max_earned.png", Texture.class);
+			ImageButton.ImageButtonStyle maxStyle = new ImageButton.ImageButtonStyle();
+			maxStyle.imageUp = new TextureRegionDrawable(new TextureRegion(maxUp));
+			maxStyle.imageOver = new TextureRegionDrawable(new TextureRegion(maxOver));
+			maxStyle.imageDown = new TextureRegionDrawable(new TextureRegion(maxDown));
+			
+			btnMax = new ImageButton(maxStyle);
+			
+			// Button Regen
+			Texture regenUp = assetManager.get("regen_unearned.png", Texture.class);
+			Texture regenOver = assetManager.get("regen_blocked.png", Texture.class);
+			Texture regenDown = assetManager.get("regen_earned.png", Texture.class);
+			ImageButton.ImageButtonStyle regenStyle = new ImageButton.ImageButtonStyle();
+			regenStyle.imageUp = new TextureRegionDrawable(new TextureRegion(regenUp));
+			regenStyle.imageOver = new TextureRegionDrawable(new TextureRegion(regenOver));
+			regenStyle.imageDown = new TextureRegionDrawable(new TextureRegion(regenDown));
+			
+			btnRegen = new ImageButton(regenStyle);
+			
+			
+			// Button Teleport
+			Texture teleportUp = assetManager.get("teleport_unearned.png", Texture.class);
+			Texture teleportOver = assetManager.get("teleport_blocked.png", Texture.class);
+			Texture teleportDown = assetManager.get("teleport_earned.png", Texture.class);
+			ImageButton.ImageButtonStyle teleportStyle = new ImageButton.ImageButtonStyle();
+			teleportStyle.imageUp = new TextureRegionDrawable(new TextureRegion(teleportUp));
+			teleportStyle.imageOver = new TextureRegionDrawable(new TextureRegion(teleportOver));
+			teleportStyle.imageDown = new TextureRegionDrawable(new TextureRegion(teleportDown));
+			
+			btnTeleport = new ImageButton(teleportStyle);
+			
+			
+			// Button Tripple
+			Texture trippleUp = assetManager.get("tripple_unearned.png", Texture.class);
+			Texture trippleOver = assetManager.get("tripple_blocked.png", Texture.class);
+			Texture trippleDown = assetManager.get("tripple_earned.png", Texture.class);
+			ImageButton.ImageButtonStyle trippleStyle = new ImageButton.ImageButtonStyle();
+			trippleStyle.imageUp = new TextureRegionDrawable(new TextureRegion(trippleUp));
+			trippleStyle.imageOver = new TextureRegionDrawable(new TextureRegion(trippleOver));
+			trippleStyle.imageDown = new TextureRegionDrawable(new TextureRegion(trippleDown));
+			
+			btnTripple = new ImageButton(trippleStyle);
+			
+			//Button Vampire
+			Texture vampireUp = assetManager.get("vampire_unearned.png", Texture.class);
+			Texture vampireOver = assetManager.get("vampire_blocked.png", Texture.class);
+			Texture vampireDown = assetManager.get("vampire_earned.png", Texture.class);
+			ImageButton.ImageButtonStyle vampireStyle = new ImageButton.ImageButtonStyle();
+			vampireStyle.imageUp = new TextureRegionDrawable(new TextureRegion(vampireUp));
+			vampireStyle.imageOver = new TextureRegionDrawable(new TextureRegion(vampireOver));
+			vampireStyle.imageDown = new TextureRegionDrawable(new TextureRegion(vampireDown));
+			
+			btnVampire = new ImageButton(vampireStyle);
+			
+			
+			
+			
+			
+			tableSk = new Table();
+			
+			//table.row();
+			tableSk.add(btnTeleport).width(100).height(100);
+			tableSk.add(btnHP).width(100).height(100).spaceLeft(50);
+			tableSk.add(btnArmor).width(100).height(100).spaceLeft(100);
+			tableSk.add(btnRegen).width(100).height(100).spaceLeft(50);
+			tableSk.row();
+			tableSk.add(btnTripple).width(100).height(100);
+			tableSk.add(btnMana).width(100).height(100).spaceLeft(50);
+			tableSk.add(btnArmor2).width(100).height(100).spaceLeft(100);
+			tableSk.add(btnDuration).width(100).height(100).spaceLeft(50);
+			tableSk.row();
+			tableSk.add(btnMagic).width(100).height(100);
+			tableSk.add(btnBuff).width(100).height(100).spaceLeft(50);
+			tableSk.add(btnVampire).width(100).height(100).spaceLeft(100);
+			tableSk.add(btnCooldown).width(100).height(100).spaceLeft(50);
+			
+			
+			tableSk.setFillParent(true);
+			tableSk.pack();
+			
+			tableSk.getColor().a = 0f;
+			
+			stageSk.addActor(tableSk);
+			tableSk.addAction(Actions.fadeIn(2f));
+			
+		}
+		public void load() {
+		/*
+		 * assetManager.load("armor_blocked.png", Texture.class);
+		 * assetManager.load("armor_earned.png", Texture.class);
+		 * assetManager.load("armor_unearned.png", Texture.class);
+		 * assetManager.load("armor2_blocked.png", Texture.class);
+		 * assetManager.load("armor2_earned.png", Texture.class);
+		 * assetManager.load("armor2_unearned.png", Texture.class);
+		 * assetManager.load("buff_blocked.png", Texture.class);
+		 * assetManager.load("buff_earneded.png", Texture.class);
+		 * assetManager.load("buff_unearned.png", Texture.class);
+		 * assetManager.load("cooldown_blocked.png", Texture.class);
+		 * assetManager.load("cooldown_earned.png", Texture.class);
+		 * assetManager.load("cooldown_unearned.png", Texture.class);
+		 * assetManager.load("duration_blocked.png", Texture.class);
+		 * assetManager.load("duration_earned.png", Texture.class);
+		 * assetManager.load("duration_unearned.png", Texture.class);
+		 * assetManager.load("HP_earned.png", Texture.class);
+		 * assetManager.load("HP_unearned.png", Texture.class);
+		 * assetManager.load("magic_blocked.png", Texture.class);
+		 * assetManager.load("magic_earned.png", Texture.class);
+		 * assetManager.load("magic_unearned.png", Texture.class);
+		 * assetManager.load("MANA_earned.png", Texture.class);
+		 * assetManager.load("MANA_unearned.png", Texture.class);
+		 * assetManager.load("max_blocked.png", Texture.class);
+		 * assetManager.load("max_earned.png", Texture.class);
+		 * assetManager.load("max_unearned.png", Texture.class);
+		 * assetManager.load("regen_blocked.png", Texture.class);
+		 * assetManager.load("regen_earned.png", Texture.class);
+		 * assetManager.load("regen_unearned.png", Texture.class);
+		 * assetManager.load("telepor_blocked.png", Texture.class);
+		 * assetManager.load("telepor_earned.png", Texture.class);
+		 * assetManager.load("telepor_unearned.png", Texture.class);
+		 * assetManager.load("tripple_blocked.png", Texture.class);
+		 * assetManager.load("tripple_earned.png", Texture.class);
+		 * assetManager.load("tripple_unearned.png", Texture.class);
+		 * assetManager.load("vampire_blocked.png", Texture.class);
+		 * assetManager.load("vampire_earned.png", Texture.class);
+		 * assetManager.load("vampire_unearned.png", Texture.class);
+		 */
+			
+			
+		}
+ public void		checkClick() {
+	 if(btnArmor.isPressed()) {
+		 Texture armOver = assetManager.get("armor_earned.png", Texture.class);
+		 Texture armDown = assetManager.get("armor_earned.png", Texture.class);
+		 Texture armUp = assetManager.get("armor_earned.png", Texture.class);	
+		 ImageButton.ImageButtonStyle armst = new ImageButton.ImageButtonStyle();
+			armst.imageOver = new TextureRegionDrawable(new TextureRegion(armOver));
+			armst.imageDown = new TextureRegionDrawable(new TextureRegion(armDown));
+			armst.imageUp = new TextureRegionDrawable(new TextureRegion(armUp));
+			btnArmor.setStyle(armst);
+		}
+	 if(btnArmor2.isPressed()) {
+		 Texture armOver = assetManager.get("armor2_earned.png", Texture.class);
+		 Texture armDown = assetManager.get("armor2_earned.png", Texture.class);
+		 Texture armUp = assetManager.get("armor2_earned.png", Texture.class);	
+		 ImageButton.ImageButtonStyle armst = new ImageButton.ImageButtonStyle();
+			armst.imageOver = new TextureRegionDrawable(new TextureRegion(armOver));
+			armst.imageDown = new TextureRegionDrawable(new TextureRegion(armDown));
+			armst.imageUp = new TextureRegionDrawable(new TextureRegion(armUp));
+			btnArmor2.setStyle(armst);
+		}
+	 if(btnBuff.isPressed()) {
+		 Texture armOver = assetManager.get("buff_earned.png", Texture.class);
+		 Texture armDown = assetManager.get("buff_earned.png", Texture.class);
+		 Texture armUp = assetManager.get("buff_earned.png", Texture.class);		
+		 ImageButton.ImageButtonStyle armst = new ImageButton.ImageButtonStyle();
+			armst.imageOver = new TextureRegionDrawable(new TextureRegion(armOver));
+			armst.imageDown = new TextureRegionDrawable(new TextureRegion(armDown));
+			armst.imageUp = new TextureRegionDrawable(new TextureRegion(armUp));
+			btnBuff.setStyle(armst);
+		}
+	 if(btnCooldown.isPressed()) {
+		 Texture armOver = assetManager.get("cooldown_earned.png", Texture.class);
+		 Texture armDown = assetManager.get("cooldown_earned.png", Texture.class);
+		 Texture armUp = assetManager.get("cooldown_earned.png", Texture.class);		
+		 ImageButton.ImageButtonStyle armst = new ImageButton.ImageButtonStyle();
+			armst.imageOver = new TextureRegionDrawable(new TextureRegion(armOver));
+			armst.imageDown = new TextureRegionDrawable(new TextureRegion(armDown));
+			armst.imageUp = new TextureRegionDrawable(new TextureRegion(armUp));
+			btnCooldown.setStyle(armst);
+		}
+	 if(btnDuration.isPressed()) {
+		 Texture armOver = assetManager.get("duration_earned.png", Texture.class);
+		 Texture armDown = assetManager.get("duration_earned.png", Texture.class);
+		 Texture armUp = assetManager.get("duration_earned.png", Texture.class);		
+		 ImageButton.ImageButtonStyle armst = new ImageButton.ImageButtonStyle();
+			armst.imageOver = new TextureRegionDrawable(new TextureRegion(armOver));
+			armst.imageDown = new TextureRegionDrawable(new TextureRegion(armDown));
+			armst.imageUp = new TextureRegionDrawable(new TextureRegion(armUp));
+			btnDuration.setStyle(armst);
+		}
+	 if(btnHP.isPressed()) {
+		 Texture armOver = assetManager.get("HP_earned.png", Texture.class);
+		 Texture armDown = assetManager.get("HP_earned.png", Texture.class);
+		 Texture armUp = assetManager.get("HP_earned.png", Texture.class);		
+		 ImageButton.ImageButtonStyle armst = new ImageButton.ImageButtonStyle();
+			armst.imageOver = new TextureRegionDrawable(new TextureRegion(armOver));
+			armst.imageDown = new TextureRegionDrawable(new TextureRegion(armDown));
+			armst.imageUp = new TextureRegionDrawable(new TextureRegion(armUp));
+			btnHP.setStyle(armst);
+		}
+	 if(btnMagic.isPressed()) {
+		 Texture armOver = assetManager.get("magic_earned.png", Texture.class);
+		 Texture armDown = assetManager.get("magic_earned.png", Texture.class);
+		 Texture armUp = assetManager.get("magic_earned.png", Texture.class);		
+		 ImageButton.ImageButtonStyle armst = new ImageButton.ImageButtonStyle();
+			armst.imageOver = new TextureRegionDrawable(new TextureRegion(armOver));
+			armst.imageDown = new TextureRegionDrawable(new TextureRegion(armDown));
+			armst.imageUp = new TextureRegionDrawable(new TextureRegion(armUp));
+			btnMagic.setStyle(armst);
+		}
+	 
+	 if(btnMana.isPressed()) {
+		 Texture armOver = assetManager.get("MANA_earned.png", Texture.class);
+		 Texture armDown = assetManager.get("MANA_earned.png", Texture.class);
+		 Texture armUp = assetManager.get("MANA_earned.png", Texture.class);		
+		 ImageButton.ImageButtonStyle armst = new ImageButton.ImageButtonStyle();
+			armst.imageOver = new TextureRegionDrawable(new TextureRegion(armOver));
+			armst.imageDown = new TextureRegionDrawable(new TextureRegion(armDown));
+			armst.imageUp = new TextureRegionDrawable(new TextureRegion(armUp));
+			btnMana.setStyle(armst);
+		}
+	 if(btnMax.isPressed()) {
+		 Texture armOver = assetManager.get("max_earned.png", Texture.class);
+		 Texture armDown = assetManager.get("max_earned.png", Texture.class);
+		 Texture armUp = assetManager.get("max_earned.png", Texture.class);		
+		 ImageButton.ImageButtonStyle armst = new ImageButton.ImageButtonStyle();
+			armst.imageOver = new TextureRegionDrawable(new TextureRegion(armOver));
+			armst.imageDown = new TextureRegionDrawable(new TextureRegion(armDown));
+			armst.imageUp = new TextureRegionDrawable(new TextureRegion(armUp));
+			btnMax.setStyle(armst);
+		}
+	 if(btnRegen.isPressed()) {
+		 Texture armOver = assetManager.get("regen_earned.png", Texture.class);
+		 Texture armDown = assetManager.get("regen_earned.png", Texture.class);
+		 Texture armUp = assetManager.get("regen_earned.png", Texture.class);		
+		 ImageButton.ImageButtonStyle armst = new ImageButton.ImageButtonStyle();
+			armst.imageOver = new TextureRegionDrawable(new TextureRegion(armOver));
+			armst.imageDown = new TextureRegionDrawable(new TextureRegion(armDown));
+			armst.imageUp = new TextureRegionDrawable(new TextureRegion(armUp));
+			btnRegen.setStyle(armst);
+		}
+	 if(btnTeleport.isPressed()) {
+		 Texture armOver = assetManager.get("teleport_earned.png", Texture.class);
+		 Texture armDown = assetManager.get("teleport_earned.png", Texture.class);
+		 Texture armUp = assetManager.get("teleport_earned.png", Texture.class);		
+		 ImageButton.ImageButtonStyle armst = new ImageButton.ImageButtonStyle();
+			armst.imageOver = new TextureRegionDrawable(new TextureRegion(armOver));
+			armst.imageDown = new TextureRegionDrawable(new TextureRegion(armDown));
+			armst.imageUp = new TextureRegionDrawable(new TextureRegion(armUp));
+			btnTeleport.setStyle(armst);
+		}
+	 if(btnTripple.isPressed()) {
+		 Texture armOver = assetManager.get("tripple_earned.png", Texture.class);
+		 Texture armDown = assetManager.get("tripple_earned.png", Texture.class);
+		 Texture armUp = assetManager.get("tripple_earned.png", Texture.class);		
+		 ImageButton.ImageButtonStyle armst = new ImageButton.ImageButtonStyle();
+			armst.imageOver = new TextureRegionDrawable(new TextureRegion(armOver));
+			armst.imageDown = new TextureRegionDrawable(new TextureRegion(armDown));
+			armst.imageUp = new TextureRegionDrawable(new TextureRegion(armUp));
+			btnTripple.setStyle(armst);
+		}
+	 if(btnVampire.isPressed()) {
+		 Texture armOver = assetManager.get("vampire_earned.png", Texture.class);
+		 Texture armDown = assetManager.get("vampire_earned.png", Texture.class);
+		 Texture armUp = assetManager.get("vampire_earned.png", Texture.class);		
+		 ImageButton.ImageButtonStyle armst = new ImageButton.ImageButtonStyle();
+			armst.imageOver = new TextureRegionDrawable(new TextureRegion(armOver));
+			armst.imageDown = new TextureRegionDrawable(new TextureRegion(armDown));
+			armst.imageUp = new TextureRegionDrawable(new TextureRegion(armUp));
+			btnVampire.setStyle(armst);
+		}
+	 
+	 
+ }
+		
+		
+		
 }

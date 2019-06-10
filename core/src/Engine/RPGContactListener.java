@@ -70,7 +70,7 @@ public class RPGContactListener implements ContactListener{
 					if(contacts.get(i).getFixtureA().getUserData().getClass().getName() == "com.badlogic.gdx.physics.box2d.Fixture") {
 						if(fixBData.isBull) {
 							fixBData.shouldRemove = true;
-						if(!(fixAData.isAi) && !(fixAData.isBull)) {
+						if(!(fixAData.isBull)) {
 						
 							fixAData.setHitpoint(5);
 						}
@@ -80,7 +80,7 @@ public class RPGContactListener implements ContactListener{
 						if(contacts.get(i).getFixtureB().getUserData().getClass().getName() == "com.badlogic.gdx.physics.box2d.Fixture")
 							if(fixAData.isBull) {
 								fixAData.shouldRemove = true;
-							if(!(fixBData.isAi) && !(fixBData.isBull) && fixAData.isBull) {
+							if(!(fixBData.isBull)) {
 							
 								fixBData.setHitpoint(5);
 							}

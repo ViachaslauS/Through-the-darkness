@@ -25,11 +25,11 @@ public class Bullet {
 	private static Texture texture = new Texture(Gdx.files.internal("bullets.png"));
 	
 	public static TextureRegion[][] allBullets;
-	TextureRegion[] bulletFrames;
+	public TextureRegion[] bulletFrames;
 	Animation<TextureRegion> bulletAnimation;
 	TextureRegion currentFrame;
 	private int sideView;
-	float x,y;
+	float x,y, startX, raznica;
 	
 	public boolean remove = false;
 	
@@ -37,23 +37,24 @@ public class Bullet {
 		
 		allBullets = TextureRegion.split(texture, texture.getWidth()/10, texture.getHeight()/10);
 		bulletFrames = new TextureRegion[4];
-		for(int i=0;i<4;i++) {
-			bulletFrames[i] = allBullets[1][i];
-		}
+	
 		bulletAnimation = new Animation<TextureRegion>(0.05f,bulletFrames);
 		this.x = x;
+		startX = this.x;
 		this.y = y;
 		sideView = side;
 		f.categoryBits = RPGWorld.CATEGORY_BULLET;
 		f.maskBits = RPGWorld.MASK_BULLET;
-		f.groupIndex = 3;
+		f.groupIndex = -3;
 	}
 	public void update (float deltaTime) {
 		bulletData.updateData();
 		box.setTransform(x, y, 0);
 		//updatePhysic();
 		x += speed* deltaTime*sideView;
-		if( x < 0) {
+		raznica =Math.abs(x - startX);
+		
+		if(raznica > 150) {
 			remove = true;
 		}
 		if(bulletData.shouldRemove)

@@ -29,8 +29,8 @@ public class AiCustom extends Entities {
 	Vector3 all;
 	public int level;
 	Vector2 _coord;
-	private float time;
-	private float bulletTime = 0;
+	protected float time;
+	protected float bulletTime = 0;
 	SteeringAgent steeringAgent;
 	
 	public ArrayList<Bullet> bullets = new ArrayList<Bullet>();
@@ -39,7 +39,7 @@ public class AiCustom extends Entities {
 	Filter f = new Filter();
 	Filter attf = new Filter();
 	
-	private Animation<TextureRegion> currentAnimation;
+	protected Animation<TextureRegion> currentAnimation;
 
 	//FollowPath followPath;
 	Path<Vector2, Pathparametrs> path;
@@ -88,7 +88,7 @@ public class AiCustom extends Entities {
 		//followPath = new FollowPath<Vector2, Pathparametrs>(steeringAgent, path);
 		f.maskBits = RPGWorld.MASK_RUNNER;
 		f.categoryBits = RPGWorld.CATEGORY_RUNNER;
-		f.groupIndex = -1;
+		f.groupIndex = -2;
 		
 		attf.groupIndex = -5; // filter of attack
 		attf.categoryBits = RPGWorld.CATEGORY_RUNNER;
@@ -230,13 +230,13 @@ public class AiCustom extends Entities {
 		  
 		  updatePhysic();
 		  entitieData.updateData();
-		  frameFlip();
+		 
 		  //_________________________________________
 		  for(int i = 0; i< bullets.size(); i++)
 				 bullets.get(i).update(Gdx.graphics.getDeltaTime());
 		  
 		  if(entitieData.isMustAttack) {
-			  if(!attack(level))
+			  if(!attack())
 				  return;
 		  }
 		  
@@ -251,7 +251,7 @@ public class AiCustom extends Entities {
 //			  shoot();
 //		  }
 		  
-		  
+		 
 		  if(time>=4 && level == 2) {
 			  
 			  jump();
@@ -273,7 +273,7 @@ public class AiCustom extends Entities {
 			 // entitieBox.applyAngularImpulse(20000000f, true);
 		  }
 		  
-		  
+		  frameFlip(); 
 		
 		  
 		  
@@ -283,37 +283,39 @@ public class AiCustom extends Entities {
 	 * @param type
 	 * @param delta
 	 * @return true if attack has finished
-	 */
-	private boolean attack(int type) {
-		DURATION +=Gdx.graphics.getDeltaTime();
+	 */ 
+	protected boolean attack() {
+		currentFrame = currentAnimation.getKeyFrame(DURATION,true);
+		if(currentAnimation != attack1Animation) {
+			  currentAnimation = attack1Animation;
+			  currentFrame = currentAnimation.getKeyFrame(0);
+
+		}
 		
-		 if(currentAnimation.getKeyFrames()[currentAnimation.getKeyFrames().length-1] == currentFrame) {
+		if(currentAnimation.getKeyFrames()[currentAnimation.getKeyFrames().length-1] == currentFrame) {
 			  entitieData.isAttacking = 0;
 			  entitieData.isMustAttack = false;
+			  DURATION = 0;
 			  return true;
 		  }
-		  if(currentAnimation != attack1Animation) {
-			  currentAnimation = attack1Animation;
-			  //currentFrame = currentAnimation.getKeyFrame(0);
-			 DURATION = 0;
-		  }
-		  currentFrame = currentAnimation.getKeyFrame(DURATION,true);
-		  if(currentFrame == currentAnimation.getKeyFrames()[7]) {
-			  if(entitieData.isAttacking != -3)
-				  entitieData.isAttacking = -2;
-		  }
-		switch(type) {
-		case 1: {
+		
+		
+		DURATION +=Gdx.graphics.getDeltaTime();
+		frameFlip();
+		 
+		  
+			  
 			 
-			  return false;
-			  }
-		case 2: if(currentFrame == currentAnimation.getKeyFrames()[5] && entitieData.isAttacking!= -3) {
-			shoot();
-			entitieData.isAttacking = -3;
-		}
-			break;
-		default:
-		}
+		  
+		
+	
+		/*
+		 * switch(type) {
+		 * 
+		 * case 2: if(currentFrame == currentAnimation.getKeyFrames()[5] &&
+		 * entitieData.isAttacking!= -3) { shoot(); entitieData.isAttacking = -3; }
+		 * break; default: }
+		 */
 		return false;
 	}
 	private boolean isJump = false;
@@ -386,6 +388,9 @@ public class AiCustom extends Entities {
 		// Shoot to hero
 		public void shoot() {
 			Bullet bullet = new Bullet((this.coordX+sizeX/2)+(sizeX/2*sideView), this.coordY+(this.getSizeY()/2),this.sideView);
+			for(int i=0;i<4;i++) {
+				bullet.bulletFrames[i] = bullet.allBullets[1][i];
+			}
 			bullet.setBody(rpgWorld);
 			bullets.add(bullet);
 			

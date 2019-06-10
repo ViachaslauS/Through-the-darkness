@@ -1,6 +1,7 @@
 package Entities;
 
 import java.io.Console;
+import java.util.ArrayList;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
@@ -26,6 +27,10 @@ import Engine.RPGWorld;
  *
  */
 public class Hero  extends Entities{
+	
+	
+	public ArrayList<Bullet> bullets = new ArrayList<Bullet>();
+	
 	
 	//public PlayerStats stats;
 	
@@ -145,6 +150,13 @@ public class Hero  extends Entities{
 		entitieData.updateData();
 		updatePhysic();
 		
+		
+		// bullets for hero
+		 for(int i = 0; i< bullets.size(); i++)
+			 bullets.get(i).update(Gdx.graphics.getDeltaTime());
+	  
+		
+		
 		 if(coordX < 0)
 			coordX = 0;
 		 if(currentAction!=0) {
@@ -210,6 +222,13 @@ public class Hero  extends Entities{
 			currentAnimation = attack1Animation;
 			entitieData.skillDamage = 1.8f;
 			attack1();
+			return;
+		}
+		if(Gdx.input.isKeyJustPressed(Keys.NUM_3)) {
+			currentAction = 1;
+			currentAnimation = attack1Animation;
+			entitieData.skillDamage = 1.8f;
+			shoot();
 			return;
 		}
 		//teleport
@@ -401,6 +420,19 @@ public class Hero  extends Entities{
 		physicsFixture.setFilterData(f);
 		sensorFixture.setFilterData(f);
 	}
+	
+	
+	//  hero shoot
+			public void shoot() {
+				Bullet bullet = new Bullet((this.coordX+sizeX/2)+(sizeX/2*sideView), this.coordY+(this.getSizeY()/2),this.sideView);
+				for(int i=0;i<4;i++) {
+					bullet.bulletFrames[i] = bullet.allBullets[0][i];
+				}
+				bullet.f.groupIndex = -4;
+				bullet.setBody(rpgWorld);
+				bullets.add(bullet);
+				
+			}
 	
 	public void updateStats() {
 		
