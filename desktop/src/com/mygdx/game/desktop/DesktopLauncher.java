@@ -1,5 +1,6 @@
 package com.mygdx.game.desktop;
 
+import com.badlogic.gdx.Files.FileType;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.mygdx.game.RPG;
@@ -18,7 +19,7 @@ public class DesktopLauncher {
 		config.height = windowHeight;
 		config.foregroundFPS = 40;
 		config.backgroundFPS = 40;
-		
+		config.addIcon("Icon.png", FileType.Internal);
 		new LwjglApplication(new RPG(), config);
 	}
 }

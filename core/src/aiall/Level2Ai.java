@@ -1,13 +1,16 @@
 package aiall;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.math.Vector2;
 
 public class Level2Ai extends AiCustom {
 
+	Sound shootSound;
+	
 	public Level2Ai(Vector2 size, Vector2 coord, int botLevel) {
 		super(size, coord, botLevel);
-	
+		shootSound = Gdx.audio.newSound(Gdx.files.internal("magic.wav"));
 	}
 	
 	@Override
@@ -48,8 +51,10 @@ public class Level2Ai extends AiCustom {
 			  jump();
 		  }
 		  if(entitieData.isMustAttack) {
-			  if(!attack())
+			  if(!attack()) {
+				  
 				  return;
+			  }
 		  }
 		  
 		  if(entitieData.isAttacking == -1 ) {
@@ -68,13 +73,18 @@ public class Level2Ai extends AiCustom {
 		
 		  
 	} 
-	
-	
+	boolean isSounded = false;
 	@Override
 	protected boolean attack() {
 	 super.attack();
+	 if(currentFrame == currentAnimation.getKeyFrames()[3] && !isSounded) {
+		 shootSound.play(0.4f);
+		 isSounded = true;
+	 }
 	 if(currentFrame == currentAnimation.getKeyFrames()[5] && entitieData.isAttacking!= -5)
-	 { shoot(); 
+	 { 
+		 isSounded = false;
+		 shoot(); 
 	 entitieData.isAttacking = -5; }
 	 
 	 

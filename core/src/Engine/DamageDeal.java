@@ -2,6 +2,7 @@ package Engine;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.WorldManifold;
@@ -13,9 +14,12 @@ public class DamageDeal {
 
 	RPGWorld world;
 	ObjectData data;
+	Sound hitSound;
+	
 	
 	public DamageDeal(RPGWorld world) {
 		this.world = world;
+		hitSound = Gdx.audio.newSound(Gdx.files.internal("hit.wav"));
 	}
 	
 	/**
@@ -111,6 +115,7 @@ public class DamageDeal {
 		if(dealData.isAttacking == 1) {
 			if((dealer.getBody().getPosition().x > receiver.getBody().getPosition().x && dealData.sideView < 0) || (dealer.getBody().getPosition().x < receiver.getBody().getPosition().x && dealData.sideView > 0))
 			recData.setHitpoint(dealData.getDAMAGE());
+			hitSound.play(0.3f);
 			dealData.isAttacking = 2;
 		}
 		aiReact(recData, dealData);
@@ -153,6 +158,7 @@ public class DamageDeal {
 					dealData.attackTime = 0;
 					dealData.isAttacking = -3;
 					recData.setHitpoint(dealData.getDAMAGE());
+					hitSound.play(0.3f);
 				}
 				else {
 					if(dealData.isAttacking != -3) {

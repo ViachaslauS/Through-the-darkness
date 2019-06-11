@@ -17,6 +17,7 @@ import com.badlogic.gdx.physics.box2d.World;
 
 import Engine.ObjectData;
 import Engine.RPGWorld;
+import Entities.Buff.BuffType;
 
 
 
@@ -41,12 +42,26 @@ public class Hero  extends Entities{
 	private Texture skills;
 	Filter f = new Filter();
 	
-	private Sound shift;
+	private float soundsDuration = 0;
+	private Sound teleport;
+	private Sound move;
+	private Sound attack1Sound;
+	private Sound attack2Sound;
+	private Sound shootSound;
+	
 	Animation<TextureRegion> currentAnimation;
 	Animation<TextureRegion>[] allAnimations;
 	
+	private Animation<TextureRegion> buff1Animation;
+	private Animation<TextureRegion> buff2Animation;
+	private Animation<TextureRegion> buff3Animation;
+	TextureRegion[] buff1Frames,buff2Frames,buff3Frames;
+	
 	private Animation<TextureRegion> attack2Animation;
 	private TextureRegion[] attack2Frames;
+	
+	private Animation<TextureRegion> shootAnimation;
+	private TextureRegion[] shootFrames;
 	
 	int[] skillsLevel = new int[3];
 	public void picParam() {
@@ -85,7 +100,7 @@ public class Hero  extends Entities{
 		setCoord(heroCoord);
 		sideView = 1; 
 		allSheets = manager.get("Hero.png",Texture.class);
-		shift = manager.get("sprintSound.wav",Sound.class)	 ;
+		move = manager.get("move.wav",Sound.class);
 		skills = manager.get("dark_skills.png",Texture.class);
 		entitieData.isAi = false;
 		picParam();
@@ -103,6 +118,10 @@ public class Hero  extends Entities{
 		moveFrames = new TextureRegion[MOVE_FRAME_COLS*MOVE_FRAME_ROWS];
 		attack1Frames = new TextureRegion[ATTACK1_FRAME_COLS*ATTACK1_FRAME_ROWS];
 		attack2Frames = new TextureRegion[8];
+		shootFrames = new TextureRegion[10];
+		buff1Frames = new TextureRegion[10];
+		buff2Frames = new TextureRegion[10];
+		buff3Frames = new TextureRegion[10];
 		//include to TextureRegions sprites
 		int index = 0;
 		for(int i=0;i<STAY_FRAME_ROWS;i++)  
@@ -126,22 +145,36 @@ public class Hero  extends Entities{
 		for(int i=0;i<10;i++) {
 			teleportFrames[i] = temp[0][i];
 			attack1Frames[i] = temp[1][i];
+			shootFrames[i] = temp[4][i];
+			buff1Frames[i] = temp[5][i];
+			buff2Frames[i] = temp[6][i];
+			buff3Frames[i] = temp[7][i];
 		}
 		for(int i = 0; i<8; i++) {
 			attack2Frames[i] = temp[3][i];
 		}
 		//Initialize of animations
+		buff1Animation = new Animation<TextureRegion>(ANIMATION_SPEED*(1-entitieData.stats.ATKSPEED()),buff1Frames);
+		buff2Animation = new Animation<TextureRegion>(ANIMATION_SPEED*(1-entitieData.stats.ATKSPEED()),buff2Frames);
+		buff3Animation = new Animation<TextureRegion>(ANIMATION_SPEED*(1-entitieData.stats.ATKSPEED()),buff3Frames);
+		
 		stayAnimation = new Animation<TextureRegion>(0.10f, stayFrames);
 		moveAnimation = new Animation<TextureRegion>(0.10f,moveFrames);
 		attack1Animation = new Animation<TextureRegion>(ANIMATION_SPEED*(1-entitieData.stats.ATKSPEED()),attack1Frames);
 		attack2Animation = new Animation<TextureRegion>(0.1f,attack2Frames);
 		deathAnimation = new Animation<TextureRegion>(0.10f,deathFrames);
 		teleportAnimation = new Animation<TextureRegion>(ANIMATION_SPEED*(1-entitieData.stats.ATKSPEED()),teleportFrames);	
-		
+		shootAnimation = new Animation<TextureRegion>(ANIMATION_SPEED*(1-entitieData.stats.ATKSPEED()),shootFrames);
 		currentFrame = stayAnimation.getKeyFrame(0.10f, true);
 		// Add fucking teleport
 		
 		
+		
+		
+		attack1Sound = manager.get("attack1.wav",Sound.class);
+		attack2Sound = manager.get("attack2.wav",Sound.class);
+		teleport = manager.get("teleport.wav",Sound.class);
+		shootSound = manager.get("magic.wav",Sound.class);
 	}
 
 	@Override
@@ -149,8 +182,8 @@ public class Hero  extends Entities{
 		updateStats();
 		entitieData.updateData();
 		updatePhysic();
-		
-		
+	
+			
 		// bullets for hero
 		 for(int i = 0; i< bullets.size(); i++)
 			 bullets.get(i).update(Gdx.graphics.getDeltaTime());
@@ -168,7 +201,11 @@ public class Hero  extends Entities{
 		 else
 			 checkKeys();
 		 if(Gdx.input.isKeyPressed(Keys.D) || Gdx.input.isKeyPressed(Keys.RIGHT)) {   //move right
-				
+			if(soundsDuration >= 0.4f && isEntitieGrounded()) {
+			 move.play(0.1f);
+			 soundsDuration = 0;
+			}
+			soundsDuration+=Gdx.graphics.getDeltaTime();
 				currentFrame = moveAnimation.getKeyFrame(delta, true);
 				//entitieData.currentFrame = currentFrame;
 				if(currentFrame.isFlipX()) {
@@ -181,7 +218,11 @@ public class Hero  extends Entities{
 				return;	
 			}
 			if(Gdx.input.isKeyPressed(Keys.A) || Gdx.input.isKeyPressed(Keys.LEFT)) {    //move left
-				
+				if(soundsDuration >= 0.4f && isEntitieGrounded()) {
+					 move.play(0.1f);
+					 soundsDuration = 0;
+					}
+					soundsDuration+=Gdx.graphics.getDeltaTime();
 				currentFrame = moveAnimation.getKeyFrame(delta, true);
 				//entitieData.currentFrame = currentFrame;
 				if(!currentFrame.isFlipX())
@@ -202,8 +243,12 @@ public class Hero  extends Entities{
 		switch(currentAction) {
 		case 1:attack1();   	break;
 		case 2:teleport();	    break;
-		case 3:jump();		   return false;
+		case 3:jump();		    return false;
 		case 4:attack2();       break;
+		case 5:shoot(); 		break;
+		case 6:buff1();			break;
+		case 7:buff2();			break;
+		case 8:buff3();			break;
 		default: return false;
 		}
 		return true;
@@ -222,12 +267,14 @@ public class Hero  extends Entities{
 			currentAnimation = attack1Animation;
 			entitieData.skillDamage = 1.8f;
 			attack1();
+			attack1Sound.play(0.6f);
 			return;
 		}
 		if(Gdx.input.isKeyJustPressed(Keys.NUM_3)) {
-			currentAction = 1;
-			currentAnimation = attack1Animation;
-			entitieData.skillDamage = 1.8f;
+			currentAction = 5;
+			currentAnimation = shootAnimation;
+			entitieData.skillDamage = 3f;
+			shootSound.play(0.3f);
 			shoot();
 			return;
 		}
@@ -237,6 +284,7 @@ public class Hero  extends Entities{
 				return;
 			//isPhysicUpdatingActive = false;
 			//this.physicsFixture.setSensor(true);
+			teleport.play(0.3f);
 			currentAction = 2;
 			currentAnimation = teleportAnimation;
 			teleport();
@@ -255,8 +303,28 @@ public class Hero  extends Entities{
 			entitieData.skillDamage = 1.2f;
 			attack2();
 		}
+		if(Gdx.input.isKeyJustPressed(Keys.Q) ) {
+			currentAction = 6;
+			currentAnimation = buff1Animation;
+			
+			buff1();
+		}
+		if(Gdx.input.isKeyJustPressed(Keys.W) ) {
+			currentAction = 7;
+			currentAnimation = buff2Animation;
+			
+			buff2();
+		}
+		if(Gdx.input.isKeyJustPressed(Keys.E) ) {
+			currentAction = 8;
+			currentAnimation = buff3Animation;
+			
+			buff3();
+		}
 	}
 
+
+	
 
 	/** Check, was li pressed S button
 	 * @return
@@ -287,6 +355,24 @@ public class Hero  extends Entities{
 		frameFlip();
 		return false;
 	}
+	private void buff1() {
+		if(refresh()) {
+			entitieData.setNewBuff(BuffType.HITPOINTS, 0.5f, 10, true);
+			return;
+		}
+	}
+	private void buff2() {
+		if(refresh()) {
+			entitieData.setNewBuff(BuffType.MANA, 0.5f, 10, true);
+			return;
+		}
+	}
+	private void buff3() {
+		if(refresh()) {
+			entitieData.setNewBuff(BuffType.REGEN_FREQUENCY, 2.5f, 10, false);
+			return;
+		}
+	}
 	public void attack1() {
 		if(refresh())
 			return;
@@ -304,8 +390,7 @@ public class Hero  extends Entities{
 	int attackinInThisFrame = 0;
 	private void attack2() {
 		if(refresh()) {
-			attackinInThisFrame = 0;
-			
+			attackinInThisFrame = 0;	
 			return;
 		}
 		
@@ -313,6 +398,7 @@ public class Hero  extends Entities{
 			if(entitieData.isAttacking == 2) {
 				attackinInThisFrame = 2;
 				entitieData.isAttacking = 0;
+				attack2Sound.play(0.2f);
 			}
 			else
 				entitieData.isAttacking = 1;
@@ -321,6 +407,7 @@ public class Hero  extends Entities{
 			if(entitieData.isAttacking == 2) {
 				attackinInThisFrame = 4;
 				entitieData.isAttacking = 0;
+				attack2Sound.play(0.2f);
 			}
 			else
 				entitieData.isAttacking = 1;
@@ -329,6 +416,7 @@ public class Hero  extends Entities{
 			if(entitieData.isAttacking == 2) {
 				attackinInThisFrame = 6;
 				entitieData.isAttacking = 0;
+				attack2Sound.play(0.2f);
 			}
 			else
 				entitieData.isAttacking = 1;
@@ -366,6 +454,28 @@ public class Hero  extends Entities{
 		else
 			reset();
 	}
+	
+//  hero shoot
+	boolean isShooting = false;
+		public void shoot() {
+		if(refresh()) {
+			isShooting = false;
+			
+			return;
+		}
+		if(currentFrame == currentAnimation.getKeyFrames()[7] && !isShooting) {
+			Bullet bullet = new Bullet((this.coordX+sizeX/2)+(sizeX/2*sideView), this.coordY+(this.getSizeY()/2),this.sideView);	
+			for(int i=0;i<4;i++) {
+				bullet.bulletFrames[i] = bullet.allBullets[0][i];
+			}
+			bullet.f.groupIndex = -4;
+			bullet.setBody(rpgWorld);
+			bullets.add(bullet);
+			entitieData.setMANA(10);
+			isShooting = true;
+			}
+		}
+	
 	/**
 	 * reset current animation and action
 	 */
@@ -422,17 +532,6 @@ public class Hero  extends Entities{
 	}
 	
 	
-	//  hero shoot
-			public void shoot() {
-				Bullet bullet = new Bullet((this.coordX+sizeX/2)+(sizeX/2*sideView), this.coordY+(this.getSizeY()/2),this.sideView);
-				for(int i=0;i<4;i++) {
-					bullet.bulletFrames[i] = bullet.allBullets[0][i];
-				}
-				bullet.f.groupIndex = -4;
-				bullet.setBody(rpgWorld);
-				bullets.add(bullet);
-				
-			}
 	
 	public void updateStats() {
 		

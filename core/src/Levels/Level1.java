@@ -2,6 +2,8 @@ package Levels;
 
 import java.util.ArrayList;
 
+import com.badlogic.gdx.Audio;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -62,7 +64,34 @@ public class Level1 extends BaseLevel{
 	public  void managerLoad() {
 		assetManager.load("Battleground1.png", Texture.class);
 		assetManager.load("Hero.png", Texture.class);
-		assetManager.load("sprintSound.wav",Sound.class);
+		
+		assetManager.load("1.mp3",Music.class);
+		assetManager.load("2.mp3",Music.class);
+		assetManager.load("3.mp3",Music.class);
+		assetManager.load("4.mp3",Music.class);
+		
+		assetManager.load("attack1.wav",Sound.class);
+		assetManager.load("teleport.wav",Sound.class);
+		assetManager.load("attack2.wav",Sound.class);
+		assetManager.load("magic.wav",Sound.class);
+		assetManager.load("move.wav",Sound.class);
+		
+		assetManager.load("buttonclick.wav",Sound.class);
+		assetManager.load("gamebutton.wav",Sound.class);
+		
+		assetManager.load("dead.mp3",Sound.class);
+		
+		assetManager.load("gameover.wav",Sound.class);
+		assetManager.load("trigger1.wav",Sound.class);
+		assetManager.load("trigger2.wav",Sound.class);
+		assetManager.load("trigger3.wav",Sound.class);
+		assetManager.load("trigger4.wav",Sound.class);
+		assetManager.load("trigger5.wav",Sound.class);
+		assetManager.load("trigger6.mp3",Sound.class);
+		
+		
+		assetManager.load("skelet.wav",Sound.class);
+		
 		assetManager.load("dark_skills.png",Texture.class);
 		assetManager.load("niceBG.jpg",Texture.class);
 		assetManager.load("woodenBG.jpg",Texture.class);

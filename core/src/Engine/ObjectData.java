@@ -288,6 +288,10 @@ public class ObjectData {
 	}
 	
 	public void resetBuffs() {
+		for(int i = 0; i < buffs.size; i++) {
+				descrease(buffs.get(i));
+				buffs.removeIndex(i);
+			}
 		buffs.clear();
 	}
 	

@@ -1,5 +1,7 @@
 package Engine;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
@@ -17,9 +19,12 @@ public class RPGContactListener implements ContactListener{
 	ObjectData bodyData;
 	int sideView = 1;
 	RPGWorld world;
+	Sound hitSound; 
+	
 	public RPGContactListener(RPGWorld world) {
 		entitie = null;
 		this.world = world;
+		 hitSound = Gdx.audio.newSound(Gdx.files.internal("hit.wav"));
 	}
 	
 	@Override
@@ -69,21 +74,24 @@ public class RPGContactListener implements ContactListener{
 				
 					if(contacts.get(i).getFixtureA().getUserData().getClass().getName() == "com.badlogic.gdx.physics.box2d.Fixture") {
 						if(fixBData.isBull) {
-							fixBData.shouldRemove = true;
-						if(!(fixAData.isBull)) {
-						
-							fixAData.setHitpoint(5);
+							
+						if(!(fixAData.isBull) && !fixBData.shouldRemove) {
+							hitSound.play(0.3f);
+							fixAData.setHitpoint(45);
 						}
+						fixBData.shouldRemove = true;
 					}
 											}
 					else
 						if(contacts.get(i).getFixtureB().getUserData().getClass().getName() == "com.badlogic.gdx.physics.box2d.Fixture")
 							if(fixAData.isBull) {
-								fixAData.shouldRemove = true;
-							if(!(fixBData.isBull)) {
-							
-								fixBData.setHitpoint(5);
+								
+							if(!(fixBData.isBull) && !fixAData.shouldRemove) {
+								hitSound.play(0.3f);
+								fixBData.setHitpoint(45);
+								
 							}
+							fixAData.shouldRemove = true;
 						}
 				}
 			}

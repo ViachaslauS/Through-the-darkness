@@ -2,9 +2,12 @@ package Levels;
 
 import java.util.ArrayList;
 
+import com.badlogic.gdx.Audio;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -53,6 +56,8 @@ public class BaseLevel implements GlobalWindow{
 		
 		DamageDeal damageMaster;
 		
+		Sound deathSound;
+		
 		SpriteBatch batch;
 		BitmapFont font;                        //font
 		Texture background;
@@ -82,6 +87,7 @@ public class BaseLevel implements GlobalWindow{
 		
 		private float Time = 0.0f;
 		
+		Music[] music;
 		
 		public enum State {
 			PAUSE,
@@ -163,7 +169,6 @@ private void renderRun(float delta) {
 		camera.position.y = 360;
 	if(camera.position.y > MAP_MAX_HEIGHT-360)
 		camera.position.y = MAP_MAX_HEIGHT-360;
-	Gdx.app.log("camera coord", ""+ (hero.getCoordY()-260));
 	camera.update();
 	
 	game.batch.setProjectionMatrix(camera.combined);
@@ -210,7 +215,7 @@ private void renderSkillMenu(float delta) {
 	stageSk.act(Math.min(Gdx.graphics.getDeltaTime(),1/60f));	
 	checkClick();
 	game.batch.begin();
-	game.batch.draw(gameMenuScreen, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+	game.batch.draw(gameMenuScreen, 0, 0, 1600, 900);
 	game.batch.end();
 	stageSk.draw();
 }
@@ -222,7 +227,7 @@ private void renderPause(float delta) {
 		stage.act(Math.min(Gdx.graphics.getDeltaTime(),1/60f));	
 		
 		 game.batch.begin();
-		 game.batch.draw(gameMenuScreen, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		 game.batch.draw(gameMenuScreen, 0, 0, 1600, 900);
 		 game.batch.end();
 		 stage.draw();
 		 checkKeys();
@@ -242,36 +247,40 @@ private void drawInterface() {
 		private void backgroundDraw() {
 			
 			float coord = hero.getCoordX();
-			if(coord/1280 > mapCounter)
+			if(coord/1600 > mapCounter)
 			{
 				mapCounter++;
-				centreMapCoord+=1280;
+				centreMapCoord+=1600;
 			}
-			if(coord/1280 < mapCounter) {
+			if(coord/1600 < mapCounter) {
 				mapCounter--;
-				centreMapCoord-=1280;
+				centreMapCoord-=1600;
 			}
 			//float coordYBG = (camera.position.y - 360f)/MAP_MAX_HEIGHT*720;
 			
-			game.batch.draw(background, centreMapCoord-1280, camera.position.y-360,1280,720);
-			game.batch.draw(background, centreMapCoord, camera.position.y-360,1280,720);
-			game.batch.draw(background, centreMapCoord+1280, camera.position.y-360,1280,720);
+			game.batch.draw(background, centreMapCoord-1600, camera.position.y-450,1600,900);
+			game.batch.draw(background, centreMapCoord, camera.position.y-450,1600,900);
+			game.batch.draw(background, centreMapCoord+1600, camera.position.y-450,1600,900);
 		}
-		
+		boolean deathWas = false;
 		private void update(float delta)
 		{
+			
+			playMusic();
+			
 			if(Gdx.input.isTouched()) {
 				Vector3 touchPos = new Vector3(Gdx.input.getX(),Gdx.input.getY(),0);
 				camera.unproject(touchPos);
-				Gdx.app.log("coords of touch "," "+touchPos);
+				Gdx.app.log("coords of touch "," "+((int)touchPos.x/SS)+" "+((int)touchPos.y/SS));
 			}
 
 			damageMaster.update();
 			//Gdx.app.log("Hitpoints of ai and hero",""+ ai.getHITPOINT()+"  "+hero.getHITPOINT());
 			if(hero.getHITPOINT() <= 0.0f || hero.getCoordY() < -100) {
 				hero.getEntitieData().resetHitpoints();
-				if(hero.death()) {
-					
+				if(hero.death() && !deathWas) {
+					deathSound.play();
+					deathWas = true;
 					//dispose();
 				}
 			}
@@ -327,6 +336,16 @@ private void drawInterface() {
 //			hero.getEntitieData().stats.getSkillPoints());
 		}
 		
+		int currentMusic = 0;
+		private void playMusic() {
+			if(!music[currentMusic].isPlaying()) {
+				currentMusic++;
+			if(currentMusic > 3)
+				currentMusic = 0;
+			music[currentMusic].setVolume(0.3f);
+			music[currentMusic].play();
+			}
+		}
 		private void check_path() {
 			
 			  //System.out.println("hero :" + hero.getCoordX()+ "\n");
@@ -352,26 +371,32 @@ private void drawInterface() {
 
 			batch = new SpriteBatch();
 
+			music = new Music[4];
+			for(int i=1;i<5;i++) {
+				music[i-1] = assetManager.get(""+i+".mp3",Music.class);
+			}
+			
 			// camera
 			camera = new OrthographicCamera();
-			camera.setToOrtho(false, RPG.WINDOW_WIDTH, RPG.WINDOW_HEIGHT);
-			viewport = new FitViewport(RPG.WINDOW_WIDTH, RPG.WINDOW_HEIGHT, camera);
+			camera.setToOrtho(false, 1600, 900);
+			viewport = new FitViewport(1600, 900, camera);
 			
 			//camera HUD
 			cameraHUD = new OrthographicCamera();		
-			cameraHUD.setToOrtho(false, RPG.WINDOW_WIDTH, RPG.WINDOW_HEIGHT);
-			viewportHUD = new FitViewport(RPG.WINDOW_WIDTH, RPG.WINDOW_HEIGHT, cameraHUD);
+			cameraHUD.setToOrtho(false, 1600, 900);
+			viewportHUD = new FitViewport(1600, 900, cameraHUD);
 			
 			createPause();
 			createSkill();
 			
+			deathSound = assetManager.get("dead.mp3",Sound.class);
 			
 			//Background
 			background = assetManager.get("Battleground1.png",Texture.class);
 			backgroundSkills = assetManager.get("niceBG.jpg",Texture.class);
 			gameMenuScreen = assetManager.get("woodenBG.jpg",Texture.class);
 			//Player
-			hero = new Hero(new Vector2(150.0f,150.0f),new Vector2(600.0f,300.0f),assetManager);
+			hero = new Hero(new Vector2(150.0f,150.0f),new Vector2(SS*2,20*SS),assetManager);
 			//ai = new AiCustom(new Vector2(150.0f,150.0f) , new Vector2(900.0f,150.0f),2225);
 			//hero.setBody(world);
 			hero.setBody(rpgWorld);

@@ -26,6 +26,7 @@ public class MovementPlatform extends Platform{
 		rightBorder = maxPos.x+size.x/2;
 		upBorder = maxPos.y+size.y/2;
 		
+		PhysicFixture.setFriction(1.0f);
 		this.velocity = velocity;
 	
 	}
