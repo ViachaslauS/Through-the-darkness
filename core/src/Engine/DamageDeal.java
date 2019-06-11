@@ -15,11 +15,12 @@ public class DamageDeal {
 	RPGWorld world;
 	ObjectData data;
 	Sound hitSound;
-	
+	Sound clickSound;
 	
 	public DamageDeal(RPGWorld world) {
 		this.world = world;
 		hitSound = Gdx.audio.newSound(Gdx.files.internal("hit.wav"));
+		clickSound = Gdx.audio.newSound(Gdx.files.internal("gamebutton.wav"));
 	}
 	
 	/**
@@ -98,6 +99,7 @@ public class DamageDeal {
 			}
 		}
 		if(Gdx.input.isKeyJustPressed(Keys.F) && !button.isTrigger) {
+			clickSound.play(0.4f);
 			TriggerListener.objects.set(button.id,!TriggerListener.objects.get(button.id)); 
 		}
 		if(button.isTrigger) {

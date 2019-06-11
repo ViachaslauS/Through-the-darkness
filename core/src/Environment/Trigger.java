@@ -12,6 +12,7 @@ public class Trigger extends Platform{
 	
 	DynamicObjectsData myData;
 	boolean isDynamic;
+	boolean wasActivated = false;
 	
 	public Trigger(int id,Vector2 pos, Vector2 size, RPGWorld rpgWorld, boolean isDynamic) {
 		super(id, pos, size, rpgWorld);
@@ -23,11 +24,20 @@ public class Trigger extends Platform{
 		this.isDynamic = isDynamic;
 	}
 	
+	protected boolean temp;
 	@Override
 	public void update(SpriteBatch batch) {
-		boolean temp = TriggerListener.objects.get(id);
+		temp = TriggerListener.objects.get(id);
+		if(wasActivated && !isDynamic) {
+			temp = false;
+		}
 		if(myData.isNear) {
+			if(!isDynamic && !wasActivated) {
 			temp = true;
+			wasActivated = true;
+			}
+			if(isDynamic)
+				temp = true;
 		}
 		else
 			if(isDynamic)

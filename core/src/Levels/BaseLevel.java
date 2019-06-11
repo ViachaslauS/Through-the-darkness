@@ -35,6 +35,7 @@ import com.mygdx.game.RPG;
 
 import Engine.DamageDeal;
 import Engine.RPGWorld;
+import Engine.TriggerListener;
 import Engine.UserInterface;
 import Entities.Hero;
 import Entities.Buff.BuffType;
@@ -88,7 +89,7 @@ public class BaseLevel implements GlobalWindow{
 		private float Time = 0.0f;
 		
 		Music[] music;
-		
+		Sound[] sounds;
 		public enum State {
 			PAUSE,
 			RUN,
@@ -176,10 +177,11 @@ private void renderRun(float delta) {
 	game.batch.begin();
 	
 	backgroundDraw();
+	game.batch.draw(hero.currentFrame, hero.getCoordX(), hero.getCoordY(), hero.getSizeX(), hero.getSizeY());
+	
 	for(int i = 0; i < platforms.size;i++) {
 		platforms.get(i).update(game.batch);
 	}
-	game.batch.draw(hero.currentFrame, hero.getCoordX(), hero.getCoordY(), hero.getSizeX(), hero.getSizeY());
 	for(int i =0; i<bots.size();i++)
 	{
 		// Slava CRITICAL SECTION
@@ -192,7 +194,7 @@ private void renderRun(float delta) {
 		for(int j=0;j<hero.bullets.size();j++)  
 			hero.bullets.get(j).render(game.batch,delta);
 		// ________________________________
-	
+		
 	game.batch.end();
 	//cameraHUD.position.set(hero.getCoordX(), /* hero.getCoordY() + */350.0f, 0);
 	cameraHUD.update();
@@ -268,6 +270,8 @@ private void drawInterface() {
 			
 			playMusic();
 			
+			triggerReaction();
+			
 			if(Gdx.input.isTouched()) {
 				Vector3 touchPos = new Vector3(Gdx.input.getX(),Gdx.input.getY(),0);
 				camera.unproject(touchPos);
@@ -336,11 +340,15 @@ private void drawInterface() {
 //			hero.getEntitieData().stats.getSkillPoints());
 		}
 		
+		protected void triggerReaction() {
+			
+			
+		}
 		int currentMusic = 0;
 		private void playMusic() {
 			if(!music[currentMusic].isPlaying()) {
 				currentMusic++;
-			if(currentMusic > 3)
+			if(currentMusic > 3 && (!TriggerListener.objects.get(113)))
 				currentMusic = 0;
 			music[currentMusic].setVolume(0.3f);
 			music[currentMusic].play();
@@ -371,8 +379,8 @@ private void drawInterface() {
 
 			batch = new SpriteBatch();
 
-			music = new Music[4];
-			for(int i=1;i<5;i++) {
+			music = new Music[5];
+			for(int i=1;i<6;i++) {
 				music[i-1] = assetManager.get(""+i+".mp3",Music.class);
 			}
 			
@@ -396,7 +404,7 @@ private void drawInterface() {
 			backgroundSkills = assetManager.get("niceBG.jpg",Texture.class);
 			gameMenuScreen = assetManager.get("woodenBG.jpg",Texture.class);
 			//Player
-			hero = new Hero(new Vector2(150.0f,150.0f),new Vector2(SS*2,20*SS),assetManager);
+			hero = new Hero(new Vector2(150.0f,150.0f),new Vector2(SS*2,15*SS),assetManager);
 			//ai = new AiCustom(new Vector2(150.0f,150.0f) , new Vector2(900.0f,150.0f),2225);
 			//hero.setBody(world);
 			hero.setBody(rpgWorld);
@@ -414,6 +422,11 @@ private void drawInterface() {
 			//hero.getEntitieData().setNewBuff(BuffType.HITPOINTS, 100f, 1000, true);
 			hero.getEntitieData().setNewBuff(BuffType.MANA, 100, 1000, true);
 
+			sounds = new Sound[6];
+			for(int i=0;i<5;i++) {
+				sounds[i] = assetManager.get("trigger"+(i+1)+".wav",Sound.class);
+			}
+			sounds[5] = assetManager.get("trigger6.mp3",Sound.class);
 		}
 
 		/**

@@ -69,6 +69,7 @@ public class Level1 extends BaseLevel{
 		assetManager.load("2.mp3",Music.class);
 		assetManager.load("3.mp3",Music.class);
 		assetManager.load("4.mp3",Music.class);
+		assetManager.load("5.mp3",Music.class);
 		
 		assetManager.load("attack1.wav",Sound.class);
 		assetManager.load("teleport.wav",Sound.class);

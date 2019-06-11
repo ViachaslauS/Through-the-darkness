@@ -271,9 +271,9 @@ public class ObjectData {
 	}
 
 	private void checkARMOR() {
-		if(ARMOR > 1) {
-			ARMOR = 1;
-		}
+		//if(ARMOR > 1) {
+		//	ARMOR = 1;
+		//}
 		if(ARMOR < 0) {
 			ARMOR = 0;
 		}

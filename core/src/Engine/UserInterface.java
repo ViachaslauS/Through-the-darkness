@@ -2,6 +2,7 @@ package Engine;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.mygdx.game.RPG;
@@ -16,7 +17,7 @@ public class UserInterface {
 	TextureRegion fullMANA, emptyBar;
 	TextureRegion[][] allBars;
 	boolean[][] isDrawed;
-	
+	BitmapFont font;
 	Texture[][] buffIcons;
 	Texture attack1;
 	public UserInterface() {
@@ -48,6 +49,8 @@ public class UserInterface {
 		buffIcons[6][1] = new Texture(Gdx.files.internal("armor2.png"));
 		buffIcons[7][0] = new Texture(Gdx.files.internal("regspeed1.png"));
 		buffIcons[7][1] = new Texture(Gdx.files.internal("regspeed2.png"));
+		
+		font = new BitmapFont(Gdx.files.internal("UI.fnt"));
 	}
 	
 	public void draw(SpriteBatch batch, ObjectData objectData) {
@@ -58,8 +61,9 @@ public class UserInterface {
 		//batch.draw(fullHP, 20, Gdx.graphics.getHeight()-50,objectData.MAXHITPOINT*5,50, objectData.HITPOINT*5, 50, 1, 1, 0, false);
 		batch.draw(emptyBar,20,900-110,objectData.MAXMANA*3,70);
 		batch.draw(fullMANA, 40,900-110,objectData.MANA*3,70);
-		
-		batch.draw(attack1, 10, 10,75,75);
+		font.draw(batch,"Level "+objectData.stats.getLevel(),25,790);
+		font.draw(batch,""+objectData.stats.getExp()+"/"+objectData.stats.getMaxExp()+" Experience",25,755);
+		//batch.draw(attack1, 10, 10,75,75);
 		
 		//int counter = 0;
 		for(int i = 0; i < objectData.getBuffs().size; i++) {

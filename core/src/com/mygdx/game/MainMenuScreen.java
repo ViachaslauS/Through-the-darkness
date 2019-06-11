@@ -56,6 +56,7 @@ public class MainMenuScreen implements GlobalWindow{
 	private Viewport viewport;
 	private Music soundtrack;
 	private BitmapFont font;
+	private BitmapFont font2;
 	private TextureRegion[][] imageCollector;
 	
 	public MainMenuScreen(final RPG rpg) {
@@ -85,10 +86,9 @@ public class MainMenuScreen implements GlobalWindow{
 		game.batch.begin();
 		
 		game.batch.draw(mainImage, 0, 0, RPG.WINDOW_WIDTH, RPG.WINDOW_HEIGHT);
-		
+		font2.draw(game.batch, "THROUGH THE DARKNESS",Gdx.graphics.getWidth()/2-150,Gdx.graphics.getHeight()-150);
 		game.batch.end();
 		stage.draw();
-		
 		if(btnPlay.isPressed()) {
 			game.setScreen(new LevelLoading(game, new Level1(game)));
 			dispose();
@@ -130,7 +130,7 @@ public class MainMenuScreen implements GlobalWindow{
 		buttonOverTex = imageCollector[0][1];
 		buttonDownTex = imageCollector[0][0];
 		font = assetManager.get("menu_font.fnt", BitmapFont.class);
-		
+		font2 = new BitmapFont(Gdx.files.internal("Title.fnt"));
 		
 		tbs = new TextButton.TextButtonStyle();
 		tbs.font = font;

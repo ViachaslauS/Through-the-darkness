@@ -3,6 +3,7 @@ package Levels;
 import java.util.ArrayList;
 import java.util.Vector;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
@@ -11,7 +12,11 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.RPG;
 
+import Engine.TriggerListener;
+import Entities.Buff;
+import Entities.Buff.BuffType;
 import Environment.ActivatingObject;
+import Environment.GameBuff;
 import Environment.MovementPlatform;
 import Environment.Platform;
 import Environment.SecretPlatform;
@@ -36,6 +41,48 @@ public class Level2 extends BaseLevel{
 		return bots;
 	}	
 	
+	
+	@Override
+	protected void triggerReaction() {
+		if(TriggerListener.objects.get(118)) {
+			TriggerListener.objects.set(118, false);
+			TriggerListener.objects.set(114, false);
+			//if(music[currentMusic].getVolume()!=0) {
+			//music[currentMusic].setVolume(music[currentMusic].getVolume()-0.02f);
+			//}
+			music[currentMusic].setVolume(0);
+			music[4].setVolume(0.5f);
+			music[4].play();
+		}
+		if(TriggerListener.objects.get(119)) {
+			sounds[5].play(1.0f);
+			TriggerListener.objects.set(119, false);
+		}
+		if(TriggerListener.objects.get(120)) {
+			sounds[0].play(1.0f);
+			TriggerListener.objects.set(120, false);
+		}
+		if(TriggerListener.objects.get(121)) {
+			sounds[1].play(1.0f);
+			TriggerListener.objects.set(121, false);
+		}
+		if(TriggerListener.objects.get(122)) {
+			sounds[2].play(1.0f);
+			TriggerListener.objects.set(122, false);
+		}
+		if(TriggerListener.objects.get(123)) {
+			sounds[3].play(1.0f);
+			TriggerListener.objects.set(123, false);
+		}
+		if(TriggerListener.objects.get(124)) {
+			sounds[4].play(1.0f);
+			TriggerListener.objects.set(124, false);
+		}
+		if(TriggerListener.objects.get(125)) {
+			hero.getEntitieData().setNewBuff(BuffType.ARMOR, 1, 120, false);
+		}
+	}
+	
 	//@Override
 	public Array<Platform> createEnvironment() {
 		platforms = new Array<Platform>();
@@ -51,7 +98,7 @@ public class Level2 extends BaseLevel{
 		platforms.add(new Platform(platforms.size,new Vector2(5*SS,0*SS),new Vector2(6*SS,3*SS),rpgWorld));//8
 		platforms.add(new Platform(platforms.size,new Vector2(11*SS,0*SS),new Vector2(17*SS,2*SS),rpgWorld));//9
 		platforms.add(new Platform(platforms.size,new Vector2(28*SS,0*SS),new Vector2(2*SS,3*SS),rpgWorld));//10
-		platforms.add(new Platform(platforms.size,new Vector2(35*SS,0*SS),new Vector2(45*SS,2*SS),rpgWorld));//11
+		platforms.add(new Platform(platforms.size,new Vector2(35*SS,0*SS),new Vector2(55*SS,2*SS),rpgWorld));//11
 		platforms.add(new Platform(platforms.size,new Vector2(30*SS,0*SS),new Vector2(5*SS,1*SS),rpgWorld));//12
 		platforms.add(new Platform(platforms.size,new Vector2(25*SS,16*SS),new Vector2(1*SS,3*SS),rpgWorld));//13
 		platforms.add(new Platform(platforms.size,new Vector2(26*SS,16*SS),new Vector2(7*SS,1*SS),rpgWorld));//14
@@ -63,7 +110,7 @@ public class Level2 extends BaseLevel{
 		
 		
 		//platforms.add(new Platform(platforms.size,new Vector2(0*SS,0*SS),new Vector2(0*SS,0*SS),rpgWorld));// 20 MOVING!!!
-		platforms.add(new MovementPlatform(platforms.size, new Vector2(7*SS+5,2*SS), new Vector2(3*SS,1*SS-20), rpgWorld, new Vector2(7*SS+5,12*SS), new Vector2(0,80), true));
+		platforms.add(new MovementPlatform(platforms.size, new Vector2(7*SS+5,2*SS), new Vector2(3*SS-40,1*SS-20), rpgWorld, new Vector2(7*SS+5,12*SS), new Vector2(0,80), true));
 		
 		platforms.add(new Platform(platforms.size,new Vector2(50*SS,16*SS),new Vector2(3*SS,1*SS),rpgWorld));//21
 		platforms.add(new Platform(platforms.size,new Vector2(54*SS,14*SS),new Vector2(1*SS,4*SS),rpgWorld));//22
@@ -111,11 +158,11 @@ public class Level2 extends BaseLevel{
 		platforms.add(new Platform(platforms.size,new Vector2(117*SS,20*SS),new Vector2(6*SS,3*SS),rpgWorld));//64
 		platforms.add(new Platform(platforms.size,new Vector2(119*SS,23*SS),new Vector2(4*SS,5*SS),rpgWorld));//65
 		platforms.add(new Platform(platforms.size,new Vector2(99*SS,5*SS),new Vector2(1*SS,2*SS),rpgWorld));//66
-		platforms.add(new Platform(platforms.size,new Vector2(90*SS,7*SS),new Vector2(22*SS,8*SS),rpgWorld));//67
+		platforms.add(new Platform(platforms.size,new Vector2(90*SS,7*SS),new Vector2(26*SS,8*SS),rpgWorld));//67
 		platforms.add(new Platform(platforms.size,new Vector2(90*SS,0*SS),new Vector2(14*SS,2*SS),rpgWorld));//68
 		platforms.add(new Platform(platforms.size,new Vector2(104*SS,0*SS),new Vector2(33*SS,4*SS),rpgWorld));//69
 		platforms.add(new Platform(platforms.size,new Vector2(112*SS,8*SS),new Vector2(25*SS,7*SS),rpgWorld));//70
-		platforms.add(new Platform(platforms.size,new Vector2(119*SS,4*SS),new Vector2(18*SS,5*SS),rpgWorld));//71
+		platforms.add(new Platform(platforms.size,new Vector2(123*SS,4*SS),new Vector2(14*SS,5*SS),rpgWorld));//71
 		platforms.add(new Platform(platforms.size,new Vector2(129*SS,17*SS),new Vector2(6*SS,1*SS),rpgWorld));//72
 		platforms.add(new Platform(platforms.size,new Vector2(133*SS,18*SS),new Vector2(2*SS,2*SS),rpgWorld));//73
 		platforms.add(new Platform(platforms.size,new Vector2(153*SS,0*SS),new Vector2(10*SS,15*SS),rpgWorld));//74
@@ -135,7 +182,7 @@ public class Level2 extends BaseLevel{
 		platforms.add(new Platform(platforms.size,new Vector2(190*SS,18*SS),new Vector2(33*SS,5*SS),rpgWorld));//88
 		platforms.add(new Platform(platforms.size,new Vector2(181*SS,26*SS),new Vector2(13*SS,5*SS),rpgWorld));//89
 		platforms.add(new Platform(platforms.size,new Vector2(194*SS,29*SS),new Vector2(5*SS,2*SS),rpgWorld));//90
-		platforms.add(new Platform(platforms.size,new Vector2(199*SS,24*SS),new Vector2(23*SS,7*SS),rpgWorld));//91
+		platforms.add(new Platform(platforms.size,new Vector2(199*SS,23*SS),new Vector2(23*SS,8*SS),rpgWorld));//91
 		platforms.add(new Platform(platforms.size,new Vector2(212*SS,10*SS),new Vector2(19*SS,5*SS),rpgWorld));//92
 		platforms.add(new Platform(platforms.size,new Vector2(224*SS,5*SS),new Vector2(7*SS,5*SS),rpgWorld));//93
 		platforms.add(new Platform(platforms.size,new Vector2(24*SS,16*SS),new Vector2(1*SS,9*SS),rpgWorld));//94
@@ -147,7 +194,7 @@ public class Level2 extends BaseLevel{
 		
 		
 		//97
-		platforms.add(new MovementPlatform(platforms.size, new Vector2(83*SS,15*SS), new Vector2(4*SS-15,1*SS-20), rpgWorld, new Vector2(83*SS,21*SS), new Vector2(0,70), true));
+		platforms.add(new MovementPlatform(platforms.size, new Vector2(83*SS,15*SS+20), new Vector2(4*SS-15,1*SS-20), rpgWorld, new Vector2(83*SS,21*SS), new Vector2(0,70), true));
 		
 		//98 USE
 		platforms.add(new MovementPlatform(platforms.size, new Vector2(137*SS,14*SS), new Vector2(3*SS,1*SS), rpgWorld, new Vector2(153*SS,14*SS), new Vector2(90,0), false));
@@ -167,15 +214,18 @@ public class Level2 extends BaseLevel{
 		
 		//B5
 		platforms.add(new ShowablePlatform(platforms.size, new Vector2(89*SS,21*SS), new Vector2(1*SS,2*SS), rpgWorld, true));
+		
 		platforms.add(new ActivatingObject(platforms.size, new Vector2(133*SS,19*SS), new Vector2(1*SS,1*SS), rpgWorld,platforms.size-1));
 		
 		//B6
-		platforms.add(new ShowablePlatform(platforms.size, new Vector2(167*SS,20*SS), new Vector2(1*SS,2*SS), rpgWorld, true));
+		platforms.add(new ShowablePlatform(platforms.size, new Vector2(167*SS,20*SS), new Vector2(1*SS,3*SS), rpgWorld, true));
 		platforms.add(new ActivatingObject(platforms.size, new Vector2(182*SS,3*SS), new Vector2(1*SS,1*SS), rpgWorld,platforms.size-1));
 		
 		//B7
 		platforms.add(new ShowablePlatform(platforms.size, new Vector2(189*SS,3*SS), new Vector2(1*SS,5*SS), rpgWorld, true));
+		
 		platforms.add(new ActivatingObject(platforms.size, new Vector2(200*SS,25*SS), new Vector2(1*SS,1*SS), rpgWorld,platforms.size-1));
+		
 		
 		//B8
 		platforms.add(new ShowablePlatform(platforms.size, new Vector2(209*SS,3*SS), new Vector2(3*SS,11*SS), rpgWorld, true));
@@ -183,8 +233,24 @@ public class Level2 extends BaseLevel{
 		//Secrets
 		platforms.add(new SecretPlatform(platforms.size, new Vector2(44*SS,4*SS),  new Vector2(4*SS,6*SS), rpgWorld, false));
 		
-		platforms.add(new SecretPlatform(platforms.size, new Vector2(104*SS,4*SS),  new Vector2(8*SS,3*SS), rpgWorld, false));
+		platforms.add(new SecretPlatform(platforms.size, new Vector2(104*SS,4*SS),  new Vector2(12*SS,3*SS), rpgWorld, false));
 		
+		//118 id
+		//adding triggers.
+		platforms.add(new Trigger(platforms.size, new Vector2(192*SS,3*SS), new Vector2(3*SS,10*SS), rpgWorld, false));
+		platforms.add(new Trigger(platforms.size, new Vector2(136*SS,15*SS), new Vector2(3*SS,10*SS), rpgWorld, false));
+		platforms.add(new Trigger(platforms.size, new Vector2(84*SS,1*SS), new Vector2(3*SS,5*SS), rpgWorld, false));
+		platforms.add(new Trigger(platforms.size, new Vector2(72*SS,11*SS), new Vector2(3*SS,5*SS), rpgWorld, false));
+		platforms.add(new Trigger(platforms.size, new Vector2(60*SS,14*SS), new Vector2(3*SS,5*SS), rpgWorld, false));
+		platforms.add(new Trigger(platforms.size, new Vector2(104*SS,24*SS), new Vector2(3*SS,5*SS), rpgWorld, false));
+		platforms.add(new Trigger(platforms.size, new Vector2(180*SS,24*SS), new Vector2(3*SS,5*SS), rpgWorld, false));
+		//
+		
+		//adding buffs
+		platforms.add(new GameBuff(platforms.size, new Vector2(198*SS,25*SS), new Vector2(1*SS,1*SS), rpgWorld)); // 125
+		Gdx.app.log("", ""+(platforms.size-1));
+		//adding listeners
+		TriggerListener.objects.add(false); // 149 ID dead Boss
 		
 		return platforms;
 		}
@@ -197,6 +263,7 @@ public class Level2 extends BaseLevel{
 		assetManager.load("2.mp3",Music.class);
 		assetManager.load("3.mp3",Music.class);
 		assetManager.load("4.mp3",Music.class);
+		assetManager.load("5.mp3",Music.class);
 		
 		assetManager.load("attack1.wav",Sound.class);
 		assetManager.load("teleport.wav",Sound.class);

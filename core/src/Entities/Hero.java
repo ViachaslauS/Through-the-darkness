@@ -271,6 +271,8 @@ public class Hero  extends Entities{
 			return;
 		}
 		if(Gdx.input.isKeyJustPressed(Keys.NUM_3)) {
+			if(!this.entitieData.setMANA(10))
+				return;
 			currentAction = 5;
 			currentAnimation = shootAnimation;
 			entitieData.skillDamage = 3f;
@@ -304,6 +306,7 @@ public class Hero  extends Entities{
 			attack2();
 		}
 		if(Gdx.input.isKeyJustPressed(Keys.Q) ) {
+			
 			currentAction = 6;
 			currentAnimation = buff1Animation;
 			
@@ -357,13 +360,13 @@ public class Hero  extends Entities{
 	}
 	private void buff1() {
 		if(refresh()) {
-			entitieData.setNewBuff(BuffType.HITPOINTS, 0.5f, 10, true);
+			entitieData.setNewBuff(BuffType.HITPOINTS, 0.1f, 10, true);
 			return;
 		}
 	}
 	private void buff2() {
 		if(refresh()) {
-			entitieData.setNewBuff(BuffType.MANA, 0.5f, 10, true);
+			entitieData.setNewBuff(BuffType.MANA, 0.1f, 10, true);
 			return;
 		}
 	}
@@ -471,7 +474,6 @@ public class Hero  extends Entities{
 			bullet.f.groupIndex = -4;
 			bullet.setBody(rpgWorld);
 			bullets.add(bullet);
-			entitieData.setMANA(10);
 			isShooting = true;
 			}
 		}
