@@ -82,7 +82,7 @@ public class ObjectData {
 	}
 	
 	public float getMANA() {
-		return MANA;
+		return MANA; 
 	}
 	
 	public float getARMOR() {
@@ -128,9 +128,9 @@ public class ObjectData {
 		ARMOR = armor;
 		checkARMOR();
 	}
-	
+	public float abilityDuration = 1f;
 	public void setNewBuff(BuffType what, float value, float durating,boolean cycling) {
-		buffs.add(new Buff(what, value, durating,cycling));
+		buffs.add(new Buff(what, value*abilityDuration, durating,cycling));
 		addStats(buffs.get(buffs.size-1).type,buffs.get(buffs.size-1).value);
 		
 	}
@@ -215,7 +215,7 @@ public class ObjectData {
 	/**
 	 *  if entitie get buff, inscrease parameters
 	 */
-	private void addStats(BuffType type, float value) {
+	public void addStats(BuffType type, float value) {
 			switch(type) {
 			case POWER:stats.setPower(stats.getPower()+value); break;
 			case AGILITY:stats.setAgility(stats.getAgility()+value); break; 
@@ -271,9 +271,9 @@ public class ObjectData {
 	}
 
 	private void checkARMOR() {
-		//if(ARMOR > 1) {
-		//	ARMOR = 1;
-		//}
+		/*
+		 * if(ARMOR > 1) { ARMOR = 1; }
+		 */
 		if(ARMOR < 0) {
 			ARMOR = 0;
 		}
@@ -289,9 +289,9 @@ public class ObjectData {
 	
 	public void resetBuffs() {
 		for(int i = 0; i < buffs.size; i++) {
-				descrease(buffs.get(i));
-				buffs.removeIndex(i);
-			}
+			descrease(buffs.get(i));
+			buffs.removeIndex(i);
+		}
 		buffs.clear();
 	}
 	

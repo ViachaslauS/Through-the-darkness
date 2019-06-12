@@ -6,6 +6,7 @@ public class Level1Ai extends AiCustom {
 
 	public Level1Ai(Vector2 size, Vector2 coord, int botLevel) {
 		super(size, coord, botLevel);
+		level3state = 1;
 
 	}
 	

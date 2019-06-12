@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.Texture;
 public class Skill {
 
 	public String name;
-	
+	public String fileName;
 	public float coolDown;
 	public float time;
 	
@@ -23,19 +23,30 @@ public class Skill {
 		this.coolDown = coolDown;
 		this.isAvailable = isAvailable;
 		this.isEarned = isEarned;
-		
+		this.fileName = fileName;
 		available = new Texture(Gdx.files.internal(fileName+"_earned.png"));
 		unEarned = new Texture(Gdx.files.internal(fileName+"_unearned.png"));
-		blocked = new Texture(Gdx.files.internal(fileName+"_blocked.png"));
+	//	blocked = new Texture(Gdx.files.internal(fileName+"_blocked.png"));
 	}
 	
 	public void update() {
-		if(time < 0) {
+		if(isEarned) {
+		if(time <= 0) {
 			time = 0;
-			isActive = false;
+			isAvailable = true;
 		}
-		if(time > 0 && isActive)
+		if(time > 0 ) {
+			isAvailable = false;
 			time -=Gdx.graphics.getDeltaTime();
+		}
+	}
+		
+}
+	public String getfileName() {
+		return this.fileName;
+	}
+	public void setCooldown() {
+		time = coolDown;
 	}
 
  }

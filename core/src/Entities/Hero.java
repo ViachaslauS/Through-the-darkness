@@ -29,7 +29,7 @@ import Entities.Buff.BuffType;
  */
 public class Hero  extends Entities{
 	
-	
+	public ArrayList<Skill> msSkills = new ArrayList<Skill>();
 	public ArrayList<Bullet> bullets = new ArrayList<Bullet>();
 	
 	
@@ -49,6 +49,7 @@ public class Hero  extends Entities{
 	private Sound attack2Sound;
 	private Sound shootSound;
 	
+	private Sound shift;
 	Animation<TextureRegion> currentAnimation;
 	Animation<TextureRegion>[] allAnimations;
 	
@@ -56,12 +57,11 @@ public class Hero  extends Entities{
 	private Animation<TextureRegion> buff2Animation;
 	private Animation<TextureRegion> buff3Animation;
 	TextureRegion[] buff1Frames,buff2Frames,buff3Frames;
+	private Animation<TextureRegion> shootAnimation;
+	private TextureRegion[] shootFrames;
 	
 	private Animation<TextureRegion> attack2Animation;
 	private TextureRegion[] attack2Frames;
-	
-	private Animation<TextureRegion> shootAnimation;
-	private TextureRegion[] shootFrames;
 	
 	int[] skillsLevel = new int[3];
 	public void picParam() {
@@ -95,6 +95,7 @@ public class Hero  extends Entities{
 		super("herostats");
 		//preferences = Gdx.app.getPreferences("herostats");
 		manager = loader;
+		createSkills();
 		//stats = new PlayerStats("herostats");
 		setSize(heroSize);
 		setCoord(heroCoord);
@@ -118,10 +119,14 @@ public class Hero  extends Entities{
 		moveFrames = new TextureRegion[MOVE_FRAME_COLS*MOVE_FRAME_ROWS];
 		attack1Frames = new TextureRegion[ATTACK1_FRAME_COLS*ATTACK1_FRAME_ROWS];
 		attack2Frames = new TextureRegion[8];
+		
 		shootFrames = new TextureRegion[10];
 		buff1Frames = new TextureRegion[10];
 		buff2Frames = new TextureRegion[10];
 		buff3Frames = new TextureRegion[10];
+		
+		
+		
 		//include to TextureRegions sprites
 		int index = 0;
 		for(int i=0;i<STAY_FRAME_ROWS;i++)  
@@ -164,17 +169,16 @@ public class Hero  extends Entities{
 		attack2Animation = new Animation<TextureRegion>(0.1f,attack2Frames);
 		deathAnimation = new Animation<TextureRegion>(0.10f,deathFrames);
 		teleportAnimation = new Animation<TextureRegion>(ANIMATION_SPEED*(1-entitieData.stats.ATKSPEED()),teleportFrames);	
+		
 		shootAnimation = new Animation<TextureRegion>(ANIMATION_SPEED*(1-entitieData.stats.ATKSPEED()),shootFrames);
 		currentFrame = stayAnimation.getKeyFrame(0.10f, true);
 		// Add fucking teleport
-		
-		
-		
 		
 		attack1Sound = manager.get("attack1.wav",Sound.class);
 		attack2Sound = manager.get("attack2.wav",Sound.class);
 		teleport = manager.get("teleport.wav",Sound.class);
 		shootSound = manager.get("magic.wav",Sound.class);
+		
 	}
 
 	@Override
@@ -182,8 +186,10 @@ public class Hero  extends Entities{
 		updateStats();
 		entitieData.updateData();
 		updatePhysic();
-	
-			
+		for(int i = 0; i<msSkills.size();i++)
+			msSkills.get(i).update();
+		
+		
 		// bullets for hero
 		 for(int i = 0; i< bullets.size(); i++)
 			 bullets.get(i).update(Gdx.graphics.getDeltaTime());
@@ -201,11 +207,13 @@ public class Hero  extends Entities{
 		 else
 			 checkKeys();
 		 if(Gdx.input.isKeyPressed(Keys.D) || Gdx.input.isKeyPressed(Keys.RIGHT)) {   //move right
-			if(soundsDuration >= 0.4f && isEntitieGrounded()) {
-			 move.play(0.1f);
-			 soundsDuration = 0;
-			}
-			soundsDuration+=Gdx.graphics.getDeltaTime();
+			 if(soundsDuration >= 0.4f && isEntitieGrounded()) {
+				 move.play(0.1f);
+				 soundsDuration = 0;
+				}
+				soundsDuration+=Gdx.graphics.getDeltaTime();
+	
+			 
 				currentFrame = moveAnimation.getKeyFrame(delta, true);
 				//entitieData.currentFrame = currentFrame;
 				if(currentFrame.isFlipX()) {
@@ -223,6 +231,7 @@ public class Hero  extends Entities{
 					 soundsDuration = 0;
 					}
 					soundsDuration+=Gdx.graphics.getDeltaTime();
+				
 				currentFrame = moveAnimation.getKeyFrame(delta, true);
 				//entitieData.currentFrame = currentFrame;
 				if(!currentFrame.isFlipX())
@@ -243,7 +252,7 @@ public class Hero  extends Entities{
 		switch(currentAction) {
 		case 1:attack1();   	break;
 		case 2:teleport();	    break;
-		case 3:jump();		    return false;
+		case 3:jump();		   return false;
 		case 4:attack2();       break;
 		case 5:shoot(); 		break;
 		case 6:buff1();			break;
@@ -270,9 +279,10 @@ public class Hero  extends Entities{
 			attack1Sound.play(0.6f);
 			return;
 		}
-		if(Gdx.input.isKeyJustPressed(Keys.NUM_3)) {
+		if(Gdx.input.isKeyJustPressed(Keys.NUM_3) && msSkills.get(2).isAvailable) {
 			if(!this.entitieData.setMANA(10))
 				return;
+			msSkills.get(2).setCooldown();
 			currentAction = 5;
 			currentAnimation = shootAnimation;
 			entitieData.skillDamage = 3f;
@@ -281,9 +291,10 @@ public class Hero  extends Entities{
 			return;
 		}
 		//teleport
-		if(Gdx.input.isKeyJustPressed(Keys.SHIFT_LEFT)) {
+		if(Gdx.input.isKeyJustPressed(Keys.SHIFT_LEFT) && msSkills.get(0).isAvailable) {
 			if(!this.entitieData.setMANA(10))
 				return;
+			msSkills.get(0).setCooldown();
 			//isPhysicUpdatingActive = false;
 			//this.physicsFixture.setSensor(true);
 			teleport.play(0.3f);
@@ -299,35 +310,35 @@ public class Hero  extends Entities{
 			jump();
 		}
 		//attack2
-		if(Gdx.input.isKeyPressed(Keys.NUM_2)) {
+		if(Gdx.input.isKeyPressed(Keys.NUM_2) && msSkills.get(1).isEarned) {
 			currentAction = 4;
 			currentAnimation = attack2Animation;
 			entitieData.skillDamage = 1.2f;
 			attack2();
 		}
-		if(Gdx.input.isKeyJustPressed(Keys.Q) ) {
-			
+		if(Gdx.input.isKeyJustPressed(Keys.Q) && msSkills.get(3).isEarned && msSkills.get(3).isAvailable ) {
+			msSkills.get(3).setCooldown();
 			currentAction = 6;
 			currentAnimation = buff1Animation;
-			
+
 			buff1();
 		}
-		if(Gdx.input.isKeyJustPressed(Keys.W) ) {
+		if(Gdx.input.isKeyJustPressed(Keys.W) && msSkills.get(4).isEarned && msSkills.get(4).isAvailable ) {
+			msSkills.get(4).setCooldown();
 			currentAction = 7;
 			currentAnimation = buff2Animation;
-			
+
 			buff2();
 		}
-		if(Gdx.input.isKeyJustPressed(Keys.E) ) {
+		if(Gdx.input.isKeyJustPressed(Keys.E) && msSkills.get(5).isEarned && msSkills.get(5).isAvailable ) {
+			msSkills.get(5).setCooldown();
 			currentAction = 8;
 			currentAnimation = buff3Animation;
-			
+
 			buff3();
 		}
 	}
 
-
-	
 
 	/** Check, was li pressed S button
 	 * @return
@@ -358,6 +369,7 @@ public class Hero  extends Entities{
 		frameFlip();
 		return false;
 	}
+	
 	private void buff1() {
 		if(refresh()) {
 			entitieData.setNewBuff(BuffType.HITPOINTS, 0.1f, 10, true);
@@ -376,6 +388,7 @@ public class Hero  extends Entities{
 			return;
 		}
 	}
+	
 	public void attack1() {
 		if(refresh())
 			return;
@@ -393,7 +406,8 @@ public class Hero  extends Entities{
 	int attackinInThisFrame = 0;
 	private void attack2() {
 		if(refresh()) {
-			attackinInThisFrame = 0;	
+			attackinInThisFrame = 0;
+			
 			return;
 		}
 		
@@ -463,7 +477,7 @@ public class Hero  extends Entities{
 		public void shoot() {
 		if(refresh()) {
 			isShooting = false;
-			
+
 			return;
 		}
 		if(currentFrame == currentAnimation.getKeyFrames()[7] && !isShooting) {
@@ -477,7 +491,7 @@ public class Hero  extends Entities{
 			isShooting = true;
 			}
 		}
-	
+
 	/**
 	 * reset current animation and action
 	 */
@@ -535,9 +549,26 @@ public class Hero  extends Entities{
 	
 	
 	
+	
 	public void updateStats() {
 		
 		attack1Animation.setFrameDuration(ANIMATION_SPEED*(1-entitieData.stats.ATKSPEED()));
 		teleportAnimation.setFrameDuration(ANIMATION_SPEED*(1-entitieData.stats.ATKSPEED()));
+	}
+	public void createSkills() {
+		msSkills.add(new Skill("Teleport", 3, false, false, "teleport" ));
+		msSkills.add(new Skill("Tripple", 0, false, false, "tripple" ));
+		msSkills.add(new Skill("Magic", 5, false, false, "magic" ));
+		msSkills.add(new Skill("HP", 20, false, false, "HP" ));
+		msSkills.add(new Skill("Mana", 20, false, false, "MANA" ));
+		msSkills.add(new Skill("Buff", 20, false, false, "buff" ));
+		msSkills.add(new Skill("Armor", 0, false, false, "armor" ));
+		msSkills.add(new Skill("Armor2", 0, false, false, "armor2" ));
+		msSkills.add(new Skill("Vampire", 0, false, false, "vampire" ));
+		msSkills.add(new Skill("Regen", 0, false, false, "regen" ));
+		msSkills.add(new Skill("Duration", 0,false, false, "duration" ));
+		msSkills.add(new Skill("Cooldown", 0, false, false, "cooldown" ));
+		msSkills.add(new Skill("Max", 0, false, false, "max" ));
+		
 	}
 }

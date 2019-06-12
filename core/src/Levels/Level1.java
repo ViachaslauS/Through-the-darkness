@@ -19,6 +19,7 @@ import Environment.ShowablePlatform;
 import aiall.AiCustom;
 import aiall.Level1Ai;
 import aiall.Level2Ai;
+import aiall.Level3Ai;
 
 public class Level1 extends BaseLevel{
 	
@@ -30,7 +31,7 @@ public class Level1 extends BaseLevel{
 	//@Override
 	public ArrayList<AiCustom> createEnemy() {
 		 bots = new ArrayList<AiCustom>();
-		 	bots.add(new AiCustom(new Vector2(300.0f,300.0f) , new Vector2(5800.0f,180.0f),3));
+		 	bots.add(new Level3Ai(new Vector2(300.0f,300.0f) , new Vector2(5800.0f,180.0f),3, rpgWorld));
 			bots.add(new Level1Ai(new Vector2(150.0f,150.0f) , new Vector2(1100.0f,180.0f),1));
 			bots.add(new Level1Ai(new Vector2(150.0f,150.0f) , new Vector2(1500.0f,150.0f),1));
 			bots.add(new Level2Ai(new Vector2(150.0f,150.0f) , new Vector2(2100.0f,150.0f),2));
@@ -55,7 +56,7 @@ public class Level1 extends BaseLevel{
 		platforms.add( new Platform(platforms.size,new Vector2(3900,200), new Vector2(150,30), rpgWorld));
 		platforms.add( new Platform(platforms.size,new Vector2(4100,350), new Vector2(150,30), rpgWorld));
 		platforms.add( new Platform(platforms.size,new Vector2(4250,450), new Vector2(150,30), rpgWorld)); 
-		platforms.add( new Platform(platforms.size,new Vector2(5400,0), new Vector2(20,1000), rpgWorld));
+		//platforms.add( new Platform(platforms.size,new Vector2(5400,0), new Vector2(20,1000), rpgWorld));
 		platforms.add( new Platform(platforms.size,new Vector2(0,450), new Vector2(10,1000), rpgWorld));
 		platforms.add(new Platform(platforms.size, new Vector2(SS*2,SS*3), new Vector2(SS,SS), rpgWorld));
 		return platforms;
@@ -115,11 +116,13 @@ public class Level1 extends BaseLevel{
 		assetManager.load("duration_unearned.png", Texture.class);
 		assetManager.load("HP_earned.png", Texture.class);
 		assetManager.load("HP_unearned.png", Texture.class);
+		assetManager.load("HP_blocked.png", Texture.class);
 		assetManager.load("magic_blocked.png", Texture.class);
 		assetManager.load("magic_earned.png", Texture.class);
 		assetManager.load("magic_unearned.png", Texture.class);
 		assetManager.load("MANA_earned.png", Texture.class);
 		assetManager.load("MANA_unearned.png", Texture.class);
+		assetManager.load("MANA_blocked.png", Texture.class);
 		assetManager.load("max_blocked.png", Texture.class);
 		assetManager.load("max_earned.png", Texture.class);
 		assetManager.load("max_unearned.png", Texture.class);
@@ -135,7 +138,12 @@ public class Level1 extends BaseLevel{
 		assetManager.load("vampire_blocked.png", Texture.class);
 		assetManager.load("vampire_earned.png", Texture.class);
 		assetManager.load("vampire_unearned.png", Texture.class);
-		
+		assetManager.load("power_unearned.png", Texture.class);
+		assetManager.load("power_blocked.png", Texture.class);
+		assetManager.load("aghility_unearned.png", Texture.class);
+		assetManager.load("aghility_blocked.png", Texture.class);
+		assetManager.load("intellegens_unearned.png", Texture.class);
+		assetManager.load("intellegens_blocked.png", Texture.class);	
 	}
 
 }

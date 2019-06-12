@@ -26,6 +26,7 @@ import Entities.Entities;
 public class AiCustom extends Entities {
 	//public float sideView;
 	//boolean isAttaking;
+    public ArrayList<AiCustom> bots;
 	Vector3 all;
 	public int level;
 	Vector2 _coord;
@@ -210,6 +211,10 @@ public class AiCustom extends Entities {
 			currentAnimation = stayAnimation;
 	}
 		//SLAVA CRITICAL
+		// 1- ne zakonchil 0 - otkl 2 - zakonchil
+		int isEnded1 = 1;
+		int isEnded2 = 1;
+		int isEnded3 = 1;
 		public boolean isDead = false;
 		//___
 	  public void update(float delta) {
@@ -235,10 +240,7 @@ public class AiCustom extends Entities {
 		  for(int i = 0; i< bullets.size(); i++)
 				 bullets.get(i).update(Gdx.graphics.getDeltaTime());
 		  
-		  if(entitieData.isMustAttack) {
-			  if(!attack())
-				  return;
-		  }
+		
 		  
 		  
 		  time+= Gdx.graphics.getDeltaTime();
@@ -250,6 +252,19 @@ public class AiCustom extends Entities {
 //			  bulletTime = 0;
 //			  shoot();
 //		  }
+		 
+		  if(entitieData.isMustAttack && isEnded1 == 1) {
+			  if(!attack())
+				  return;
+		  }
+		  if((level3state == 2 || level3state ==3) && isEnded2 == 1) {
+			if(!attackShoot())
+				return;
+			}
+		  if((level3state ==3) && isEnded3 == 1) {
+				if(!attack3())
+					return;
+				}
 		  
 		 
 		  if(time>=4 && level == 2) {
@@ -278,7 +293,7 @@ public class AiCustom extends Entities {
 		  
 		  
 	  }
-	  float DURATION;
+	  float DURATION = 0.0f;
 	  /**
 	 * @param type
 	 * @param delta
@@ -317,6 +332,12 @@ public class AiCustom extends Entities {
 		 * break; default: }
 		 */
 		return false;
+	}
+	protected boolean attackShoot() {
+		return true;
+	}
+	protected boolean attack3() {
+		return true;
 	}
 	private boolean isJump = false;
 	  public void jump() {
@@ -391,6 +412,8 @@ public class AiCustom extends Entities {
 			for(int i=0;i<4;i++) {
 				bullet.bulletFrames[i] = bullet.allBullets[1][i];
 			}
+			if(level == 3)
+				bullet.y -= 60;
 			bullet.setBody(rpgWorld);
 			bullets.add(bullet);
 			
@@ -406,5 +429,8 @@ public class AiCustom extends Entities {
 			batch.draw(currentHPBar, coordX, coordY + sizeY+20,sizeX/entitieData.getMAXHITPOINT()*entitieData.getHITPOINT(), 5);
 		}
 		//___________________________________________________
-	
+	public void draw(SpriteBatch batch) {
+		
+	}
+		
 }

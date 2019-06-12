@@ -29,7 +29,7 @@ public class Bullet {
 	Animation<TextureRegion> bulletAnimation;
 	TextureRegion currentFrame;
 	private int sideView;
-	float x,y, startX, raznica;
+	public float x,y, startX, raznica;
 	
 	public boolean remove = false;
 	
@@ -54,7 +54,7 @@ public class Bullet {
 		x += speed* deltaTime*sideView;
 		raznica =Math.abs(x - startX);
 		
-		if(raznica > 150) {
+		if(raznica > 500) {
 			remove = true;
 		}
 		if(bulletData.shouldRemove)

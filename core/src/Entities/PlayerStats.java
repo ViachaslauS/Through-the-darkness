@@ -32,7 +32,7 @@ public class PlayerStats {
 		agility = pref.getFloat("Agility", 1.0f);
 		intelligency = pref.getFloat("Intel",1.0f);
 		statsPoints = pref.getInteger("StatsPoints", 0);
-		skillPoints = pref.getInteger("SkillPoints",0);
+		skillPoints = pref.getInteger("SkillPoints",12);
 	}
 	void startStats(int level) {
 		pref.clear();
@@ -51,7 +51,7 @@ public class PlayerStats {
 		checkLevel();
 	}
 	private void checkLevel() {
-		if(experience >= level*10) {
+		if(experience >= 10) {
 			experience = 0.0f;
 			level++;
 			statsPoints+=3;
@@ -108,13 +108,19 @@ public class PlayerStats {
 		return level;
 	}
 	public float getMaxExp() {
-		return level*10f;
+		return 10f;
 	}
 	public int getStatsPoints() {
 		return statsPoints;
 	}
 	public int getSkillPoints() {
 		return skillPoints;
+	}
+	public void setSkillPoints(int points) {
+		skillPoints = points;
+	}
+	public void setStatsPoints(int points) {
+		statsPoints = points;
 	}
 	public void addPower(float pow) {
 		power+=pow;
