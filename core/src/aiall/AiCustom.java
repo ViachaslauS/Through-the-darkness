@@ -38,7 +38,7 @@ public class AiCustom extends Entities {
 	private float attack_time=0;
 	
 	Filter f = new Filter();
-	Filter attf = new Filter();
+	public Filter attf = new Filter();
 	
 	protected Animation<TextureRegion> currentAnimation;
 
@@ -206,7 +206,7 @@ public class AiCustom extends Entities {
 			stayAnimation = new Animation<TextureRegion>(0.20f,stayFrames);
 			moveAnimation = new Animation<TextureRegion>(0.10f,moveFrames);
 			
-			attack1Animation = new Animation<TextureRegion>(0.2f/*0.15f-botLevel/100*/,attack1Frames);
+			attack1Animation = new Animation<TextureRegion>(0.1f/*0.15f-botLevel/100*/,attack1Frames);
 			currentFrame = stayAnimation.getKeyFrame(0.10f, true);
 			currentAnimation = stayAnimation;
 	}
@@ -361,19 +361,26 @@ public class AiCustom extends Entities {
 		entitieData.isAttacking = b;
 		
 	}
-	Fixture attackRange;
+	public Fixture attackRange;
 	 @Override
 	protected void bodyInitialize() {
 		 CircleShape circlePolygon = new CircleShape();
-			circlePolygon.setRadius(sizeX*2);
-			circlePolygon.setPosition(new Vector2(sizeX/2,sizeY/2));
+		
+		 circlePolygon.setRadius(sizeX*2); circlePolygon.setPosition(new
+		  Vector2(sizeX/2,sizeY/2));
+
+		 
+		 	
 			//Gdx.app.log("Sprite Coord", ""+ entitieBox.getGravityScale());
 			sensorFixture = entitieBox.createFixture(circlePolygon,0f);
 			sensorFixture.setUserData(entitieData);
 			sensorFixture.setSensor(true);
 			
-			circlePolygon.setRadius(sizeX/2);
-			circlePolygon.setPosition(new Vector2(sizeX/2,sizeY/2));
+		
+		  circlePolygon.setRadius(sizeX/2+20); circlePolygon.setPosition(new
+		  Vector2(sizeX/2,sizeY/2));
+		  
+		 
 			attackRange = entitieBox.createFixture(circlePolygon,0f);
 			attackRange.setUserData(entitieData);
 			attackRange.setSensor(true);
@@ -392,7 +399,7 @@ public class AiCustom extends Entities {
 				entitieBox.setGravityScale(1000f);
 				entitieBox.setTransform(coordX, coordY, 0);
 				
-				physicsFixture.setFilterData(f);
+				physicsFixture.setFilterData(attf);
 			    sensorFixture.setFilterData(f);
 			    attackRange.setFilterData(attf);
 	}

@@ -35,7 +35,7 @@ public class Entities {
 		entitieData = new ObjectData(name);
 	}
 	
-	protected ObjectData entitieData;
+	public ObjectData entitieData;
 	
 	protected float HITPOINT;
 	/**
@@ -255,9 +255,9 @@ public class Entities {
 		}
 	}
 	
-	protected Body entitieBox;
+	public Body entitieBox;
 	protected Fixture physicsFixture;
-	protected Fixture sensorFixture;
+	public Fixture sensorFixture;
 	protected RPGWorld rpgWorld;
 	/**
 	 * Set body for entitie

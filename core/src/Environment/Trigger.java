@@ -10,9 +10,8 @@ import Engine.TriggerListener;
 
 public class Trigger extends Platform{
 	
-	DynamicObjectsData myData;
+	
 	boolean isDynamic;
-	boolean wasActivated = false;
 	
 	public Trigger(int id,Vector2 pos, Vector2 size, RPGWorld rpgWorld, boolean isDynamic) {
 		super(id, pos, size, rpgWorld);
@@ -28,20 +27,36 @@ public class Trigger extends Platform{
 	@Override
 	public void update(SpriteBatch batch) {
 		temp = TriggerListener.objects.get(id);
-		if(wasActivated && !isDynamic) {
+		if(!isDynamic && myData.wasActivated)
 			temp = false;
-		}
-		if(myData.isNear) {
-			if(!isDynamic && !wasActivated) {
-			temp = true;
-			wasActivated = true;
-			}
-			if(isDynamic)
-				temp = true;
-		}
-		else
-			if(isDynamic)
-				temp = false;
+//					if(temp)
+//						myData.wasActivated = true;
+//					if(!isDynamic) {
+//						if(!myData.isNear)
+//							temp = false;
+//						if(myData.isNear && !myData.wasActivated)
+//							temp = true;
+//						if(myData.wasActivated && myData.isNear)
+//							temp = TriggerListener.objects.get(id);
+//					}
+//					else {
+//						temp = myData.isNear;
+//					}
+//		if(wasActivated && !isDynamic && !TriggerListener.objects.get(id)) {
+//			temp = false;
+//		}
+//		
+//		if(myData.isNear) {
+//			if(!isDynamic && !wasActivated) {
+//			temp = true;
+//			wasActivated = true;
+//			}
+//			if(isDynamic)
+//				temp = true;
+//		}
+//		else
+//			if(isDynamic)
+//				temp = false;
 		TriggerListener.objects.set(id, temp);
 	}
 }

@@ -59,26 +59,26 @@ public class PlayerStats {
 		}
 	}
 	public float MAXHP() {
-		return (float) (power*1.1);
+		return (float) (power*1.2);
 	}
 	public float DAMAGE() {
-		return (float) (power*1.05);
+		return (float) (power*0.5);
 	}
 	public float SPEED() {
-		return (float) (agility*1.005);
+		return (float) (agility*1.01);
 	}
 	public float ATKSPEED() {		// Don't touch!
 		return (float) (agility*0.007<0.75 ? agility*0.007 : 0.75);
 	}
 	
 	public float MAXMANA() {
-		return (float)(intelligency*1.1);
+		return (float)(intelligency*1.0);
 	}
 	public float MANAREG() {
-		return (float)(intelligency*1.1);
+		return (float)(intelligency*0.2f);
 	}
 	public float HPREG() {
-		return (float)(power*1.05);
+		return (float)(power*0.2f);
 	}
 	
 	public void setPower(float power) {

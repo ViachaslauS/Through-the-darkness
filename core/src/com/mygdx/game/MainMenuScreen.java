@@ -90,7 +90,7 @@ public class MainMenuScreen implements GlobalWindow{
 		game.batch.end();
 		stage.draw();
 		if(btnPlay.isPressed()) {
-			game.setScreen(new LevelLoading(game, new Level1(game)));
+			game.setScreen(new LevelLoading(game, new Level2(game)));
 			dispose();
 		}
 		if(btnExit.isPressed()) {

@@ -8,6 +8,7 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -20,6 +21,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
@@ -47,7 +49,7 @@ public class BaseLevel implements GlobalWindow{
 		/**
 		 * standart size
 		 */
-		public static final float SS = 75f;
+		public static final float SS = 80f;
 	
 		private static final float MAP_MAX_HEIGHT = 5000f;
 
@@ -58,12 +60,18 @@ public class BaseLevel implements GlobalWindow{
 		DamageDeal damageMaster;
 		
 		Sound deathSound;
+		protected Sound gameOver;
+		
+		Texture startImage;
 		
 		SpriteBatch batch;
 		BitmapFont font;                        //font
+		BitmapFont skillsFnt;
+		
 		Texture background;
 		Texture backgroundSkills;
 		Texture gameMenuScreen;
+		Texture stasTexture;
 		
 		OrthographicCamera camera;
 		FitViewport viewport;
@@ -95,10 +103,11 @@ public class BaseLevel implements GlobalWindow{
 			RUN,
 			RESUME,
 			STOPPED,
-			SKILLS_MENU
+			SKILLS_MENU,
+			START
 		}
 
-		private State state = State.RUN;
+		private State state = State.START;
 		
 		public BaseLevel(final RPG game_) {
 			assetManager = new AssetManager();
@@ -113,6 +122,8 @@ public class BaseLevel implements GlobalWindow{
 			debugRenderer = new Box2DDebugRenderer(true, true, true, true, true, true);
 			damageMaster = new DamageDeal(rpgWorld);
 			UI = new UserInterface();
+			skillsFnt = new BitmapFont(Gdx.files.internal("skillMenu.fnt"));
+			stasTexture = new Texture(Gdx.files.internal("stas.png"));
 		}
 		@Override
 		public void render(float delta) {
@@ -128,6 +139,10 @@ public class BaseLevel implements GlobalWindow{
 				break;
 			case SKILLS_MENU:
 				renderSkillMenu(delta);
+				break;
+			case START:
+				renderStart(delta);
+				break;
 			default:
 				break;
 			}
@@ -136,6 +151,17 @@ public class BaseLevel implements GlobalWindow{
 			
 			
 			}
+private void renderStart(float delta) {
+	Gdx.gl.glClearColor(0, 0.1f, 0, 1);
+	Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+	//if(Gdx.input.isKeyJustPressed(Keys.H)) {
+	//	state = State.RUN;
+	//}
+	game.batch.setProjectionMatrix(camera.combined);
+	game.batch.begin();
+	game.batch.draw(startImage,camera.position.x - camera.viewportWidth/2,camera.position.y - camera.viewportHeight/2,camera.viewportWidth,camera.viewportHeight);
+	game.batch.end();
+		}
 /**
  * @return false if state not changed
  */
@@ -146,6 +172,9 @@ private boolean checkCurrentState() {
 			newState = State.SKILLS_MENU;
 		if(Gdx.input.isKeyJustPressed(Keys.ESCAPE))
 			newState = State.PAUSE;
+		if(Gdx.input.isKeyJustPressed(Keys.H)) {
+			newState = State.START;
+		}
 		if(newState == null)
 			return false;
 		if(state != newState) {
@@ -155,9 +184,10 @@ private boolean checkCurrentState() {
 			state = State.RUN;
 		}
 		return true;
-}
+} 
+public static long ITER = 0;
 private void renderRun(float delta) {
-	
+	ITER++;
 	checkOnAdmin();
 	
 	Time+=delta;
@@ -177,6 +207,7 @@ private void renderRun(float delta) {
 	game.batch.begin();
 	
 	backgroundDraw();
+	game.batch.draw(stasTexture,SS*116,SS*4,SS*4,SS*4);
 	game.batch.draw(hero.currentFrame, hero.getCoordX(), hero.getCoordY(), hero.getSizeX(), hero.getSizeY());
 	
 	for(int i = 0; i < platforms.size;i++) {
@@ -212,15 +243,46 @@ private void renderRun(float delta) {
 	}
 
 
+private int skillsShowIndex = 0;
+
+
 private void renderSkillMenu(float delta) {
 	Gdx.gl.glClearColor(0, 0.1f, 0, 1);
 	Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 	upDateSkill();
+	skillsShowIndex = 0;
+	checkInTargetStats("Power");
+	if(skillsShowIndex==0)
+		checkInTargetStats("Aghility");
+	if(skillsShowIndex==0)
+		checkInTargetStats("Intellegens");
+	
+	for(int i = 0; i<hero.msSkills.size(); i++) {
+		if(skillsShowIndex!=0)
+			break;
+		checkInTagret(i);
+	}
 	Gdx.input.setInputProcessor(stageSk);
-	stageSk.act(Math.min(Gdx.graphics.getDeltaTime(),1/60f));	
+	stageSk.act(Math.min(Gdx.graphics.getDeltaTime(),1/60f));
+	if(timeforClick <= 0) {
 	checkClick();
+	}
+	else timeforClick -= Gdx.graphics.getDeltaTime();
+	hero.getEntitieData().checkStats();
 	game.batch.begin();
 	game.batch.draw(gameMenuScreen, 0, 0, 1600, 900);
+	skillsFnt.draw(game.batch,"Free skillpoints:"+hero.getEntitieData().stats.getSkillPoints(), 550, 650);          
+	skillsFnt.draw(game.batch,"Free stats points:"+hero.getEntitieData().stats.getStatsPoints(), 1050, 650);
+	skillsFnt.draw(game.batch,"Power: "+hero.getEntitieData().stats.getPower(),1250,550);
+	skillsFnt.draw(game.batch,"Agility: "+hero.getEntitieData().stats.getAgility(),1250,450);
+	skillsFnt.draw(game.batch,"Intelligency: "+hero.getEntitieData().stats.getIntel(),1250,350);
+	skillsFnt.draw(game.batch,"Speed: "+hero.getEntitieData().stats.SPEED(),40,600);
+	skillsFnt.draw(game.batch,"Attack speed: "+hero.getEntitieData().stats.ATKSPEED(),40,550);
+	skillsFnt.draw(game.batch,"Damage: "+hero.getEntitieData().getDAMAGE(),40,500);
+	skillsFnt.draw(game.batch,"Hitpoints: "+hero.getEntitieData().getHITPOINT()+"/"+hero.getEntitieData().getMAXHITPOINT(),40,450);
+	skillsFnt.draw(game.batch,"Mana: "+hero.getEntitieData().getMANA()+"/"+hero.getEntitieData().getMAXMANA(),40,400);
+	skillsFnt.draw(game.batch,"Armor: "+hero.getEntitieData().getARMOR(),40,350);
+	skillsFnt.draw(game.batch, showableSkillsInformation[skillsShowIndex], 20, 50);
 	game.batch.end();
 	stageSk.draw();
 }
@@ -275,11 +337,7 @@ private void drawInterface() {
 			
 			triggerReaction();
 			
-			if(Gdx.input.isTouched()) {
-				Vector3 touchPos = new Vector3(Gdx.input.getX(),Gdx.input.getY(),0);
-				camera.unproject(touchPos);
-				Gdx.app.log("coords of touch "," "+((int)touchPos.x/SS)+" "+((int)touchPos.y/SS));
-			}
+			
 
 			damageMaster.update();
 			//Gdx.app.log("Hitpoints of ai and hero",""+ ai.getHITPOINT()+"  "+hero.getHITPOINT());
@@ -349,11 +407,11 @@ private void drawInterface() {
 		}
 		int currentMusic = 0;
 		private void playMusic() {
-		/*
-		 * if(!music[currentMusic].isPlaying()) { currentMusic++; if(currentMusic > 3 &&
-		 * (!TriggerListener.objects.get(113))) currentMusic = 0;
-		 * music[currentMusic].setVolume(0.3f); music[currentMusic].play(); }
-		 */
+		
+		  if(!music[currentMusic].isPlaying()) { currentMusic++; if(currentMusic > 3 &&
+		  (!TriggerListener.objects.get(113))) currentMusic = 0;
+		  music[currentMusic].setVolume(0.2f); music[currentMusic].play(); }
+		 
 		}
 		private void check_path() {
 			
@@ -362,8 +420,10 @@ private void drawInterface() {
 			 for(int i = 0; i< bots.size(); i++)
 				  if(bots.get(i).getCoordX() <=
 				  hero.getCoordX()) {bots.get(i).sideView = 1;} else { bots.get(i).sideView = -1;} 
-			 for(int i = 0; i< bots.get(0).bots.size(); i++)
-					if(bots.get(0).bots.get(i).getCoordX() <= hero.getCoordX()) {bots.get(0).bots.get(i).sideView = 1;} else { bots.get(0).bots.get(i).sideView = -1;}
+			 if(!bots.isEmpty())	
+				 if(bots.get(0).level == 3)
+					 	for(int i = 0; i< bots.get(0).bots.size(); i++)
+					 			if(bots.get(0).bots.get(i).getCoordX() <= hero.getCoordX()) {bots.get(0).bots.get(i).sideView = 1;} else { bots.get(0).bots.get(i).sideView = -1;}
 		
 		}
 		
@@ -407,29 +467,46 @@ private void drawInterface() {
 			backgroundSkills = assetManager.get("niceBG.jpg",Texture.class);
 			gameMenuScreen = assetManager.get("woodenBG.jpg",Texture.class);
 			//Player
-			hero = new Hero(new Vector2(150.0f,150.0f),new Vector2(SS*2,15*SS),assetManager);
+			hero = new Hero(new Vector2(150.0f,150.0f),new Vector2(SS*2,20*SS),assetManager);
 			//ai = new AiCustom(new Vector2(150.0f,150.0f) , new Vector2(900.0f,150.0f),2225);
 			//hero.setBody(world);
 			hero.setBody(rpgWorld);
 			hero.setFIlter();
 			for(int i = 0; i < bots.size(); i++)
 				bots.get(i).setBody(rpgWorld);
+			
+			//sorry slava
+			PolygonShape polygonsh = new PolygonShape();
+		/*
+		 * polygonsh.setAsBox(bots.get(23).getSizeX()*5f,bots.get(23).getSizeY()/2, new
+		 * Vector2(bots.get(23).getSizeX()/2,bots.get(23).getSizeY()/2),0);
+		 * bots.get(23).sensorFixture = bots.get(23).entitieBox.createFixture(polygonsh,
+		 * 0);
+		 */
+			polygonsh.setAsBox(bots.get(23).getSizeX()*7f,bots.get(23).getSizeY()/2, new Vector2(bots.get(23).getSizeX()/2,bots.get(23).getSizeY()/2),0);
+			bots.get(23).attackRange = bots.get(23).entitieBox.createFixture(polygonsh, 0);
+			polygonsh.dispose();
+			bots.get(23).attackRange.setUserData(bots.get(23).entitieData);
+			bots.get(23).attackRange.setSensor(true);
+			bots.get(23).attackRange.setFilterData(bots.get(23).attf);
+			
+			
 			def = new BodyDef();
 			def.type = BodyType.DynamicBody;
 			//Body entitieBox = world.createBody(def);
 			Body entitieBox = rpgWorld.world.createBody(def);
 			
 			createMapObjects();
-			//level = new Level1();
-			//hero.getEntitieData().setNewBuff(BuffType.MANA, 50, 15, true);
-			//hero.getEntitieData().setNewBuff(BuffType.HITPOINTS, 100f, 1000, true);
-			hero.getEntitieData().setNewBuff(BuffType.MANA, 100, 1000, true);
-
+			
 			sounds = new Sound[6];
 			for(int i=0;i<5;i++) {
 				sounds[i] = assetManager.get("trigger"+(i+1)+".wav",Sound.class);
 			}
 			sounds[5] = assetManager.get("trigger6.mp3",Sound.class);
+			gameOver = assetManager.get("gameover.wav",Sound.class);
+			startImage = assetManager.get("startImage.png",Texture.class);
+			
+	
 		}
 
 		/**
@@ -496,13 +573,19 @@ private void drawInterface() {
 			}
 			if(Gdx.input.isKeyPressed(Keys.R))
 				hero.getEntitieData().resetBuffs();
+			if(Gdx.input.isTouched()) {
+				Vector3 touchPos = new Vector3(Gdx.input.getX(),Gdx.input.getY(),0);
+				camera.unproject(touchPos);
+				hero.setCoord(new Vector2(touchPos.x,touchPos.y));
+				Gdx.app.log("coords of touch "," "+((int)touchPos.x/SS)+" "+((int)touchPos.y/SS));
+			}
 		}
 		
 		Stage stage;
 		Table table;
 		// buttons for menu
 		TextureRegion buttonUpTex, buttonDownTex, buttonOverTex;
-		TextButton btnCnt, btnExit, btnMenu;
+		TextButton btnCnt, btnExit, btnMenu, btnRestart;
 		TextButton.TextButtonStyle tbs;
 		TextureRegion[][] imageCollector;
 		Texture allSheets;
@@ -528,15 +611,17 @@ private void drawInterface() {
 			btnMenu = new TextButton("Menu", tbs);
 			btnExit = new TextButton("Exit", tbs);
 			btnCnt = new TextButton("Continue", tbs);
-			
+			btnRestart = new TextButton("Restart", tbs);
 			table = new Table();
 			
 			table.row();
-			table.add(btnCnt).width(350).height(300).padRight(900);
+			table.add(btnCnt).width(350).height(200).padRight(900);
 			table.row();
-			table.add(btnMenu).width(350).height(300).left();
+			table.add(btnRestart).width(350).height(200).padRight(900);
 			table.row();
-			table.add(btnExit).width(350).height(300).left();
+			table.add(btnMenu).width(350).height(200).left();
+			table.row();
+			table.add(btnExit).width(350).height(200).left();
 			table.setFillParent(true);
 			table.pack();
 			
@@ -557,6 +642,9 @@ private void drawInterface() {
 			}
 			if(btnMenu.isPressed()) {
 				game.setScreen(new LevelLoading(game, new MainMenuScreen(game)));
+			}
+			if(btnRestart.isPressed()) {
+				game.setScreen(new LevelLoading(game, new Level2(game)));
 			}
 		}
 		
@@ -835,23 +923,27 @@ private void drawInterface() {
 			
 			
 		}
+		public float timeforClick = 0;
  public void		checkClick() {
-	 if(btnStrange.isPressed()) {
+	 if(btnStrange.isPressed() ) {
 		 if(hero.getEntitieData().stats.getStatsPoints() > 0 ) {
-			hero.getEntitieData().addStats(BuffType.POWER, 1);
+			 timeforClick = 0.5f;
+			 hero.getEntitieData().addStats(BuffType.POWER, 1);
 			 hero.getEntitieData().stats.setStatsPoints(hero.getEntitieData().stats.getStatsPoints()-1);
 
 		 }
 		}
 	 if(btnAgility.isPressed()) {
 		 if(hero.getEntitieData().stats.getStatsPoints() > 0 ) {
-			hero.getEntitieData().addStats(BuffType.AGILITY, 1);
+			 timeforClick = 0.5f;
+			 hero.getEntitieData().addStats(BuffType.AGILITY, 1);
 			 hero.getEntitieData().stats.setStatsPoints(hero.getEntitieData().stats.getStatsPoints()-1);
 
 		 }
 		}
 	 if(btnIntellegence.isPressed()) {
 		 if(hero.getEntitieData().stats.getStatsPoints() > 0 ) {
+			 timeforClick = 0.5f;
 			hero.getEntitieData().addStats(BuffType.INTELLIGENCY, 1);
 			 hero.getEntitieData().stats.setStatsPoints(hero.getEntitieData().stats.getStatsPoints()-1);
 
@@ -943,6 +1035,7 @@ private void drawInterface() {
 	 if(btnHP.isPressed()) {
 		 if(hero.getEntitieData().stats.getSkillPoints() > 0  && !(hero.msSkills.get(3).isEarned)) {
 			 hero.msSkills.get(3).isEarned = true;
+	
 			 hero.getEntitieData().stats.setSkillPoints(hero.getEntitieData().stats.getSkillPoints()-1);
 
 		 Texture armOver = assetManager.get("HP_earned.png", Texture.class);
@@ -1194,6 +1287,110 @@ public void updateStateSkill(String name, int index) {
 			case 11 : {btnCooldown.setStyle(armst); break;}
 			}
 	}
+	
+	public void checkInTargetStats(String name) {
+		switch(name) {
+		case "Power" : {
+			if(btnStrange.isOver())
+				skillsShowIndex = 13;
+				break;
+		}
+		case "Aghility" : {
+			if(btnAgility.isOver())
+				skillsShowIndex = 14;
+				break;
+		}
+		case "Intellegens" : {
+			if(btnIntellegence.isOver())
+				skillsShowIndex = 15;
+				break;
+		}
+		default: skillsShowIndex = 0;
+		}
+	}
+	
+private String[] showableSkillsInformation = { "",
+		"With teleport you can use fast moving",
+		"triple attack allows quick and accurate strikes",
+		"magic attack allows you to cause damage without approaching the enemy",
+		"ability to recover hitpoints",
+		"ability to recover manapoints",
+		"ability to recover faster",
+		"slightly increases armor",
+		"increases armor",
+		"passively accelerates the restoration",
+		"passively accelerates the restoration",
+		"increases the duration of buffs",
+		"reduces cooldown of abilities",
+		"increases power",
+		"increases agility",
+		"increases intelligence"};
+public void	checkInTagret(int index) {
+	switch(index)
+	 {
+		case 0 : {
+			if(btnTeleport.isOver())
+				skillsShowIndex = index+1;
+				break;
+			}
+		case 1 : {
+		if(btnTripple.isOver())
+			skillsShowIndex = index+1;
+		break;
+		}
+		case 2 : {
+			if(btnMagic.isOver())
+				skillsShowIndex = index+1;
+			break;
+			}
+		case 3 : {
+			if(btnHP.isOver())
+				skillsShowIndex = index+1;
+			break;
+			}
+		case 4 : {
+			if(btnMana.isOver())
+				skillsShowIndex = index+1;
+			break;
+			}
+		case 5 : {
+			if(btnBuff.isOver())
+				skillsShowIndex = index+1;
+			break;
+			}
+		case 6 : {
+			if(btnArmor.isOver())
+				skillsShowIndex = index+1;
+			break;
+			}
+		case 7 : {
+			if(btnArmor2.isOver())
+				skillsShowIndex = index+1;
+			break;
+			}
+		case 8 : {
+			if(btnVampire.isOver())
+				skillsShowIndex = index+1;
+			break;
+			}
+		case 9 : {
+			if(btnRegen.isOver())
+				skillsShowIndex = index+1;
+			break;
+			}
+		case 10 : {
+			if(btnDuration.isOver())
+				skillsShowIndex = index+1;
+			break;
+			}
+		case 11 : {
+			if(btnCooldown.isOver())
+				skillsShowIndex = index+1;
+			break;
+			}
+		default: skillsShowIndex = 0;
+		}
+}
 		
 		
 		

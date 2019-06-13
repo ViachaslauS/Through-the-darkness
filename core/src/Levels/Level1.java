@@ -64,25 +64,20 @@ public class Level1 extends BaseLevel{
 	//@Override
 	public  void managerLoad() {
 		assetManager.load("Battleground1.png", Texture.class);
-		assetManager.load("Hero.png", Texture.class);
-		
+		assetManager.load("Hero.png", Texture.class);		
 		assetManager.load("1.mp3",Music.class);
 		assetManager.load("2.mp3",Music.class);
 		assetManager.load("3.mp3",Music.class);
 		assetManager.load("4.mp3",Music.class);
-		assetManager.load("5.mp3",Music.class);
-		
+		assetManager.load("5.mp3",Music.class);		
 		assetManager.load("attack1.wav",Sound.class);
 		assetManager.load("teleport.wav",Sound.class);
 		assetManager.load("attack2.wav",Sound.class);
 		assetManager.load("magic.wav",Sound.class);
-		assetManager.load("move.wav",Sound.class);
-		
+		assetManager.load("move.wav",Sound.class);		
 		assetManager.load("buttonclick.wav",Sound.class);
-		assetManager.load("gamebutton.wav",Sound.class);
-		
+		assetManager.load("gamebutton.wav",Sound.class);	
 		assetManager.load("dead.mp3",Sound.class);
-		
 		assetManager.load("gameover.wav",Sound.class);
 		assetManager.load("trigger1.wav",Sound.class);
 		assetManager.load("trigger2.wav",Sound.class);
@@ -90,10 +85,7 @@ public class Level1 extends BaseLevel{
 		assetManager.load("trigger4.wav",Sound.class);
 		assetManager.load("trigger5.wav",Sound.class);
 		assetManager.load("trigger6.mp3",Sound.class);
-		
-		
 		assetManager.load("skelet.wav",Sound.class);
-		
 		assetManager.load("dark_skills.png",Texture.class);
 		assetManager.load("niceBG.jpg",Texture.class);
 		assetManager.load("woodenBG.jpg",Texture.class);
@@ -143,7 +135,9 @@ public class Level1 extends BaseLevel{
 		assetManager.load("aghility_unearned.png", Texture.class);
 		assetManager.load("aghility_blocked.png", Texture.class);
 		assetManager.load("intellegens_unearned.png", Texture.class);
-		assetManager.load("intellegens_blocked.png", Texture.class);	
+		assetManager.load("intellegens_blocked.png", Texture.class);
+		assetManager.load("startImage.png",Texture.class);
+		assetManager.load("buffSound.wav",Sound.class);
 	}
 
 }

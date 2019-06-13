@@ -48,8 +48,8 @@ public class Hero  extends Entities{
 	private Sound attack1Sound;
 	private Sound attack2Sound;
 	private Sound shootSound;
+	private Sound buffSound;
 	
-	private Sound shift;
 	Animation<TextureRegion> currentAnimation;
 	Animation<TextureRegion>[] allAnimations;
 	
@@ -105,6 +105,8 @@ public class Hero  extends Entities{
 		skills = manager.get("dark_skills.png",Texture.class);
 		entitieData.isAi = false;
 		picParam();
+		
+		buffSound = manager.get("buffSound.wav",Sound.class);
 		
 		skillsLevel[0] = skillsLevel[1] = skillsLevel[2] = 1;
 		// filter
@@ -206,7 +208,7 @@ public class Hero  extends Entities{
 		 }
 		 else
 			 checkKeys();
-		 if(Gdx.input.isKeyPressed(Keys.D) || Gdx.input.isKeyPressed(Keys.RIGHT)) {   //move right
+		 if( Gdx.input.isKeyPressed(Keys.RIGHT)) {   //move right
 			 if(soundsDuration >= 0.4f && isEntitieGrounded()) {
 				 move.play(0.1f);
 				 soundsDuration = 0;
@@ -225,7 +227,7 @@ public class Hero  extends Entities{
 				entitieData.sideView = 1;
 				return;	
 			}
-			if(Gdx.input.isKeyPressed(Keys.A) || Gdx.input.isKeyPressed(Keys.LEFT)) {    //move left
+			if( Gdx.input.isKeyPressed(Keys.LEFT)) {    //move left
 				if(soundsDuration >= 0.4f && isEntitieGrounded()) {
 					 move.play(0.1f);
 					 soundsDuration = 0;
@@ -320,21 +322,21 @@ public class Hero  extends Entities{
 			msSkills.get(3).setCooldown();
 			currentAction = 6;
 			currentAnimation = buff1Animation;
-
+			buffSound.play(0.8f);
 			buff1();
 		}
 		if(Gdx.input.isKeyJustPressed(Keys.W) && msSkills.get(4).isEarned && msSkills.get(4).isAvailable ) {
 			msSkills.get(4).setCooldown();
 			currentAction = 7;
 			currentAnimation = buff2Animation;
-
+			buffSound.play(0.8f);
 			buff2();
 		}
 		if(Gdx.input.isKeyJustPressed(Keys.E) && msSkills.get(5).isEarned && msSkills.get(5).isAvailable ) {
 			msSkills.get(5).setCooldown();
 			currentAction = 8;
 			currentAnimation = buff3Animation;
-
+			buffSound.play(0.8f);
 			buff3();
 		}
 	}
@@ -413,6 +415,11 @@ public class Hero  extends Entities{
 		
 		if(currentFrame == currentAnimation.getKeyFrames()[2] && attackinInThisFrame!=2) {
 			if(entitieData.isAttacking == 2) {
+				if(!entitieData.setMANA(2.0f)) {
+					reset();
+					attackinInThisFrame = 0;
+					return;
+				}
 				attackinInThisFrame = 2;
 				entitieData.isAttacking = 0;
 				attack2Sound.play(0.2f);
@@ -422,6 +429,11 @@ public class Hero  extends Entities{
 		}
 		if(currentFrame == currentAnimation.getKeyFrames()[4] && attackinInThisFrame!=4) {
 			if(entitieData.isAttacking == 2) {
+				if(!entitieData.setMANA(2.0f)) {
+					reset();
+					attackinInThisFrame = 0;
+					return;
+				}
 				attackinInThisFrame = 4;
 				entitieData.isAttacking = 0;
 				attack2Sound.play(0.2f);
@@ -431,6 +443,11 @@ public class Hero  extends Entities{
 		}
 		if(currentFrame == currentAnimation.getKeyFrames()[6] && attackinInThisFrame!=6) {
 			if(entitieData.isAttacking == 2) {
+				if(!entitieData.setMANA(2.0f)) {
+					reset();
+					attackinInThisFrame = 0;
+					return;
+				}
 				attackinInThisFrame = 6;
 				entitieData.isAttacking = 0;
 				attack2Sound.play(0.2f);
@@ -466,7 +483,7 @@ public class Hero  extends Entities{
 		}
 		if(isEntitieGrounded()) {
 			isJump = true;
-			entitieBox.applyLinearImpulse(new Vector2(0,1450), entitieBox.getPosition(), true);
+			entitieBox.applyLinearImpulse(new Vector2(0,1250), entitieBox.getPosition(), true);
 		}
 		else
 			reset();

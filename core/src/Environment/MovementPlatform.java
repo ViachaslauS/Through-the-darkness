@@ -26,7 +26,7 @@ public class MovementPlatform extends Platform{
 		rightBorder = maxPos.x+size.x/2;
 		upBorder = maxPos.y+size.y/2;
 		
-		PhysicFixture.setFriction(1.0f);
+		PhysicFixture.setFriction(0.0f);
 		this.velocity = velocity;
 	
 	}
@@ -35,11 +35,21 @@ public class MovementPlatform extends Platform{
 	public void update(SpriteBatch batch) {
 		if(TriggerListener.objects.get(id)) {
 			Vector2 currentVelocity = new Vector2(velocity);
-			if(position.x + size.x/2 > rightBorder || position.x-size.x/2  < leftBorder)
+			if((position.x + size.x/2 > rightBorder || position.x-size.x/2  < leftBorder) && velocity.x!=0) {
+				if(position.x + size.x/2 > rightBorder)
+					position.x = rightBorder-size.x/2;
+				else
+					position.x = leftBorder+size.x/2;
 				currentVelocity.x = 0;
-			if(position.y + size.y/2 >upBorder || position.y-size.y/2 < downBorder)
+			}
+			if((position.y + size.y/2 >upBorder || position.y-size.y/2 < downBorder) && velocity.y!=0) {
+				if(position.y + size.y/2 >upBorder)
+					position.y = upBorder-size.y/2;
+				else
+					position.y = downBorder+size.y/2;
 				currentVelocity.y = 0;
-			if(currentVelocity.x == 0 && currentVelocity.y == 0) {
+			}
+			if((currentVelocity.x == 0 && velocity.x != 0) || (currentVelocity.y == 0 && velocity.y !=0)) {
 				sideMove *= -1;
 				currentVelocity = velocity;
 			}

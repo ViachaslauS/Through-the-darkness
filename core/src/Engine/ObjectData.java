@@ -90,7 +90,7 @@ public class ObjectData {
 	}
 	
 	public float getDAMAGE() {
-		return (DAMAGE+stats.DAMAGE())*skillDamage;
+		return (DAMAGE)*skillDamage+stats.DAMAGE();
 	}
 	
 	/**
@@ -138,10 +138,10 @@ public class ObjectData {
 
 	private void loadPref() {
 		
-		MAXHITPOINT = 100.0f * stats.MAXHP()*(isBoss? 10:1);
-		MAXMANA = 100.0f * stats.MAXMANA();
+		MAXHITPOINT = (100.0f + stats.MAXHP())*(isBoss? 10:1);
+		MAXMANA = 100.0f + stats.MAXMANA();
 		HITPOINT = preferences.getFloat("HITPOINT", MAXHITPOINT);
-		DAMAGE = preferences.getFloat("DAMAGE", 25.0f) * stats.DAMAGE();
+		DAMAGE = preferences.getFloat("DAMAGE", 25.0f);
 		ARMOR = preferences.getFloat("ARMOR", 0.0f);
 		checkARMOR();
 		MANA = preferences.getFloat("MANA", MAXMANA);
@@ -194,7 +194,9 @@ public class ObjectData {
 	/**
 	 *  check on max and min values
 	 */
-	private void checkStats() {
+	public void checkStats() {
+		MAXHITPOINT = (100.0f + stats.MAXHP())*(isBoss? 10:1);
+		MAXMANA = 100.0f + stats.MAXMANA();
 		if(HITPOINT > MAXHITPOINT)
 			HITPOINT = MAXHITPOINT;
 		//if(HITPOINT < 0)
@@ -260,14 +262,14 @@ public class ObjectData {
 
 
 	private void regenMANA() {
-		MANA += stats.MANAREG();
+		MANA += 1 + stats.MANAREG();
 	}
 
 	private void regenHP() {
 		if(HITPOINT<= 0 )
 			HITPOINT = 0;
 		else
-			HITPOINT += stats.HPREG();
+			HITPOINT += 1 + stats.HPREG();
 	}
 
 	private void checkARMOR() {

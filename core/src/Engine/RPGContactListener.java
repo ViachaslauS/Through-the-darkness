@@ -201,16 +201,16 @@ private void aiReact(ObjectData rec, ObjectData deal) {
 	@Override
 	public void postSolve(Contact contact, ContactImpulse impulse) {
 
-					if(contact.getFixtureA().getUserData()!= null && contact.getFixtureB().getUserData()!= null) {//___________________________________________
-						if(contact.getFixtureA().getUserData().getClass().getName().equals("Engine.DynamicObjectsData"))
-						{
-							notNearButton(contact.getFixtureA(),contact.getFixtureB());
-						}
-						if(contact.getFixtureB().getUserData().getClass().getName().equals("Engine.DynamicObjectsData"))
-						{
-							notNearButton(contact.getFixtureB(),contact.getFixtureA());
-						}
-					}
+//					if(contact.getFixtureA().getUserData()!= null && contact.getFixtureB().getUserData()!= null) {//___________________________________________
+//						if(contact.getFixtureA().getUserData().getClass().getName().equals("Engine.DynamicObjectsData"))
+//						{
+//							notNearButton(contact.getFixtureA(),contact.getFixtureB());
+//						}
+//						if(contact.getFixtureB().getUserData().getClass().getName().equals("Engine.DynamicObjectsData"))
+//						{
+//							notNearButton(contact.getFixtureB(),contact.getFixtureA());
+//						}
+//					}
 		//___________________________________________
 					
 	}

@@ -140,7 +140,7 @@ public class Level3Ai extends AiCustom {
 		if(bots.size() <= 3) {
 		bots.add(new Level1Ai(new Vector2(150.0f,150.0f) , new Vector2(this.getCoordX()-50,180.0f),1));
 		bots.add(new Level1Ai(new Vector2(150.0f,150.0f) , new Vector2(this.getCoordX()+ 50,180.0f),1));
-		for(int i = 0; i < bots.size(); i++)
+		for(int i = bots.size()-1; i > bots.size()-3; i--)
 			bots.get(i).setBody(rpgWorld);
 		isEnded3 = 2;
 		}

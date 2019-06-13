@@ -54,7 +54,7 @@ public class Bullet {
 		x += speed* deltaTime*sideView;
 		raznica =Math.abs(x - startX);
 		
-		if(raznica > 500) {
+		if(raznica > 1000) {
 			remove = true;
 		}
 		if(bulletData.shouldRemove)

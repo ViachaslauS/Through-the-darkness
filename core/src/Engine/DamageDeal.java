@@ -9,6 +9,7 @@ import com.badlogic.gdx.physics.box2d.WorldManifold;
 import com.badlogic.gdx.utils.Array;
 
 import Entities.Buff.BuffType;
+import Levels.BaseLevel;
 
 public class DamageDeal {
 
@@ -102,7 +103,7 @@ public class DamageDeal {
 			clickSound.play(0.4f);
 			TriggerListener.objects.set(button.id,!TriggerListener.objects.get(button.id)); 
 		}
-		if(button.isTrigger) {
+		if(button.isTrigger && !button.wasActivated) {
 			TriggerListener.objects.set(button.id,true); 
 		}
 		button.isNear = true;
@@ -138,26 +139,25 @@ public class DamageDeal {
 			ObjectData recData = (ObjectData) recDataFix.getUserData();
 			ObjectData dealData = (ObjectData) dealer.getUserData();
 			
-//			if(recData.isAi) {
-//				// recData.isAttacking = -2;
-//			 if(recData.isAttacking == -2) {
-//				 recData.attackTime = 0;
-//				 recData.isAttacking = -3;
-//				 dealData.setHitpoint(recData.getDAMAGE());
-//				 
-//			 }
-//			 else {
-//				 if(dealData.isAttacking == 1)
-//					 recData.shouldEvade = true;
-//			 }
-//			 
-//				 
-//			}
-//			 
+		if(recData.isAi) {
+			// recData.isAttacking = -2;
+		 if(recData.isAttacking == -2) {
+			 recData.attackTime = 0;
+				 recData.isAttacking = -3;
+				 dealData.setHitpoint(recData.getDAMAGE());				 
+			 }
+			 else {
+				 if(dealData.isAttacking == 1)
+					 recData.shouldEvade = true;
+			 }
+		 
+				 
+			}
+		 
 			if(dealData.isAi) {
 			//	dealData.isAttacking = -2;
 				if(dealData.isAttacking == -2) {
-					dealData.attackTime = 0;
+					//dealData.attackTime = 0;
 					dealData.isAttacking = -3;
 					recData.setHitpoint(dealData.getDAMAGE());
 					hitSound.play(0.3f);

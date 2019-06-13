@@ -11,6 +11,7 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 
+import Engine.DynamicObjectsData;
 import Engine.RPGWorld;
 import Engine.TriggerListener;
 
@@ -19,7 +20,8 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 
 public class Platform {
 	
-
+	public DynamicObjectsData myData;
+	
 	protected Vector2 position;
 	protected	Rectangle bounds;
 	protected	Body platformBox;

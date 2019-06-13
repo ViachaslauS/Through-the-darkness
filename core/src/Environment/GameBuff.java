@@ -10,17 +10,17 @@ import Engine.RPGWorld;
 
 public class GameBuff extends Trigger{
 	
-	Texture bufTexture;
+	//Texture bufTexture;
 
 	public GameBuff(int id,Vector2 pos, Vector2 size, RPGWorld rpgWorld) {
 		super(id, pos, size, rpgWorld,false);
-		bufTexture = new Texture(Gdx.files.internal("gemYellow.png"));
+		texture = new Texture(Gdx.files.internal("gemYellow.png"));
 	}
 	@Override
 	public void update(SpriteBatch batch) {
 		super.update(batch);
-		if(!wasActivated)
-			batch.draw(bufTexture,position.x - size.x/2,position.y - size.y/2,size.x,size.y);
+		if(!myData.wasActivated)
+			draw(batch);
 	}
 			
 }
