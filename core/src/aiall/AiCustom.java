@@ -399,7 +399,7 @@ public class AiCustom extends Entities {
 				entitieBox.setGravityScale(1000f);
 				entitieBox.setTransform(coordX, coordY, 0);
 				
-				physicsFixture.setFilterData(attf);
+				physicsFixture.setFilterData(f);
 			    sensorFixture.setFilterData(f);
 			    attackRange.setFilterData(attf);
 	}

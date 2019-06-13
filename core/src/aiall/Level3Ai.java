@@ -130,7 +130,7 @@ public class Level3Ai extends AiCustom {
 			DURATION +=Gdx.graphics.getDeltaTime();
 			frameFlip();
 			 if(currentFrame == currentAnimation.getKeyFrames()[7]) {
-				 if(entitieData.isAttacking != -3) entitieData.isAttacking = -3; }
+				 if(entitieData.isAttacking != -3) entitieData.isAttacking = -2; }
  
 			
 			return false;

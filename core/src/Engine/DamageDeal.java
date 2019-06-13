@@ -130,7 +130,9 @@ public class DamageDeal {
 		
 	}
 	else
-	if(deal.isAi && deal.isAttacking == 0){deal.isAttacking = -1;}
+	if(deal.isAi && deal.isAttacking == 0) {
+		deal.isAttacking = -1;
+		}
 		
 	}
 		
@@ -143,6 +145,7 @@ public class DamageDeal {
 			// recData.isAttacking = -2;
 		 if(recData.isAttacking == -2) {
 			 recData.attackTime = 0;
+			 hitSound.play(0.3f);
 				 recData.isAttacking = -3;
 				 dealData.setHitpoint(recData.getDAMAGE());				 
 			 }
@@ -158,9 +161,10 @@ public class DamageDeal {
 			//	dealData.isAttacking = -2;
 				if(dealData.isAttacking == -2) {
 					//dealData.attackTime = 0;
+					hitSound.play(0.3f);
 					dealData.isAttacking = -3;
 					recData.setHitpoint(dealData.getDAMAGE());
-					hitSound.play(0.3f);
+					
 				}
 				else {
 					if(dealData.isAttacking != -3) {

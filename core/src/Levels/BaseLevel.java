@@ -185,10 +185,10 @@ private boolean checkCurrentState() {
 		}
 		return true;
 } 
-public static long ITER = 0;
+
 private void renderRun(float delta) {
-	ITER++;
-	checkOnAdmin();
+	
+	//checkOnAdmin();
 	
 	Time+=delta;
 	Gdx.gl.glClearColor(0, 0.1f, 0, 1);
@@ -239,7 +239,7 @@ private void renderRun(float delta) {
 	// player interface is here
 	game.batch.end();
 	//debugRenderer.render(world, viewport.getCamera().combined);
-	debugRenderer.render(rpgWorld.world, viewport.getCamera().combined);
+	//debugRenderer.render(rpgWorld.world, viewport.getCamera().combined);
 	}
 
 

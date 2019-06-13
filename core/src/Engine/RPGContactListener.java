@@ -164,7 +164,7 @@ private void collisionWizard(Fixture receiver, Fixture dealer) {
 	ObjectData fixBData = recreate(dealer);
 	if(fixAData.isAttacking == -1 || fixBData.isAttacking == -1)
 		aiReact(fixAData, fixBData);
-		checkAi(fixAData,fixBData);
+		//checkAi(fixAData,fixBData);
 		
 	
 		

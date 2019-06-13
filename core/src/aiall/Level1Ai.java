@@ -20,11 +20,11 @@ public class Level1Ai extends AiCustom {
 	
 	@Override
 	protected boolean attack() {
-	 super.attack();
-	  
+	if( super.attack())
+	  return true;
 		
-		 if(currentFrame == currentAnimation.getKeyFrames()[7]) {
-		 if(entitieData.isAttacking == -1 ) entitieData.isAttacking = -2; }
+		 if(currentFrame == currentAnimation.getKeyFrames()[7] && entitieData.isAttacking!= -3) {
+		 if(currentAnimation == attack1Animation) entitieData.isAttacking = -2; }
 		 
 		
 		return false;

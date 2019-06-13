@@ -183,7 +183,7 @@ public class ObjectData {
 			regenMANA();
 		}
 		
-			updateBuffs(Gdx.graphics.getDeltaTime());
+		updateBuffs(Gdx.graphics.getDeltaTime());
 		checkStats();
 		return false;
 	}

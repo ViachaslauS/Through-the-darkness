@@ -62,7 +62,7 @@ public class PlayerStats {
 		return (float) (power*1.2);
 	}
 	public float DAMAGE() {
-		return (float) (power*0.5);
+		return (float) (power*0.25);
 	}
 	public float SPEED() {
 		return (float) (agility*1.01);

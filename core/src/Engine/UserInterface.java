@@ -54,15 +54,16 @@ public class UserInterface {
 	}
 	
 	public void draw(SpriteBatch batch, ObjectData objectData) {
-		coordsX = fullHP.getTexture().getWidth()+40;
+		coordsX = 390;
 		clearDrawed();
-		batch.draw(emptyBar, 20,900-70,objectData.MAXHITPOINT*3,70);
-		batch.draw(fullHP, 40,900-70,objectData.getHITPOINT()*3,70);
+		batch.draw(emptyBar, 20,900-70,350,70);
+		batch.draw(fullHP, 40,900-70,objectData.getHITPOINT()/objectData.getMAXHITPOINT()*350,70);
 		//batch.draw(fullHP, 20, Gdx.graphics.getHeight()-50,objectData.MAXHITPOINT*5,50, objectData.HITPOINT*5, 50, 1, 1, 0, false);
-		batch.draw(emptyBar,20,900-110,objectData.MAXMANA*3,70);
-		batch.draw(fullMANA, 40,900-110,objectData.MANA*3,70);
+		batch.draw(emptyBar,20,900-110,350,70);
+		batch.draw(fullMANA, 40,900-110,objectData.MANA/objectData.getMAXMANA()*350,70);
 		font.draw(batch,"Level "+objectData.stats.getLevel(),25,790);
 		font.draw(batch,""+objectData.stats.getExp()+"/"+objectData.stats.getMaxExp()+" Experience",25,755);
+		font.draw(batch,""+Gdx.graphics.getFramesPerSecond(),1550,30);
 		//batch.draw(attack1, 10, 10,75,75);
 		
 		//int counter = 0;

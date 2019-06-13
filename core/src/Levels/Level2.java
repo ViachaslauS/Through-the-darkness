@@ -269,7 +269,7 @@ public class Level2 extends BaseLevel{
 		platforms.add(new MovementPlatform(platforms.size, new Vector2(83*SS,15*SS+20), new Vector2(4*SS-15,1*SS-20), rpgWorld, new Vector2(83*SS,21*SS), new Vector2(0,70), true));
 		
 		//98 USE
-		platforms.add(new MovementPlatform(platforms.size, new Vector2(137*SS,14*SS), new Vector2(3*SS,1*SS), rpgWorld, new Vector2(153*SS,14*SS), new Vector2(90,0), false));
+		platforms.add(new MovementPlatform(platforms.size, new Vector2(137*SS,14*SS), new Vector2(3*SS,1*SS), rpgWorld, new Vector2(151*SS,14*SS), new Vector2(90,0), false));
 		platforms.add(new ActivatingObject(platforms.size, new Vector2(119*SS,24*SS), new Vector2(1*SS,1*SS), rpgWorld,platforms.size-1));
 		
 		//B1 
